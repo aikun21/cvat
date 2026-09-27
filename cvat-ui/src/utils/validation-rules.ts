@@ -7,6 +7,7 @@ import { RuleObject } from 'antd/lib/form';
 import { RuleType } from 'rc-field-form/lib/interface';
 
 import patterns from './validation-patterns';
+import { t } from 'cvat-i18n';
 
 export function validateUsername(_: RuleObject, value: string): Promise<void> {
     if (!value) {
@@ -28,7 +29,7 @@ const validationRules = {
     firstName: [
         {
             required: true,
-            message: 'Please specify a first name',
+            message: t('Please specify a first name'),
             pattern: patterns.validateName.pattern,
         },
     ],
@@ -36,7 +37,7 @@ const validationRules = {
     lastName: [
         {
             required: true,
-            message: 'Please specify a last name',
+            message: t('Please specify a last name'),
             pattern: patterns.validateName.pattern,
         },
     ],
@@ -44,18 +45,18 @@ const validationRules = {
     email: [
         {
             type: 'email' as RuleType,
-            message: 'The input is not valid E-mail!',
+            message: t('The input is not valid E-mail!'),
         },
         {
             required: true,
-            message: 'Please specify an email address',
+            message: t('Please specify an email address'),
         },
     ],
 
     userName: [
         {
             required: true,
-            message: 'Please specify a username',
+            message: t('Please specify a username'),
         },
         {
             validator: validateUsername,

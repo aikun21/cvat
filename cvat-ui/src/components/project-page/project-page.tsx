@@ -45,6 +45,7 @@ import ProjectTopBar from './top-bar';
 import {
     localStorageRecentKeyword, localStorageRecentCapacity, predefinedFilterValues, config,
 } from './project-tasks-filter-configuration';
+import { t as tr } from 'cvat-i18n';
 
 const core = getCore();
 
@@ -102,7 +103,7 @@ export default function ProjectPageComponent(): JSX.Element {
                 }).catch((error: Error) => {
                     if (mounted.current) {
                         notification.error({
-                            message: 'Could not receive the requested project from the server',
+                            message: tr('Could not receive the requested project from the server'),
                             description: error.toString(),
                         });
                     }
@@ -113,8 +114,8 @@ export default function ProjectPageComponent(): JSX.Element {
                 });
         } else {
             notification.error({
-                message: 'Could not receive the requested project from the server',
-                description: `Requested project id "${id}" is not valid`,
+                message: tr('Could not receive the requested project from the server'),
+                description: tr('Requested project id "{{id}}" is not valid', { id }),
             });
             setFetchingProject(false);
         }
@@ -238,7 +239,7 @@ export default function ProjectPageComponent(): JSX.Element {
             )}
         </BulkWrapper>
     ) : (
-        <Empty description='No tasks found' />
+        <Empty description={tr('No tasks found')} />
     );
 
     return (
@@ -275,7 +276,7 @@ export default function ProjectPageComponent(): JSX.Element {
                                     }}
                                     defaultValue={tasksQuery.search ?? ''}
                                     className='cvat-project-page-tasks-search-bar'
-                                    placeholder='Search ...'
+                                    placeholder={tr('Search ...')}
                                 />
                                 <ResourceSelectionInfo
                                     selectedCount={selectedCount}
@@ -341,7 +342,7 @@ export default function ProjectPageComponent(): JSX.Element {
                                         className='cvat-create-task-button'
                                         onClick={() => history.push(`/tasks/create?projectId=${id}`)}
                                     >
-                                        Create a new task
+                                        {tr('Create a new task')}
                                     </Button>
                                     <Button
                                         type='primary'
@@ -349,7 +350,7 @@ export default function ProjectPageComponent(): JSX.Element {
                                         className='cvat-create-multi-tasks-button'
                                         onClick={() => history.push(`/tasks/create?projectId=${id}&many=true`)}
                                     >
-                                        Create multi tasks
+                                        {tr('Create multi tasks')}
                                     </Button>
                                 </CvatDropdownMenuPaper>
                             )}

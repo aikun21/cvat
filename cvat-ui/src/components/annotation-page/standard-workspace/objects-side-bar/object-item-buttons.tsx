@@ -24,6 +24,7 @@ import { ObjectType, ShapeType } from 'cvat-core-wrapper';
 import {
     ObjectOutsideIcon, FirstIcon, LastIcon, PreviousIcon, NextIcon,
 } from 'icons';
+import { t } from 'cvat-i18n';
 
 interface Props {
     parentID: number | null;
@@ -111,7 +112,7 @@ function NavigateFirstKeyframe(props: Props): JSX.Element {
 function NavigatePrevKeyframe(props: Props): JSX.Element {
     const { prevKeyFrameShortcut, navigatePrevKeyframe } = props;
     return navigatePrevKeyframe ? (
-        <CVATTooltip title={`Go to previous keyframe ${prevKeyFrameShortcut}`}>
+        <CVATTooltip title={t('Go to previous keyframe {{prevKeyFrameShortcut}}', { prevKeyFrameShortcut })}>
             <Icon {...classes.prevKeyFrame} component={PreviousIcon} onClick={navigatePrevKeyframe} />
         </CVATTooltip>
     ) : (
@@ -122,7 +123,7 @@ function NavigatePrevKeyframe(props: Props): JSX.Element {
 function NavigateNextKeyframe(props: Props): JSX.Element {
     const { navigateNextKeyframe, nextKeyFrameShortcut } = props;
     return navigateNextKeyframe ? (
-        <CVATTooltip title={`Go to next keyframe ${nextKeyFrameShortcut}`}>
+        <CVATTooltip title={t('Go to next keyframe {{nextKeyFrameShortcut}}', { nextKeyFrameShortcut })}>
             <Icon {...classes.nextKeyFrame} component={NextIcon} onClick={navigateNextKeyframe} />
         </CVATTooltip>
     ) : (
@@ -144,7 +145,7 @@ function SwitchLock(props: Props): JSX.Element {
         locked, switchLockShortcut, lock, unlock,
     } = props;
     return (
-        <CVATTooltip title={`Switch lock property ${switchLockShortcut}`}>
+        <CVATTooltip title={t('Switch lock property {{switchLockShortcut}}', { switchLockShortcut })}>
             {locked ? (
                 <LockFilled {...classes.lock.enabled} onClick={unlock} />
             ) : (
@@ -161,7 +162,7 @@ function SwitchOccluded(props: Props): JSX.Element {
 
     const style = locked ? disabledStyle : {};
     return (
-        <CVATTooltip title={`Switch occluded property ${switchOccludedShortcut}`}>
+        <CVATTooltip title={t('Switch occluded property {{switchOccludedShortcut}}', { switchOccludedShortcut })}>
             {occluded ? (
                 <TeamOutlined
                     {...classes.occluded.enabled}
@@ -186,7 +187,7 @@ function SwitchPinned(props: Props): JSX.Element {
 
     const style = locked ? disabledStyle : {};
     return (
-        <CVATTooltip title={`Switch pinned property ${switchPinnedShortcut}`}>
+        <CVATTooltip title={t('Switch pinned property {{switchPinnedShortcut}}', { switchPinnedShortcut })}>
             {pinned ? (
                 <PushpinFilled
                     {...classes.pinned.enabled}
@@ -211,7 +212,7 @@ function SwitchHidden(props: Props): JSX.Element {
 
     const style = hiddenDisabled || locked ? disabledStyle : {};
     return (
-        <CVATTooltip title={`Switch hidden property ${switchHiddenShortcut}`}>
+        <CVATTooltip title={t('Switch hidden property {{switchHiddenShortcut}}', { switchHiddenShortcut })}>
             {hidden ? (
                 <EyeInvisibleFilled
                     {...classes.hidden.enabled}
@@ -236,7 +237,7 @@ function SwitchOutside(props: Props): JSX.Element {
 
     const style = outsideDisabled || locked ? disabledStyle : {};
     return (
-        <CVATTooltip title={`Switch outside property ${switchOutsideShortcut}`}>
+        <CVATTooltip title={t('Switch outside property {{switchOutsideShortcut}}', { switchOutsideShortcut })}>
             {outside ? (
                 <Icon
                     {...classes.outside.enabled}
@@ -262,7 +263,7 @@ function SwitchKeyframe(props: Props): JSX.Element {
 
     const style = keyframeDisabled || locked ? disabledStyle : {};
     return (
-        <CVATTooltip title={`Switch keyframe property ${switchKeyFrameShortcut}`}>
+        <CVATTooltip title={t('Switch keyframe property {{switchKeyFrameShortcut}}', { switchKeyFrameShortcut })}>
             {keyframe ? (
                 <StarFilled
                     style={style}

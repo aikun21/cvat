@@ -31,6 +31,7 @@ import OrganizationSelector from 'components/selectors/organization-selector';
 import { confirmTransferModal } from 'utils/modals';
 import { makeBulkOperationAsync } from 'actions/bulk-actions';
 import TaskActionsItems from './actions-menu-items';
+import { t } from 'cvat-i18n';
 
 interface Props {
     taskInstance: Task;
@@ -87,8 +88,8 @@ function TaskActionsComponent(props: Readonly<Props>): JSX.Element {
     const onMergeConsensusJobs = useCallback(() => {
         if (taskInstance.consensusEnabled) {
             Modal.confirm({
-                title: 'The consensus jobs will be merged',
-                content: 'Existing annotations in parent jobs will be updated. Continue?',
+                title: t('The consensus jobs will be merged'),
+                content: t('Existing annotations in parent jobs will be updated. Continue?'),
                 className: 'cvat-modal-confirm-consensus-merge-task',
                 onOk: () => {
                     dispatch(mergeConsensusJobsAsync(taskInstance));
@@ -97,7 +98,7 @@ function TaskActionsComponent(props: Readonly<Props>): JSX.Element {
                     type: 'primary',
                     danger: true,
                 },
-                okText: 'Merge',
+                okText: t('Merge'),
             });
         }
     }, [taskInstance.consensusEnabled, taskInstance]);
@@ -151,19 +152,15 @@ function TaskActionsComponent(props: Readonly<Props>): JSX.Element {
                     await dispatch(updateTaskAsync(task, { assignee }));
                 }
             },
-            (task, idx, total) => `Updating assignee for task #${task.id} (${idx + 1}/${total})`,
+            (task, idx, total) => t('Updating assignee for task #{{id}} ({{value}}/{{total}})', { id: task.id, value: idx + 1, total }),
         ));
     }, [taskInstance, stopEditField, dispatch, collectObjectsForBulkUpdate]);
 
     const onDeleteTask = useCallback(() => {
         const tasksToDelete = currentTasks.filter((task) => selectedIds.includes(task.id));
         Modal.confirm({
-            title: isBulkMode ?
-                `Delete ${tasksToDelete.length} selected tasks` :
-                `The task ${taskInstance.id} will be deleted`,
-            content: isBulkMode ?
-                'All related data (images, annotations) for all selected tasks will be lost. Continue?' :
-                'All related data (images, annotations) will be lost. Continue?',
+            title: isBulkMode ? t('Delete {{length}} selected tasks', { length: tasksToDelete.length }) : t('The task {{id}} will be deleted', { id: taskInstance.id }),
+            content: isBulkMode ? t('All related data (images, annotations) for all selected tasks will be lost. Continue?') : t('All related data (images, annotations) will be lost. Continue?'),
             className: 'cvat-modal-confirm-delete-task',
             onOk: () => {
                 dispatch(makeBulkOperationAsync(
@@ -171,14 +168,14 @@ function TaskActionsComponent(props: Readonly<Props>): JSX.Element {
                     async (task) => {
                         await dispatch(deleteTaskAsync(task));
                     },
-                    (task, idx, total) => `Deleting task #${task.id} (${idx + 1}/${total})`,
+                    (task, idx, total) => t('Deleting task #{{id}} ({{value}}/{{total}})', { id: task.id, value: idx + 1, total }),
                 ));
             },
             okButtonProps: {
                 type: 'primary',
                 danger: true,
             },
-            okText: isBulkMode ? 'Delete selected' : 'Delete',
+            okText: isBulkMode ? t('Delete selected') : t('Delete'),
         });
     }, [taskInstance, currentTasks, selectedIds, isBulkMode]);
 
@@ -201,7 +198,7 @@ function TaskActionsComponent(props: Readonly<Props>): JSX.Element {
                     task.organizationId = newOrganization?.id ?? null;
                     await dispatch(updateTaskAsync(task, {}, ResourceUpdateTypes.UPDATE_ORGANIZATION));
                 },
-                (task, idx, total) => `Updating organization for task #${task.id} (${idx + 1}/${total})`,
+                (task, idx, total) => t('Updating organization for task #{{id}} ({{value}}/{{total}})', { id: task.id, value: idx + 1, total }),
             )).then((processedCount: number) => {
                 if (processedCount) {
                     // as for some tasks org has changed

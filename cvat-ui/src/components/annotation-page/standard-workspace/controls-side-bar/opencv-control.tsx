@@ -38,6 +38,7 @@ import { enableImageFilter as enableImageFilterAction, disableImageFilter as dis
 import { ImageFilter, ImageFilterAlias, hasFilter } from 'utils/image-processing';
 import { openAnnotationsActionModal } from 'components/annotation-page/annotations-actions/annotations-actions-modal';
 import withVisibilityHandling from './handle-popover-visibility';
+import { t } from 'cvat-i18n';
 
 interface Props {
     labels: any[];
@@ -283,7 +284,7 @@ class OpenCVControlComponent extends React.PureComponent<Props & DispatchToProps
         } catch (error: any) {
             notification.error({
                 description: error.toString(),
-                message: 'OpenCV.js processing error occurred',
+                message: t('OpenCV.js processing error occurred'),
                 className: 'cvat-notification-notice-opencv-processing-error',
             });
         }
@@ -329,7 +330,7 @@ class OpenCVControlComponent extends React.PureComponent<Props & DispatchToProps
         } catch (error: any) {
             notification.error({
                 description: error.toString(),
-                message: 'Could not initialize OpenCV library',
+                message: t('Could not initialize OpenCV library'),
             });
             this.setState({
                 initializationError: true,
@@ -356,7 +357,7 @@ class OpenCVControlComponent extends React.PureComponent<Props & DispatchToProps
                 </Row>
                 <Row justify='start' className='cvat-opencv-drawing-tools'>
                     <Col>
-                        <CVATTooltip title='Intelligent scissors' className='cvat-opencv-drawing-tool'>
+                        <CVATTooltip title={t('Intelligent scissors')} className='cvat-opencv-drawing-tool'>
                             <Button
                                 className='cvat-opencv-scissors-tool-button'
                                 onClick={() => {
@@ -389,7 +390,7 @@ class OpenCVControlComponent extends React.PureComponent<Props & DispatchToProps
         return (
             <Row justify='start'>
                 <Col>
-                    <CVATTooltip title='Histogram equalization' className='cvat-opencv-image-tool'>
+                    <CVATTooltip title={t('Histogram equalization')} className='cvat-opencv-image-tool'>
                         <Button
                             className={
                                 hasFilter(filters, ImageFilterAlias.HISTOGRAM_EQUALIZATION) ?
@@ -424,7 +425,7 @@ class OpenCVControlComponent extends React.PureComponent<Props & DispatchToProps
                 <Row justify='center' align='middle' className='cvat-opencv-tracker-content'>
                     <Col>
                         <Text type='warning' className='cvat-text-color'>
-                            No available trackers found
+                            {t('No available trackers found')}
                         </Text>
                     </Col>
                 </Row>
@@ -434,12 +435,12 @@ class OpenCVControlComponent extends React.PureComponent<Props & DispatchToProps
             <>
                 <Row justify='start'>
                     <Col className='cvat-opencv-tracker-help-message'>
-                        <Alert type='info' message='The tracker will be applied to drawn rectangles' />
+                        <Alert type='info' message={t('The tracker will be applied to drawn rectangles')} />
                     </Col>
                 </Row>
                 <Row justify='start'>
                     <Col>
-                        <Text className='cvat-text-color'>Tracker</Text>
+                        <Text className='cvat-text-color'>{t('Tracker')}</Text>
                     </Col>
                 </Row>
                 <Row align='middle' justify='center'>
@@ -472,7 +473,7 @@ class OpenCVControlComponent extends React.PureComponent<Props & DispatchToProps
                                 }
                             }}
                         >
-                            Track
+                            {t('Track')}
                         </Button>
                     </Col>
                 </Row>
@@ -488,7 +489,7 @@ class OpenCVControlComponent extends React.PureComponent<Props & DispatchToProps
                 <Row justify='start'>
                     <Col>
                         <Text className='cvat-text-color' strong>
-                            OpenCV
+                            {t('OpenCV')}
                         </Text>
                     </Col>
                 </Row>
@@ -497,17 +498,17 @@ class OpenCVControlComponent extends React.PureComponent<Props & DispatchToProps
                         tabBarGutter={8}
                         items={[{
                             key: 'drawing',
-                            label: 'Drawing',
+                            label: t('Drawing'),
                             children: this.renderDrawingContent(),
                             className: 'cvat-opencv-control-tabpane',
                         }, {
                             key: 'image',
-                            label: 'Image',
+                            label: t('Image'),
                             children: this.renderImageContent(),
                             className: 'cvat-opencv-control-tabpane',
                         }, {
                             key: 'tracking',
-                            label: 'Tracking',
+                            label: t('Tracking'),
                             children: this.renderTrackingContent(),
                             className: 'cvat-opencv-control-tabpane',
                         }]}
@@ -517,12 +518,12 @@ class OpenCVControlComponent extends React.PureComponent<Props & DispatchToProps
                         <Col>
                             {
                                 initializationProgress >= 0 ?
-                                    <Text>OpenCV is loading</Text> : (
+                                    <Text>{t('OpenCV is loading')}</Text> : (
                                         <Button
                                             className='cvat-opencv-initialization-button'
                                             onClick={() => { this.initializeOpenCV(); }}
                                         >
-                                            Reload OpenCV
+                                            {t('Reload OpenCV')}
                                         </Button>
                                     )
                             }
@@ -592,7 +593,7 @@ class OpenCVControlComponent extends React.PureComponent<Props & DispatchToProps
                         }
                     }}
                 >
-                    <CVATTooltip title='OpenCV tools' placement='right'>
+                    <CVATTooltip title={t('OpenCV tools')} placement='right'>
                         <Icon {...dynamicIconProps} component={OpenCVIcon} />
                     </CVATTooltip>
                 </CustomPopover>

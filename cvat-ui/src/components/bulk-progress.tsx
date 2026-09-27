@@ -12,6 +12,7 @@ import { CombinedState } from 'reducers';
 import { resetErrors } from 'actions/notification-actions';
 import { makeBulkOperationAsync, bulkActions } from 'actions/bulk-actions';
 import CVATMarkdown from './common/cvat-markdown';
+import { t } from 'cvat-i18n';
 
 export default function BulkProgress(): JSX.Element | null {
     const dispatch = useDispatch();
@@ -23,7 +24,7 @@ export default function BulkProgress(): JSX.Element | null {
     }));
 
     const percent = status?.percent ?? 0;
-    const message = status?.message ?? 'Processing...';
+    const message = status?.message ?? t('Processing...');
 
     const handleRetry = (): void => {
         if (bulkError?.retryPayload) {
@@ -39,12 +40,10 @@ export default function BulkProgress(): JSX.Element | null {
             <>
                 {remainingItemsCount > 0 ? (
                     <>
-                        Some items failed to process. You can retry the operation for the remaining
+                        {t('Some items failed to process. You can retry the operation for the remaining')}
                         {` ${remainingItemsCount} items.`}
                     </>
-                ) : (
-                    'An error occurred during the bulk operation.'
-                )}
+                ) : (t('An error occurred during the bulk operation.'))}
                 {remainingItemsCount > 0 && (
                     <>
                         <br />
@@ -56,7 +55,7 @@ export default function BulkProgress(): JSX.Element | null {
                                 handleRetry();
                             }}
                         >
-                            Retry
+                            {t('Retry')}
                         </Button>
                     </>
                 )}
@@ -87,7 +86,7 @@ export default function BulkProgress(): JSX.Element | null {
                 onClick={() => dispatch(bulkActions.cancelBulkAction())}
                 type='primary'
             >
-                Cancel
+                {t('Cancel')}
             </Button>
         </div>
     );

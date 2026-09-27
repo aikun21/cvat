@@ -14,6 +14,7 @@ import Text from 'antd/lib/typography/Text';
 
 import CVATTooltip from 'components/common/cvat-tooltip';
 import { layerDragID } from './index';
+import { t } from 'cvat-i18n';
 
 interface LayerHeaderProps {
     zOrder: number;
@@ -43,8 +44,8 @@ function LayerHeader(props: LayerHeaderProps): JSX.Element {
         ...(!visible ? ['cvat-objects-sidebar-z-layer-mark-invisible'] : []),
     ].join(' ');
 
-    const visibilityTooltip = `${visible ? 'Hide' : 'Show'} layer. Hold Shift when clicking to apply for lower layers`;
-    const selectLayerTooltip = selected ? 'Current layer' : 'Set as current layer';
+    const visibilityTooltip = t('{{value}} layer. Hold Shift when clicking to apply for lower layers', { value: visible ? 'Hide' : 'Show' });
+    const selectLayerTooltip = selected ? t('Current layer') : t('Set as current layer');
     return (
         <div
             ref={setNodeRef}
@@ -52,7 +53,7 @@ function LayerHeader(props: LayerHeaderProps): JSX.Element {
             style={style}
         >
             <div>
-                <CVATTooltip title={collapsed ? 'Expand layer' : 'Collapse layer'}>
+                <CVATTooltip title={collapsed ? t('Expand layer') : t('Collapse layer')}>
                     <Button
                         className='cvat-objects-sidebar-z-layer-collapse-button'
                         type='text'
@@ -72,7 +73,7 @@ function LayerHeader(props: LayerHeaderProps): JSX.Element {
                         onClick={(): void => selectLayer(zOrder)}
                     />
                 </CVATTooltip>
-                <CVATTooltip title='Drag layer'>
+                <CVATTooltip title={t('Drag layer')}>
                     <Button
                         {...attributes}
                         {...listeners}

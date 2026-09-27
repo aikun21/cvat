@@ -16,6 +16,7 @@ import CVATTooltip from 'components/common/cvat-tooltip';
 import { CombinedState } from 'reducers';
 import { DimensionType } from 'cvat-core-wrapper';
 import { showStatistics } from 'actions/annotation-actions';
+import { t } from 'cvat-i18n';
 
 interface StateToProps {
     visible: boolean;
@@ -118,7 +119,7 @@ function StatisticsModalComponent(props: StateToProps & DispatchToProps): JSX.El
 
     rows.push({
         key: '___total',
-        label: 'Total',
+        label: t('Total'),
         rectangle: `${data.total.rectangle.shape} / ${data.total.rectangle.track}`,
         polygon: `${data.total.polygon.shape} / ${data.total.polygon.track}`,
         polyline: `${data.total.polyline.shape} / ${data.total.polyline.track}`,
@@ -134,7 +135,7 @@ function StatisticsModalComponent(props: StateToProps & DispatchToProps): JSX.El
     });
 
     const makeShapesTracksTitle = (title: string): JSX.Element => (
-        <CVATTooltip title='Shapes / Tracks'>
+        <CVATTooltip title={t('Shapes / Tracks')}>
             <Text strong>{title}</Text>
             <QuestionCircleOutlined className='cvat-info-circle-icon' />
         </CVATTooltip>
@@ -142,7 +143,7 @@ function StatisticsModalComponent(props: StateToProps & DispatchToProps): JSX.El
 
     const columns = [
         {
-            title: <Text strong> Label </Text>,
+            title: <Text strong> {t('Label')}{' '}</Text>,
             dataIndex: 'label',
             render: (text: string) => {
                 const sep = '{{cvat.skeleton.lbl.sep}}';
@@ -188,7 +189,7 @@ function StatisticsModalComponent(props: StateToProps & DispatchToProps): JSX.El
             width: 100,
         },
         {
-            title: makeShapesTracksTitle('Ellipse'),
+            title: makeShapesTracksTitle(t('Ellipse')),
             dataIndex: 'ellipse',
             key: 'ellipse',
             width: 100,
@@ -206,33 +207,33 @@ function StatisticsModalComponent(props: StateToProps & DispatchToProps): JSX.El
             width: 100,
         },
         {
-            title: makeShapesTracksTitle('Mask'),
+            title: makeShapesTracksTitle(t('Mask')),
             dataIndex: 'mask',
             key: 'mask',
             width: 100,
         },
         {
-            title: <Text strong> Tag </Text>,
+            title: <Text strong> {t('Tag')}{' '}</Text>,
             dataIndex: 'tag',
             key: 'tag',
             width: 100,
         },
         {
-            title: <Text strong> Manually </Text>,
+            title: <Text strong> {t('Manually')}{' '}</Text>,
             dataIndex: 'manually',
             key: 'manually',
             fixed: 'right',
             width: 100,
         },
         {
-            title: <Text strong> Interpolated </Text>,
+            title: <Text strong> {t('Interpolated')}{' '}</Text>,
             dataIndex: 'interpolated',
             key: 'interpolated',
             fixed: 'right',
             width: 100,
         },
         {
-            title: <Text strong> Total </Text>,
+            title: <Text strong> {t('Total')}{' '}</Text>,
             dataIndex: 'total',
             key: 'total',
             fixed: 'right',
@@ -242,7 +243,7 @@ function StatisticsModalComponent(props: StateToProps & DispatchToProps): JSX.El
 
     const columns3D = [
         {
-            title: <Text strong> Label </Text>,
+            title: <Text strong> {t('Label')}{' '}</Text>,
             dataIndex: 'label',
             key: 'label',
         },
@@ -252,7 +253,7 @@ function StatisticsModalComponent(props: StateToProps & DispatchToProps): JSX.El
             key: 'cuboid',
         },
         {
-            title: <Text strong> Total </Text>,
+            title: <Text strong> {t('Total')}{' '}</Text>,
             dataIndex: 'total',
             key: 'total',
         },
@@ -263,31 +264,31 @@ function StatisticsModalComponent(props: StateToProps & DispatchToProps): JSX.El
             <div className='cvat-job-info-modal-window'>
                 <Row justify='start'>
                     <Col>
-                        <Text className='cvat-text'>Overview</Text>
+                        <Text className='cvat-text'>{t('Overview')}</Text>
                     </Col>
                 </Row>
                 <Row justify='start'>
                     <Col span={4}>
                         <Text strong className='cvat-text'>
-                            Assignee
+                            {t('Assignee')}
                         </Text>
                         <Text className='cvat-text'>{assignee}</Text>
                     </Col>
                     <Col span={4}>
                         <Text strong className='cvat-text'>
-                            Start frame
+                            {t('Start frame')}
                         </Text>
                         <Text className='cvat-text'>{startFrame}</Text>
                     </Col>
                     <Col span={4}>
                         <Text strong className='cvat-text'>
-                            Stop frame
+                            {t('Stop frame')}
                         </Text>
                         <Text className='cvat-text'>{stopFrame}</Text>
                     </Col>
                     <Col span={4}>
                         <Text strong className='cvat-text'>
-                            Frames
+                            {t('Frames')}
                         </Text>
                         <Text className='cvat-text'>{stopFrame - startFrame + 1}</Text>
                     </Col>
@@ -296,7 +297,7 @@ function StatisticsModalComponent(props: StateToProps & DispatchToProps): JSX.El
                     <Row justify='start' className='cvat-job-info-bug-tracker'>
                         <Col>
                             <Text strong className='cvat-text'>
-                                Bug tracker
+                                {t('Bug tracker')}
                             </Text>
                             <a href={bugTracker}>{bugTracker}</a>
                         </Col>
@@ -304,7 +305,7 @@ function StatisticsModalComponent(props: StateToProps & DispatchToProps): JSX.El
                 )}
                 <Row justify='space-around' className='cvat-job-info-statistics'>
                     <Col span={24}>
-                        <Text className='cvat-text'>Annotations statistics</Text>
+                        <Text className='cvat-text'>{t('Annotations statistics')}</Text>
                         <Table
                             scroll={{ x: 'max-content', y: 400 }}
                             bordered

@@ -8,6 +8,7 @@ import Icon from '@ant-design/icons';
 import { FitIcon } from 'icons';
 import { Canvas } from 'cvat-canvas-wrapper';
 import CVATTooltip from 'components/common/cvat-tooltip';
+import { t } from 'cvat-i18n';
 
 export interface Props {
     canvasInstance: Canvas;
@@ -17,7 +18,7 @@ function FitControl(props: Props): JSX.Element {
     const { canvasInstance } = props;
 
     return (
-        <CVATTooltip title='Fit the image [Double Click]' placement='right'>
+        <CVATTooltip title={t('Fit the image [Double Click]')} placement='right'>
             <Icon className='cvat-fit-control' component={FitIcon} onClick={(): void => canvasInstance.fit()} />
         </CVATTooltip>
     );

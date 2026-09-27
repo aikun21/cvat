@@ -4,25 +4,26 @@
 
 import { Config } from '@react-awesome-query-builder/antd';
 import asyncFetchUsers from 'components/resource-sorting-filtering/request-users';
+import { t } from 'cvat-i18n';
 
 export const config: Partial<Config> = {
     fields: {
         state: {
-            label: 'State',
+            label: t('State'),
             type: 'select',
             operators: ['select_any_in', 'select_equals'], // ['select_equals', 'select_not_equals', 'select_any_in', 'select_not_any_in']
             valueSources: ['value'],
             fieldSettings: {
                 listValues: [
                     { value: 'new', title: 'new' },
-                    { value: 'in progress', title: 'in progress' },
+                    { value: 'in progress', title: t('in progress') },
                     { value: 'rejected', title: 'rejected' },
                     { value: 'completed', title: 'completed' },
                 ],
             },
         },
         stage: {
-            label: 'Stage',
+            label: t('Stage'),
             type: 'select',
             operators: ['select_any_in', 'select_equals'],
             valueSources: ['value'],
@@ -35,7 +36,7 @@ export const config: Partial<Config> = {
             },
         },
         dimension: {
-            label: 'Dimension',
+            label: t('Dimension'),
             type: 'select',
             operators: ['select_equals'],
             valueSources: ['value'],
@@ -47,7 +48,7 @@ export const config: Partial<Config> = {
             },
         },
         assignee: {
-            label: 'Assignee',
+            label: t('Assignee'),
             type: 'select',
             valueSources: ['value'],
             operators: ['select_equals'],
@@ -58,32 +59,32 @@ export const config: Partial<Config> = {
             },
         },
         updatedDate: {
-            label: 'Last updated',
+            label: t('Last updated'),
             type: 'datetime',
             operators: ['between', 'greater', 'greater_or_equal', 'less', 'less_or_equal'],
         },
         type: {
-            label: 'Type',
+            label: t('Type'),
             type: 'select',
             operators: ['select_equals'],
             valueSources: ['value'],
             fieldSettings: {
                 listValues: [
-                    { value: 'annotation', title: 'Annotation' },
-                    { value: 'ground_truth', title: 'Ground truth' },
-                    { value: 'consensus_replica', title: 'Consensus replica' },
+                    { value: 'annotation', title: t('Annotation') },
+                    { value: 'ground_truth', title: t('Ground truth') },
+                    { value: 'consensus_replica', title: t('Consensus replica') },
                 ],
             },
         },
         id: {
-            label: 'ID',
+            label: t('ID'),
             type: 'number',
             operators: ['equal', 'between', 'greater', 'greater_or_equal', 'less', 'less_or_equal'],
             fieldSettings: { min: 0 },
             valueSources: ['value'],
         },
         parent_job_id: {
-            label: 'Parent ID',
+            label: t('Parent ID'),
             type: 'number',
             operators: ['is_empty', 'is_not_empty', 'equal', 'between', 'greater', 'greater_or_equal', 'less', 'less_or_equal'],
             fieldSettings: { min: 0 },

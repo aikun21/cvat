@@ -21,6 +21,7 @@ import SecurityContent from './security-content/security-content';
 import PrivacyConsentCard from './profile-content/privacy-consent-card';
 
 import './styles.scss';
+import { t } from 'cvat-i18n';
 
 const { Title } = Typography;
 const supportedTabs = ['profile', 'security', 'privacy-consent'];
@@ -38,17 +39,17 @@ function ProfilePageComponent(): JSX.Element {
         {
             key: 'profile',
             icon: <UserOutlined />,
-            label: <Text className='cvat-profile-page-menu-item-profile'>Profile</Text>,
+            label: <Text className='cvat-profile-page-menu-item-profile'>{t('Profile')}</Text>,
         },
         {
             key: 'security',
             icon: <LockOutlined />,
-            label: <Text className='cvat-profile-page-menu-item-security'>Security</Text>,
+            label: <Text className='cvat-profile-page-menu-item-security'>{t('Security')}</Text>,
         },
         {
             key: 'privacy-consent',
             icon: <BellOutlined />,
-            label: <Text className='cvat-profile-page-menu-item-privacy-consent'>Privacy & consent</Text>,
+            label: <Text className='cvat-profile-page-menu-item-privacy-consent'>{t('Privacy & consent')}</Text>,
         },
     ];
 
@@ -84,7 +85,7 @@ function ProfilePageComponent(): JSX.Element {
             <Row justify='center' align='middle'>
                 <Col {...dimensions}>
                     <Title level={1} className='cvat-profile-page-welcome'>
-                        {`Welcome, ${user?.username}`}
+                        {t('Welcome, {{username}}', { username: user?.username })}
                     </Title>
                 </Col>
             </Row>

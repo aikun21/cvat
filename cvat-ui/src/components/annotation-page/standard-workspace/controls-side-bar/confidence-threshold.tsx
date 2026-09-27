@@ -7,6 +7,7 @@ import ReactDOM from 'react-dom';
 import Text from 'antd/lib/typography/Text';
 import Slider from 'antd/lib/slider';
 import { Col, Row } from 'antd/lib/grid';
+import { t } from 'cvat-i18n';
 
 interface Props {
     thresholdValue: number;
@@ -35,7 +36,7 @@ function ConfidenceThreshold(props: Props): React.ReactPortal | null {
                         onChange={onChange}
                     />
                 </Col>
-                <Text type='secondary'>minimum confidence filter</Text>
+                <Text type='secondary'>{t('minimum confidence filter')}</Text>
             </Row>,
             target,
         ) :

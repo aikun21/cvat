@@ -89,6 +89,7 @@ import BulkProgress from './bulk-progress';
 import ProfilePageComponent from './profile-page/profile-page';
 import ServerUnavailableComponent from './server-unavailable/server-unavailable';
 import GitHubStarModal from './github-star-prompt/github-star-modal';
+import { t } from 'cvat-i18n';
 
 interface CVATAppProps {
     loadFormats: () => void;
@@ -248,22 +249,20 @@ class CVATApplication extends React.PureComponent<CVATAppProps & RouteComponentP
         if (showPlatformNotification()) {
             stopNotifications(false);
             Modal.warning({
-                title: 'Unsupported platform detected',
+                title: t('Unsupported platform detected'),
                 className: 'cvat-modal-unsupported-platform-warning',
                 content: (
                     <>
                         <Row>
                             <Col>
                                 <Text>
-                                    {`The browser you are using is ${name} ${version} based on ${engine}.` +
-                                        ' CVAT was tested in the latest versions of Chrome and Firefox.' +
-                                        ' We recommend to use Chrome (or another Chromium based browser)'}
+                                    {t('The browser you are using is {{name}} {{version}} based on {{engine}}. CVAT was tested in the latest versions of Chrome and Firefox. We recommend to use Chrome (or another Chromium based browser)', { name, version, engine })}
                                 </Text>
                             </Col>
                         </Row>
                         <Row>
                             <Col>
-                                <Text type='secondary'>{`The operating system is ${os}`}</Text>
+                                <Text type='secondary'>{t('The operating system is {{os}}', { os })}</Text>
                             </Col>
                         </Row>
                     </>
@@ -273,12 +272,12 @@ class CVATApplication extends React.PureComponent<CVATAppProps & RouteComponentP
         } else if (showUnsupportedNotification()) {
             stopNotifications(false);
             Modal.warning({
-                title: 'Unsupported features detected',
+                title: t('Unsupported features detected'),
                 className: 'cvat-modal-unsupported-features-warning',
                 content: (
                     <Text>
-                        {`${name} v${version} does not support API, which is used by CVAT. `}
-                        It is strongly recommended to update your browser.
+                        {t('{{name}} v{{version}} does not support API, which is used by CVAT. ', { name, version })}
+                        {t('It is strongly recommended to update your browser.')}
                     </Text>
                 ),
                 onOk: () => stopNotifications(true),
@@ -457,8 +456,7 @@ class CVATApplication extends React.PureComponent<CVATAppProps & RouteComponentP
                     <CVATMarkdown history={history}>{title}</CVATMarkdown>
                 ),
                 duration: null,
-                description: errorLength > appConfig.MAXIMUM_NOTIFICATION_MESSAGE_LENGTH ?
-                    'Open the Browser Console to get details' : <CVATMarkdown history={history}>{error}</CVATMarkdown>,
+                description: errorLength > appConfig.MAXIMUM_NOTIFICATION_MESSAGE_LENGTH ? t('Open the Browser Console to get details') : <CVATMarkdown history={history}>{error}</CVATMarkdown>,
             });
 
             if (shouldLog) {
@@ -678,7 +676,7 @@ class CVATApplication extends React.PureComponent<CVATAppProps & RouteComponentP
                 <Space align='center' direction='vertical' className='cvat-spinner cvat-server-unavailable'>
                     <DisconnectOutlined className='cvat-disconnected' />
                     <Text className='cvat-server-unavailable-title' strong>
-                        Cannot connect to the server
+                        {t('Cannot connect to the server')}
                     </Text>
                     <ServerUnavailableComponent details={healthCheckError} />
                 </Space>
@@ -686,7 +684,7 @@ class CVATApplication extends React.PureComponent<CVATAppProps & RouteComponentP
         }
 
         return (
-            <Spin size='large' fullscreen className='cvat-spinner' tip='Connecting...' />
+            <Spin size='large' fullscreen className='cvat-spinner' tip={t('Connecting...')} />
         );
     }
 }

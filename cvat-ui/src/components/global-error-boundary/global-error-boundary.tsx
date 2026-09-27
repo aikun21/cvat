@@ -17,6 +17,7 @@ import { resetAfterErrorAsync } from 'actions/boundaries-actions';
 import { CombinedState } from 'reducers';
 import { logError } from 'cvat-logger';
 import config from 'config';
+import { t } from 'cvat-i18n';
 
 interface OwnProps {
     children: JSX.Element;
@@ -106,19 +107,19 @@ class GlobalErrorBoundary extends React.PureComponent<Props, State> {
                 <div className='cvat-global-boundary'>
                     <Result
                         status='error'
-                        title='Oops, something went wrong'
-                        subTitle='More likely there are some issues with the tool'
+                        title={t('Oops, something went wrong')}
+                        subTitle={t('More likely there are some issues with the tool')}
                     >
                         <div>
                             <Paragraph>
-                                <Paragraph strong>What has happened?</Paragraph>
-                                <Paragraph>Program error has just occurred</Paragraph>
+                                <Paragraph strong>{t('What has happened?')}</Paragraph>
+                                <Paragraph>{t('Program error has just occurred')}</Paragraph>
                                 <Collapse
                                     accordion
                                     defaultActiveKey={['errorMessage']}
                                     items={[{
                                         key: 'errorMessage',
-                                        label: 'Exception details',
+                                        label: t('Exception details'),
                                         children: (
                                             <Text type='danger'>
                                                 <TextArea
@@ -133,25 +134,25 @@ class GlobalErrorBoundary extends React.PureComponent<Props, State> {
                             </Paragraph>
 
                             <Paragraph>
-                                <Text strong>What should I do?</Text>
+                                <Text strong>{t('What should I do?')}</Text>
                             </Paragraph>
                             <ul>
                                 <li>
-                                    Notify an administrator or submit the issue directly on
-                                    <a href={config.GITHUB_URL}> GitHub. </a>
-                                    Please, provide also:
+                                    {t('Notify an administrator or submit the issue directly on')}
+                                    <a href={config.GITHUB_URL}> {t('GitHub.')}{' '}</a>
+                                    {t('Please, provide also:')}
                                     <ul>
-                                        <li>Full error message above</li>
-                                        <li>Steps to reproduce the issue</li>
-                                        <li>Your operating system and browser version</li>
-                                        <li>CVAT version</li>
+                                        <li>{t('Full error message above')}</li>
+                                        <li>{t('Steps to reproduce the issue')}</li>
+                                        <li>{t('Your operating system and browser version')}</li>
+                                        <li>{t('CVAT version')}</li>
                                         <ul>
                                             <li>
-                                                <Text strong>Server: </Text>
+                                                <Text strong>{t('Server:')}{' '}</Text>
                                                 {serverVersion}
                                             </li>
                                             <li>
-                                                <Text strong>UI: </Text>
+                                                <Text strong>{t('UI:')}{' '}</Text>
                                                 {uiVersion}
                                             </li>
                                         </ul>
@@ -159,19 +160,19 @@ class GlobalErrorBoundary extends React.PureComponent<Props, State> {
                                 </li>
                                 {job ? (
                                     <li>
-                                        Press
+                                        {t('Press')}
                                         {/* eslint-disable-next-line */}
                                         <a onClick={restoreGlobalState}> here </a>
-                                        if you wish CVAT tried to restore your annotation progress or
+                                        {t('if you wish CVAT tried to restore your annotation progress or')}
                                         {/* eslint-disable-next-line */}
                                         <a onClick={() => window.location.reload()}> update </a>
-                                        the page
+                                        {t('the page')}
                                     </li>
                                 ) : (
                                     <li>
                                         {/* eslint-disable-next-line */}
-                                        <a onClick={() => window.location.reload()}>Update </a>
-                                        the page
+                                        <a onClick={() => window.location.reload()}>{t('Update')}{' '}</a>
+                                        {t('the page')}
                                     </li>
                                 )}
                             </ul>

@@ -7,6 +7,7 @@ import { ActionUnion, createAction, ThunkAction } from 'utils/redux';
 import {
     ActiveInference, ModelsQuery,
 } from 'reducers';
+import { isDesktop } from 'utils/environment';
 import {
     getCore, MLModel, RQStatus,
 } from 'cvat-core-wrapper';
@@ -180,6 +181,9 @@ function listen(
 
 export function getInferenceStatusAsync(): ThunkAction {
     return async (dispatch, getState): Promise<void> => {
+        // no serverless functions in the desktop build
+        if (isDesktop) return;
+
         const dispatchCallback = (action: ModelsActions): void => {
             dispatch(action);
         };

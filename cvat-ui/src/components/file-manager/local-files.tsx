@@ -8,6 +8,7 @@ import React from 'react';
 import Text from 'antd/lib/typography/Text';
 import Upload, { RcFile } from 'antd/lib/upload';
 import { InboxOutlined } from '@ant-design/icons';
+import { t } from 'cvat-i18n';
 
 interface Props {
     files: File[];
@@ -36,13 +37,13 @@ export default function LocalFiles(props: Props): JSX.Element {
                 <p className='ant-upload-drag-icon'>
                     <InboxOutlined />
                 </p>
-                <p className='ant-upload-text'>Click or drag files to this area</p>
+                <p className='ant-upload-text'>{t('Click or drag files to this area')}</p>
                 <p className='ant-upload-hint'>{ hint }</p>
             </Upload.Dragger>
             {files.length >= 5 && (
                 <>
                     <br />
-                    <Text className='cvat-text-color'>{`${files.length} files selected`}</Text>
+                    <Text className='cvat-text-color'>{t('{{length}} files selected', { length: files.length })}</Text>
                 </>
             )}
         </>

@@ -12,6 +12,7 @@ import Text from 'antd/lib/typography/Text';
 
 import { Project } from 'cvat-core-wrapper';
 import ActionsMenu from 'components/projects-page/actions-menu';
+import { t } from 'cvat-i18n';
 
 interface DetailsComponentProps {
     projectInstance: Project;
@@ -33,7 +34,7 @@ export default function ProjectTopBar(props: DetailsComponentProps): JSX.Element
                     size='large'
                 >
                     <LeftOutlined />
-                    Back to projects
+                    {t('Back to projects')}
                 </Button>
             </Col>
             <Col className='cvat-project-top-bar-actions'>
@@ -42,7 +43,7 @@ export default function ProjectTopBar(props: DetailsComponentProps): JSX.Element
                     onUpdateProject={onUpdateProject}
                     triggerElement={(
                         <Button size='middle' className='cvat-project-page-actions-button'>
-                            <Text className='cvat-text-color'>Actions</Text>
+                            <Text className='cvat-text-color'>{t('Actions')}</Text>
                             <MoreOutlined className='cvat-menu-icon' />
                         </Button>
                     )}

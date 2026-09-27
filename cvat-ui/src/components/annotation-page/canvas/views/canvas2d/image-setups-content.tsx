@@ -26,6 +26,7 @@ import {
 import { clamp } from 'utils/math';
 import { GridColor, CombinedState, PlayerSettingsState } from 'reducers';
 import GammaFilter from './gamma-filter';
+import { t } from 'cvat-i18n';
 
 const minGridSize = 5;
 const maxGridSize = 1000;
@@ -44,18 +45,18 @@ export default function ImageSetupsContent(): JSX.Element {
 
     return (
         <div className='cvat-canvas-image-setups-content'>
-            <Text>Image grid</Text>
+            <Text>{t('Image grid')}</Text>
             <hr />
             <Row justify='space-between' align='middle' gutter={8}>
                 <Col span={1} />
                 <Col span={6}>
-                    <Text className='cvat-text-color'> Size </Text>
+                    <Text className='cvat-text-color'> {t('Size')}{' '}</Text>
                 </Col>
                 <Col span={8}>
-                    <Text className='cvat-text-color'> Color </Text>
+                    <Text className='cvat-text-color'> {t('Color')}{' '}</Text>
                 </Col>
                 <Col span={8}>
-                    <Text className='cvat-text-color'> Opacity </Text>
+                    <Text className='cvat-text-color'> {t('Opacity')}{' '}</Text>
                 </Col>
             </Row>
             <Row justify='space-between' align='middle' gutter={8}>
@@ -93,19 +94,19 @@ export default function ImageSetupsContent(): JSX.Element {
                         }}
                     >
                         <Select.Option key='white' value={GridColor.White}>
-                            White
+                            {t('White')}
                         </Select.Option>
                         <Select.Option key='black' value={GridColor.Black}>
-                            Black
+                            {t('Black')}
                         </Select.Option>
                         <Select.Option key='red' value={GridColor.Red}>
-                            Red
+                            {t('Red')}
                         </Select.Option>
                         <Select.Option key='green' value={GridColor.Green}>
-                            Green
+                            {t('Green')}
                         </Select.Option>
                         <Select.Option key='blue' value={GridColor.Blue}>
-                            Blue
+                            {t('Blue')}
                         </Select.Option>
                     </Select>
                 </Col>
@@ -122,13 +123,13 @@ export default function ImageSetupsContent(): JSX.Element {
                     />
                 </Col>
             </Row>
-            <Text>Color settings</Text>
+            <Text>{t('Color settings')}</Text>
             <hr />
             <Row justify='space-around'>
                 <Col span={24}>
                     <Row className='cvat-image-setups-brightness'>
                         <Col span={6}>
-                            <Text className='cvat-text-color'> Brightness </Text>
+                            <Text className='cvat-text-color'> {t('Brightness')}{' '}</Text>
                         </Col>
                         <Col span={12}>
                             <Slider
@@ -143,7 +144,7 @@ export default function ImageSetupsContent(): JSX.Element {
                     </Row>
                     <Row className='cvat-image-setups-contrast'>
                         <Col span={6}>
-                            <Text className='cvat-text-color'> Contrast </Text>
+                            <Text className='cvat-text-color'> {t('Contrast')}{' '}</Text>
                         </Col>
                         <Col span={12}>
                             <Slider
@@ -158,7 +159,7 @@ export default function ImageSetupsContent(): JSX.Element {
                     </Row>
                     <Row className='cvat-image-setups-saturation'>
                         <Col span={6}>
-                            <Text className='cvat-text-color'> Saturation </Text>
+                            <Text className='cvat-text-color'> {t('Saturation')}{' '}</Text>
                         </Col>
                         <Col span={12}>
                             <Slider
@@ -186,7 +187,7 @@ export default function ImageSetupsContent(): JSX.Element {
                             dispatch(resetImageFilters());
                         }}
                     >
-                        Reset color settings
+                        {t('Reset color settings')}
                     </Button>
                 </Col>
             </Row>

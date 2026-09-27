@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import React from 'react';
+import { t } from 'cvat-i18n';
 
 interface NameTemplateTooltipProps {
     example: string;
@@ -11,26 +12,26 @@ interface NameTemplateTooltipProps {
 function NameTemplateTooltip({ example }: NameTemplateTooltipProps) {
     return (
         <>
-            You can use the template:
+            {t('You can use the template:')}
             <ul style={{ marginBottom: 0 }}>
                 <li>
                     <code>{'{{id}}'}</code>
                     <br />
-                    - resource id
+                    {t('- resource id')}
                 </li>
                 <li>
                     <code>{'{{name}}'}</code>
                     <br />
-                    - resource name
+                    {t('- resource name')}
                 </li>
                 <li>
                     <code>{'{{index}}'}</code>
                     <br />
-                    - index in selection
+                    {t('- index in selection')}
                 </li>
             </ul>
             <div>
-                Example:
+                {t('Example:')}
                 <br />
                 <i>{example}</i>
             </div>

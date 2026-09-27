@@ -16,6 +16,7 @@ import { ShapeType, Label, DimensionType } from 'cvat-core-wrapper';
 import { clamp } from 'utils/math';
 import LabelSelector from 'components/label-selector/label-selector';
 import CVATTooltip from 'components/common/cvat-tooltip';
+import { t } from 'cvat-i18n';
 
 interface Props {
     shapeType: ShapeType;
@@ -60,20 +61,18 @@ function DrawShapePopoverComponent(props: Props): JSX.Element {
 
     const is2D = jobInstance.dimension === DimensionType.DIMENSION_2D;
     const simplifyDisabled = typeof numberOfPoints !== 'undefined';
-    const simplifyTooltip = simplifyDisabled ?
-        'Simplification is unavailable when a predefined number of points is set' :
-        'Automatically start polygon/polyline simplification after shape is drawn';
+    const simplifyTooltip = simplifyDisabled ? t('Simplification is unavailable when a predefined number of points is set') : t('Automatically start polygon/polyline simplification after shape is drawn');
 
     return (
         <div className='cvat-draw-shape-popover-content'>
             <Row justify='start'>
                 <Col>
-                    <Text className='cvat-text-color' strong>{`Draw new ${shapeType}`}</Text>
+                    <Text className='cvat-text-color' strong>{t('Draw new {{shapeType}}', { shapeType })}</Text>
                 </Col>
             </Row>
             <Row justify='start'>
                 <Col>
-                    <Text className='cvat-text-color'>Label</Text>
+                    <Text className='cvat-text-color'>{t('Label')}</Text>
                 </Col>
             </Row>
             <Row justify='center'>
@@ -90,7 +89,7 @@ function DrawShapePopoverComponent(props: Props): JSX.Element {
                 <>
                     <Row>
                         <Col>
-                            <Text className='cvat-text-color'> Drawing method </Text>
+                            <Text className='cvat-text-color'> {t('Drawing method')}{' '}</Text>
                         </Col>
                     </Row>
                     <Row className='cvat-draw-shape-popover-drawing-method'>
@@ -101,26 +100,22 @@ function DrawShapePopoverComponent(props: Props): JSX.Element {
                                 onChange={onChangeRectDrawingMethod}
                             >
                                 <Radio.Button value={RectDrawingMethod.CLASSIC}>
-                                    2 Points
+                                    {t('2 Points')}
                                 </Radio.Button>
                                 {shapeType === ShapeType.RECTANGLE && (
                                     <Radio.Button value={RectDrawingMethod.EXTREME_POINTS}>
-                                        4 Points
+                                        {t('4 Points')}
                                     </Radio.Button>
                                 )}
                                 <CVATTooltip
                                     title={
-                                        `Click at least ${shapeType === ShapeType.ELLIPSE ? 'five' : 'three'} contour points. ` +
-                                        'A dashed fitted shape previews the result ' +
-                                        'as points are added or removed; ' +
-                                        `press ${repeatShapeShortcut} or select Done to finish, ` +
-                                        'and right-click to undo the last point.'
+                                        t('Click at least {{value}} contour points. A dashed fitted shape previews the result as points are added or removed; press {{repeatShapeShortcut}} or select Done to finish, and right-click to undo the last point.', { value: shapeType === ShapeType.ELLIPSE ? t('five') : t('three'), repeatShapeShortcut })
                                     }
                                 >
                                     <Radio.Button
                                         value={RectDrawingMethod.ROTATED_POINTS}
                                     >
-                                        Rotated
+                                        {t('Rotated')}
                                     </Radio.Button>
                                 </CVATTooltip>
                             </Radio.Group>
@@ -132,7 +127,7 @@ function DrawShapePopoverComponent(props: Props): JSX.Element {
                 <>
                     <Row>
                         <Col>
-                            <Text className='cvat-text-color'> Drawing method </Text>
+                            <Text className='cvat-text-color'> {t('Drawing method')}{' '}</Text>
                         </Col>
                     </Row>
                     <Row justify='space-around'>
@@ -143,10 +138,10 @@ function DrawShapePopoverComponent(props: Props): JSX.Element {
                                 onChange={onChangeCuboidDrawingMethod}
                             >
                                 <Radio value={CuboidDrawingMethod.CLASSIC} style={{ width: 'auto' }}>
-                                    From rectangle
+                                    {t('From rectangle')}
                                 </Radio>
                                 <Radio value={CuboidDrawingMethod.CORNER_POINTS} style={{ width: 'auto' }}>
-                                    By 4 Points
+                                    {t('By 4 Points')}
                                 </Radio>
                             </Radio.Group>
                         </Col>
@@ -157,7 +152,7 @@ function DrawShapePopoverComponent(props: Props): JSX.Element {
                 <>
                     <Row justify='space-around' align='middle'>
                         <Col span={14}>
-                            <Text className='cvat-text-color'> Number of points: </Text>
+                            <Text className='cvat-text-color'> {t('Number of points:')}{' '}</Text>
                         </Col>
                         <Col span={10}>
                             <InputNumber
@@ -182,7 +177,7 @@ function DrawShapePopoverComponent(props: Props): JSX.Element {
                         <CVATTooltip title={simplifyTooltip}>
                             <Row justify='space-around' align='middle'>
                                 <Col span={14}>
-                                    <Text className='cvat-text-color'> Simplify </Text>
+                                    <Text className='cvat-text-color'> {t('Simplify')}{' '}</Text>
                                 </Col>
                                 <Col span={10}>
                                     <Switch
@@ -199,16 +194,16 @@ function DrawShapePopoverComponent(props: Props): JSX.Element {
             ) : null}
             <Row justify='space-around'>
                 <Col span={24}>
-                    <CVATTooltip title={`Press ${repeatShapeShortcut} to draw again`}>
-                        <Button className={`cvat-draw-${shapeType}-shape-button`} onClick={onDrawShape}>Shape</Button>
+                    <CVATTooltip title={t('Press {{repeatShapeShortcut}} to draw again', { repeatShapeShortcut })}>
+                        <Button className={`cvat-draw-${shapeType}-shape-button`} onClick={onDrawShape}>{t('Shape')}</Button>
                     </CVATTooltip>
                     {shapeType !== ShapeType.MASK && (
-                        <CVATTooltip title={`Press ${repeatShapeShortcut} to draw again`}>
+                        <CVATTooltip title={t('Press {{repeatShapeShortcut}} to draw again', { repeatShapeShortcut })}>
                             <Button
                                 className={`cvat-draw-${shapeType}-track-button`}
                                 onClick={onDrawTrack}
                             >
-                                Track
+                                {t('Track')}
                             </Button>
                         </CVATTooltip>
                     )}

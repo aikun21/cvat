@@ -15,6 +15,7 @@ import { CombinedState } from 'reducers';
 import { switchAutomaticBordering, switchSnapToPoint } from 'actions/settings-actions';
 import CVATTooltip from 'components/common/cvat-tooltip';
 import withVisibilityHandling from './handle-popover-visibility';
+import { t } from 'cvat-i18n';
 
 const CustomPopover = withVisibilityHandling(Popover, 'snap-tools-control');
 
@@ -33,13 +34,13 @@ function SnapToolsControlComponent(): JSX.Element {
             <Row justify='start'>
                 <Col>
                     <Text className='cvat-text-color' strong>
-                        Snap Tools
+                        {t('Snap Tools')}
                     </Text>
                 </Col>
             </Row>
             <Row justify='start' className='cvat-snap-tools-row'>
                 <Col>
-                    <CVATTooltip title={`Snap to contour ${normalizedKeyMap.SWITCH_AUTOMATIC_BORDERING}`}>
+                    <CVATTooltip title={t('Snap to contour {{SWITCH_AUTOMATIC_BORDERING}}', { SWITCH_AUTOMATIC_BORDERING: normalizedKeyMap.SWITCH_AUTOMATIC_BORDERING })}>
                         <Button
                             className={
                                 automaticBordering ?
@@ -55,7 +56,7 @@ function SnapToolsControlComponent(): JSX.Element {
                     </CVATTooltip>
                 </Col>
                 <Col>
-                    <CVATTooltip title={`Snap to point ${normalizedKeyMap.SWITCH_SNAP_TO_POINT}`}>
+                    <CVATTooltip title={t('Snap to point {{SWITCH_SNAP_TO_POINT}}', { SWITCH_SNAP_TO_POINT: normalizedKeyMap.SWITCH_SNAP_TO_POINT })}>
                         <Button
                             className={
                                 snapToPoint ?
@@ -80,7 +81,7 @@ function SnapToolsControlComponent(): JSX.Element {
             overlayClassName='cvat-snap-tools-control-popover'
             content={popoverContent}
         >
-            <CVATTooltip title='Snap tools' placement='right'>
+            <CVATTooltip title={t('Snap tools')} placement='right'>
                 <Icon
                     className={`cvat-snap-tools-control ${isAnySnapEnabled ? 'cvat-snap-tools-active' : ''}`}
                     component={SnapToolsIcon}

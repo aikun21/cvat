@@ -10,6 +10,7 @@ import { ActiveControl } from 'reducers';
 import { Canvas } from 'cvat-canvas-wrapper';
 import { Canvas3d } from 'cvat-canvas3d-wrapper';
 import CVATTooltip from 'components/common/cvat-tooltip';
+import { t } from 'cvat-i18n';
 
 export interface Props {
     canvasInstance: Canvas | Canvas3d;
@@ -20,7 +21,7 @@ function MoveControl(props: Props): JSX.Element {
     const { canvasInstance, activeControl } = props;
 
     return (
-        <CVATTooltip title='Move the image' placement='right'>
+        <CVATTooltip title={t('Move the image')} placement='right'>
             <Icon
                 component={MoveIcon}
                 className={

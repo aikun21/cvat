@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'" />
+    <title>CVAT 视频标注</title>
+    <style>
+        html, body { height: 100%; margin: 0; }
+        body {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-family: "Microsoft YaHei", "Segoe UI", sans-serif; color: #555; background: #fff;
+        }
+        .spinner {
+            width: 40px; height: 40px; margin-bottom: 20px;
+            border: 3px solid #e5e7eb; border-top-color: #1b67ff; border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        .title { font-size: 18px; color: #333; margin-bottom: 8px; }
+        #status { white-space: pre-line; text-align: center; line-height: 1.8; max-width: 560px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="spinner"></div>
+    <div class="title">CVAT 视频标注</div>
+    <div id="status">正在启动……</div>
+    <script>
+        window.setStatus = (text) => { document.getElementById('status').textContent = text; };
+    </script>
+</body>
+</html>

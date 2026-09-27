@@ -27,6 +27,7 @@ import {
 import CVATMarkdown from 'components/common/cvat-markdown';
 import TargetStorageField from 'components/storage/target-storage-field';
 import NameTemplateTooltip from 'components/common/cvat-name-template-tooltip';
+import { t as tr } from 'cvat-i18n';
 
 const core = getCore();
 
@@ -126,7 +127,7 @@ function ExportBackupModal(): JSX.Element {
     useEffect(() => {
         const loc = defaultStorageLocation ? defaultStorageLocation.split('_')[0] : 'local';
         const cloudId = defaultStorageCloudId !== undefined && defaultStorageCloudId !== null ? `№${defaultStorageCloudId}` : '';
-        setHelpMessage(`Export backup to ${loc} storage ${cloudId}`);
+        setHelpMessage(tr('Export backup to {{loc}} storage {{cloudId}}', { loc, cloudId }));
     }, [defaultStorageLocation, defaultStorageCloudId]);
 
     const closeModal = (): void => {
@@ -169,9 +170,9 @@ function ExportBackupModal(): JSX.Element {
                 ));
                 closeModal();
                 const description =
-                    'Bulk backup export was started. You can check progress [here](/requests).';
+                    tr('Bulk backup export was started. You can check progress [here](/requests).');
                 Notification.info({
-                    message: 'Bulk backup export started',
+                    message: tr('Bulk backup export started'),
                     description: (
                         <CVATMarkdown history={history}>{description}</CVATMarkdown>
                     ),
@@ -199,11 +200,9 @@ function ExportBackupModal(): JSX.Element {
                 );
                 closeModal();
 
-                const description = isBulkMode ?
-                    'Bulk backup export was started. You can check progress [here](/requests).' :
-                    'Backup export was started. You can check progress [here](/requests).';
+                const description = isBulkMode ? tr('Bulk backup export was started. You can check progress [here](/requests).') : tr('Backup export was started. You can check progress [here](/requests).');
                 Notification.info({
-                    message: isBulkMode ? 'Bulk backup export started' : 'Backup export started',
+                    message: isBulkMode ? tr('Bulk backup export started') : tr('Backup export started'),
                     description: (
                         <CVATMarkdown history={history}>{description}</CVATMarkdown>
                     ),
@@ -235,10 +234,10 @@ function ExportBackupModal(): JSX.Element {
             title={
                 isBulkMode ? (
                     <Text strong>
-                        {`Export ${selectedInstances.length} ${instanceType}s`}
+                        {tr('Export {{length}} {{instanceType}}s', { length: selectedInstances.length, instanceType })}
                     </Text>
                 ) : (
-                    <Text strong>{`Export ${instanceType} #${instance?.id}`}</Text>
+                    <Text strong>{tr('Export {{instanceType}} #{{id}}', { instanceType, id: instance?.id })}</Text>
                 )
             }
             open={!!instance}
@@ -254,11 +253,11 @@ function ExportBackupModal(): JSX.Element {
                 onFinish={handleExport}
             >
                 {isBulkMode ? (
-                    <Form.Item label={<Text strong>Name template</Text>} required>
+                    <Form.Item label={<Text strong>{tr('Name template')}</Text>} required>
                         <Input
                             value={nameTemplate}
                             onChange={(e) => setNameTemplate(e.target.value)}
-                            placeholder='backup_{{id}}'
+                            placeholder={'backup_{{id}}'}
                             suffix='.zip'
                             className='cvat-modal-export-filename-input'
                         />
@@ -270,16 +269,16 @@ function ExportBackupModal(): JSX.Element {
                                     />
                                 )}
                             >
-                                When forming the backup name, a template is used.
+                                {tr('When forming the backup name, a template is used.')}
                                 {' '}
                                 <QuestionCircleOutlined />
                             </Tooltip>
                         </Text>
                     </Form.Item>
                 ) : (
-                    <Form.Item label={<Text strong>Custom name</Text>} name='customName'>
+                    <Form.Item label={<Text strong>{tr('Custom name')}</Text>} name='customName'>
                         <Input
-                            placeholder='Custom name for a backup file'
+                            placeholder={tr('Custom name for a backup file')}
                             suffix='.zip'
                             className='cvat-modal-export-filename-input'
                         />
@@ -287,10 +286,10 @@ function ExportBackupModal(): JSX.Element {
                 )}
                 <TargetStorageField
                     instanceId={instance ? instance.id : null}
-                    switchDescription='Use default settings'
+                    switchDescription={tr('Use default settings')}
                     switchHelpMessage={helpMessage}
                     useDefaultStorage={isBulkMode ? false : useDefaultStorage}
-                    storageDescription={`Specify target storage for export ${instanceType}`}
+                    storageDescription={tr('Specify target storage for export {{instanceType}}', { instanceType })}
                     locationValue={storageLocation}
                     onChangeUseDefaultStorage={isBulkMode ? undefined : (value: boolean) => setUseDefaultStorage(value)}
                     onChangeLocationValue={(value: StorageLocation) => setStorageLocation(value)}
@@ -304,8 +303,8 @@ function ExportBackupModal(): JSX.Element {
                             checked={lightweight}
                             onChange={setLightweight}
                         />
-                        <Text strong>Use lightweight backup whenever possible</Text>
-                        <Tooltip title='If a task uses media from a cloud storage, its possible to make a backup without including media. The task restored from a lightweight backup has to be manually connected to the cloud storage.'>
+                        <Text strong>{tr('Use lightweight backup whenever possible')}</Text>
+                        <Tooltip title={tr('If a task uses media from a cloud storage, its possible to make a backup without including media. The task restored from a lightweight backup has to be manually connected to the cloud storage.')}>
                             <QuestionCircleOutlined />
                         </Tooltip>
                     </Space>

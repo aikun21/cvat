@@ -12,6 +12,7 @@ import Progress from 'antd/lib/progress';
 
 import { shallowEqual } from 'utils/redux';
 import { CombinedState } from 'reducers';
+import { t } from 'cvat-i18n';
 
 function UploadFileStatusModal(): JSX.Element {
     const {
@@ -29,7 +30,7 @@ function UploadFileStatusModal(): JSX.Element {
 
     return (
         <Modal
-            title='Uploading the file'
+            title={t('Uploading the file')}
             open={!!importingId && importingProgress < 100}
             closable={false}
             footer={null}

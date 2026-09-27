@@ -17,6 +17,7 @@ import {
 } from '@ant-design/icons';
 
 import { CombinedState } from 'reducers';
+import { t } from 'cvat-i18n';
 
 interface ServerUnavailableProps {
     details: string | null;
@@ -48,8 +49,7 @@ function DefaultServerUnavailableComponent({ details }: ServerUnavailableProps):
         return (
             <div className='cvat-server-unavailable-message'>
                 <Text>
-                    CVAT could not reach the server or one of the services required to run it.
-                    Make sure the backend, database, Redis and Open Policy Agent are running and available.
+                    {t('CVAT could not reach the server or one of the services required to run it. Make sure the backend, database, Redis and Open Policy Agent are running and available.')}
                 </Text>
             </div>
         );
@@ -64,7 +64,7 @@ function DefaultServerUnavailableComponent({ details }: ServerUnavailableProps):
                 type='error'
                 showIcon
                 icon={<ClockCircleOutlined />}
-                message='Connection check failed'
+                message={t('Connection check failed')}
                 description={summary}
             />
         );
@@ -75,7 +75,7 @@ function DefaultServerUnavailableComponent({ details }: ServerUnavailableProps):
             className='cvat-health-check-error'
             type='error'
             showIcon
-            message='Required services are not healthy'
+            message={t('Required services are not healthy')}
             description={(
                 <Space direction='vertical' size={12}>
                     <Text type='secondary'>{summary}</Text>

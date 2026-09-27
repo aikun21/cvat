@@ -27,6 +27,7 @@ import { updateTaskAsync, updateTaskMetadataAsync } from 'actions/tasks-actions'
 import TopBarComponent from './top-bar';
 import DetailsComponent from './details';
 import { getCloudStorageById } from './cloud-storage-editor';
+import { t } from 'cvat-i18n';
 
 const core = getCore();
 
@@ -74,7 +75,7 @@ function TaskPageComponent(): JSX.Element {
             }
         } catch (error: any) {
             notification.error({
-                message: 'Could not receive the requested task from the server',
+                message: t('Could not receive the requested task from the server'),
                 description: error.toString(),
             });
         }

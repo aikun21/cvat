@@ -72,6 +72,7 @@ import { registerComponentShortcuts } from 'actions/shortcuts-actions';
 import { subKeyMap } from 'utils/component-subkeymap';
 import ImageSetupsContent from './image-setups-content';
 import CanvasTipsComponent from './canvas-hints';
+import { t } from 'cvat-i18n';
 
 const cvat = getCore();
 const MAX_DISTANCE_TO_OPEN_SHAPE = 50;
@@ -284,26 +285,26 @@ function mapStateToProps(state: CombinedState): StateToProps {
 
 const componentShortcuts = {
     SWITCH_AUTOMATIC_BORDERING: {
-        name: 'Toggle snap to contour',
-        description: 'Toggle automatic snap to contour for polygons and polylines during drawing/editing',
+        name: t('Toggle snap to contour'),
+        description: t('Toggle automatic snap to contour for polygons and polylines during drawing/editing'),
         sequences: [],
         scope: ShortcutScope.STANDARD_WORKSPACE,
     },
     SWITCH_SNAP_TO_POINT: {
-        name: 'Toggle snap to point',
-        description: 'Toggle automatic snapping to nearby points',
+        name: t('Toggle snap to point'),
+        description: t('Toggle automatic snapping to nearby points'),
         sequences: [],
         scope: ShortcutScope.STANDARD_WORKSPACE,
     },
     NEXT_OBJECT: {
-        name: 'Next object',
-        description: 'Go to the next object and center it on the canvas',
+        name: t('Next object'),
+        description: t('Go to the next object and center it on the canvas'),
         sequences: ['tab'],
         scope: ShortcutScope.ANNOTATION_PAGE,
     },
     PREVIOUS_OBJECT: {
-        name: 'Previous object',
-        description: 'Go to the previous object and center it on the canvas',
+        name: t('Previous object'),
+        description: t('Go to the previous object and center it on the canvas'),
         sequences: ['shift+tab'],
         scope: ShortcutScope.ANNOTATION_PAGE,
     },
@@ -691,7 +692,7 @@ class CanvasWrapperComponent extends React.PureComponent<Props> {
     private onCanvasWarningOccurrence = (event: any): void => {
         const { message, domain } = event.detail;
         notification.warning({
-            message: domain ? `${domain}` : 'Warning',
+            message: domain ? `${domain}` : t('Warning'),
             description: message,
             duration: 5,
             className: 'cvat-notification-warning-canvas',
@@ -1072,7 +1073,7 @@ class CanvasWrapperComponent extends React.PureComponent<Props> {
                                 } catch (error: any) {
                                     notification.error({
                                         description: error.toString(),
-                                        message: 'Image processing error occurred',
+                                        message: t('Image processing error occurred'),
                                         className: 'cvat-notification-notice-image-processing-error',
                                     });
                                 }
@@ -1271,7 +1272,7 @@ class CanvasWrapperComponent extends React.PureComponent<Props> {
                     <UpOutlined className='cvat-canvas-image-setups-trigger' />
                 </Popover>
 
-                <CVATTooltip title={`Open layer stack. Current layer ${currentZLayer}`}>
+                <CVATTooltip title={t('Open layer stack. Current layer {{currentZLayer}}', { currentZLayer })}>
                     <button
                         className='cvat-canvas-layer-stack-trigger'
                         type='button'

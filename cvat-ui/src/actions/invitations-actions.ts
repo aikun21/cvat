@@ -5,6 +5,7 @@
 import { ActionUnion, ThunkAction, createAction } from 'utils/redux';
 import { CombinedState, InvitationsQuery } from 'reducers';
 import { Invitation, Organization, getCore } from 'cvat-core-wrapper';
+import { t } from 'cvat-i18n';
 
 const cvat = getCore();
 
@@ -71,7 +72,7 @@ export function getInvitationsAsync(query: Partial<InvitationsQuery>, showNotifi
             if (error instanceof Error) {
                 dispatch(invitationActions.getInvitationsFailed(error.message));
             } else {
-                dispatch(invitationActions.getInvitationsFailed('Unknown error'));
+                dispatch(invitationActions.getInvitationsFailed(t('Unknown error')));
             }
         }
     };

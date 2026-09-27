@@ -7,6 +7,7 @@ import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import Text from 'antd/lib/typography/Text';
 import { CloseOutlined } from '@ant-design/icons';
+import { t } from 'cvat-i18n';
 
 interface Props {
     images: Record<string, ImageBitmap>;
@@ -54,7 +55,7 @@ function ContextImageSelector(props: Props): React.ReactPortal {
             <div className='cvat-context-image-gallery'>
                 <div className='cvat-context-image-gallery-header'>
                     <Text>
-                        Click the image to display it as a context image
+                        {t('Click the image to display it as a context image')}
                     </Text>
                     <CloseOutlined className='cvat-context-image-close-button' onClick={onClose} />
                 </div>

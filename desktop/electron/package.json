@@ -1,0 +1,88 @@
+{
+  "name": "cvat-desktop",
+  "productName": "CVATDesktop",
+  "version": "0.1.0",
+  "description": "CVAT video annotation as a local desktop app (Chinese UI)",
+  "main": "main.js",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win",
+    "dist:dir": "electron-builder --win --dir"
+  },
+  "devDependencies": {
+    "electron": "^44.4.5",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "com.aikun21.cvatdesktop",
+    "productName": "CVATDesktop",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main.js",
+      "loading.html",
+      "assets/**",
+      "package.json",
+      "!node_modules/**"
+    ],
+    "extraResources": [
+      {
+        "from": "../staging/python",
+        "to": "python"
+      },
+      {
+        "from": "../staging/backend",
+        "to": "backend"
+      },
+      {
+        "from": "../staging/static",
+        "to": "static"
+      },
+      {
+        "from": "../staging/db-template",
+        "to": "db-template"
+      },
+      {
+        "from": "../staging/opa-bundle",
+        "to": "opa-bundle"
+      },
+      {
+        "from": "../../cvat-ui/dist",
+        "to": "ui"
+      },
+      {
+        "from": "../vendor/redis",
+        "to": "redis"
+      },
+      {
+        "from": "../vendor/opa",
+        "to": "opa"
+      }
+    ],
+    "asar": true,
+    "win": {
+      "target": [
+        "nsis",
+        "zip"
+      ],
+      "icon": "build/icon.ico",
+      "artifactName": "CVATDesktop-${version}-portable-win-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "CVATDesktop-Setup-${version}.exe",
+      "shortcutName": "CVAT 视频标注"
+    },
+    "npmRebuild": false,
+    "extraFiles": [
+      {
+        "from": "build/使用说明.txt",
+        "to": "使用说明.txt"
+      }
+    ]
+  }
+}

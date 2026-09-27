@@ -24,6 +24,7 @@ import UserSelector from 'components/task-page/user-selector';
 import { JobStageSelector, JobStateSelector } from 'components/job-item/job-selectors';
 import { makeKey } from 'reducers/consensus-reducer';
 import JobActionsItems from './actions-menu-items';
+import { t } from 'cvat-i18n';
 
 interface Props {
     jobInstance: Job;
@@ -88,8 +89,8 @@ function JobActionsComponent(
     const onMergeConsensusJob = useCallback(() => {
         if (jobInstance.replicasCount > 0) {
             Modal.confirm({
-                title: 'The consensus job will be merged',
-                content: 'Existing annotations in the parent job will be updated. Continue?',
+                title: t('The consensus job will be merged'),
+                content: t('Existing annotations in the parent job will be updated. Continue?'),
                 className: 'cvat-modal-confirm-consensus-merge-job',
                 onOk: () => {
                     dispatch(mergeConsensusJobsAsync(jobInstance));
@@ -98,19 +99,15 @@ function JobActionsComponent(
                     type: 'primary',
                     danger: true,
                 },
-                okText: 'Merge',
+                okText: t('Merge'),
             });
         }
     }, [jobInstance]);
 
     const onDeleteJob = useCallback(() => {
         Modal.confirm({
-            title: isBulkMode ?
-                `Delete ${jobsToAct.length} selected jobs` :
-                `The job ${jobInstance.id} will be deleted`,
-            content: isBulkMode ?
-                'All related data (annotations) for all selected jobs will be lost. Continue?' :
-                'All related data (annotations) will be lost. Continue?',
+            title: isBulkMode ? t('Delete {{length}} selected jobs', { length: jobsToAct.length }) : t('The job {{id}} will be deleted', { id: jobInstance.id }),
+            content: isBulkMode ? t('All related data (annotations) for all selected jobs will be lost. Continue?') : t('All related data (annotations) will be lost. Continue?'),
             className: 'cvat-modal-confirm-delete-job',
             onOk: () => {
                 setTimeout(() => {
@@ -121,7 +118,7 @@ function JobActionsComponent(
                                 await dispatch(deleteJobAsync(job));
                             }
                         },
-                        (job, idx, total) => `Deleting job #${job.id} (${idx + 1}/${total})`,
+                        (job, idx, total) => t('Deleting job #{{id}} ({{value}}/{{total}})', { id: job.id, value: idx + 1, total }),
                     ));
                 }, 0);
             },
@@ -129,7 +126,7 @@ function JobActionsComponent(
                 type: 'primary',
                 danger: true,
             },
-            okText: isBulkMode ? 'Delete selected' : 'Delete',
+            okText: isBulkMode ? t('Delete selected') : t('Delete'),
         });
     }, [jobInstance, isBulkMode, jobsToAct, dispatch]);
 
@@ -183,7 +180,7 @@ function JobActionsComponent(
             async (job) => {
                 await dispatch(updateJobAsync(job, fields));
             },
-            (job, idx, total) => `Updating job #${job.id} (${idx + 1}/${total})`,
+            (job, idx, total) => t('Updating job #{{id}} ({{value}}/{{total}})', { id: job.id, value: idx + 1, total }),
         ));
     }, [jobsToAct, dispatch, stopEditField]);
 

@@ -11,6 +11,7 @@ import { CloudStorage } from 'cvat-core-wrapper';
 import SelectCloudStorage from 'components/select-cloud-storage/select-cloud-storage';
 import config from 'config';
 import CloudStorageBrowser, { RemoteFile } from './remote-browser';
+import { t } from 'cvat-i18n';
 
 interface Props {
     formRef: any;
@@ -54,9 +55,9 @@ export default function CloudStorageTab(props: Props): JSX.Element {
             />
             {cloudStorage ? (
                 <Form.Item
-                    label='Select data source'
+                    label={t('Select data source')}
                     name='manifestSelect'
-                    rules={[{ required: true, message: 'Please, specify a data source' }]}
+                    rules={[{ required: true, message: t('Please, specify a data source') }]}
                     initialValue={(cloudStorage.manifests?.length) ? cloudStorage.manifests[0] : null}
                 >
                     <Select
@@ -75,9 +76,9 @@ export default function CloudStorageTab(props: Props): JSX.Element {
 
             {cloudStorage && selectedSource ? (
                 <Form.Item
-                    label='Files'
+                    label={t('Files')}
                     name='cloudStorageFiles'
-                    rules={[{ required: true, message: 'Please, select a files' }]}
+                    rules={[{ required: true, message: t('Please, select a files') }]}
                 >
                     <CloudStorageBrowser
                         resource={cloudStorage}

@@ -12,6 +12,7 @@ import { CombinedState } from 'reducers';
 import { Job, Task, Project } from 'cvat-core-wrapper';
 import MLModel from 'cvat-core/src/ml-model';
 import { previewQueue, getRequestId } from 'utils/preview-queue';
+import { t } from 'cvat-i18n';
 
 interface Props {
     job?: Job | undefined;
@@ -113,7 +114,7 @@ export default function Preview(props: Readonly<Props>): JSX.Element {
                 className={previewClassName || ''}
                 src={imgSrc}
                 onClick={onClick}
-                alt='Preview image'
+                alt={t('Preview image')}
                 aria-hidden
             />
         </div>

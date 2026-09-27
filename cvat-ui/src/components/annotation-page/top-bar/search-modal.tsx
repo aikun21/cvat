@@ -14,6 +14,7 @@ import type { BaseSelectRef } from 'rc-select';
 import { CombinedState } from 'reducers';
 import { changeFrameAsync, switchShowSearchFramesModal } from 'actions/annotation-actions';
 import CvatTooltip from 'components/common/cvat-tooltip';
+import { t } from 'cvat-i18n';
 
 interface SearchResult {
     number: number;
@@ -101,10 +102,10 @@ function SearchFramesModal(): JSX.Element {
             <AutoComplete
                 ref={autoCompleteRef}
                 defaultValue={searchTerm}
-                placeholder='Type to search'
+                placeholder={t('Type to search')}
                 showSearch
                 onSearch={onSearch}
-                notFoundContent={searchTerm ? <Text>No frames found</Text> : null}
+                notFoundContent={searchTerm ? <Text>{t('No frames found')}</Text> : null}
                 options={searchResults.map((item) => ({
                     value: item.number,
                     label: (

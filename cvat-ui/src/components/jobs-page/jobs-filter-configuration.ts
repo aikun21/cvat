@@ -5,25 +5,26 @@
 
 import { Config } from '@react-awesome-query-builder/antd';
 import asyncFetchUsers from 'components/resource-sorting-filtering/request-users';
+import { t } from 'cvat-i18n';
 
 export const config: Partial<Config> = {
     fields: {
         state: {
-            label: 'State',
+            label: t('State'),
             type: 'select',
             operators: ['select_any_in', 'select_equals'],
             valueSources: ['value'],
             fieldSettings: {
                 listValues: [
                     { value: 'new', title: 'new' },
-                    { value: 'in progress', title: 'in progress' },
+                    { value: 'in progress', title: t('in progress') },
                     { value: 'rejected', title: 'rejected' },
                     { value: 'completed', title: 'completed' },
                 ],
             },
         },
         stage: {
-            label: 'Stage',
+            label: t('Stage'),
             type: 'select',
             operators: ['select_any_in', 'select_equals'],
             valueSources: ['value'],
@@ -36,7 +37,7 @@ export const config: Partial<Config> = {
             },
         },
         dimension: {
-            label: 'Dimension',
+            label: t('Dimension'),
             type: 'select',
             operators: ['select_equals'],
             valueSources: ['value'],
@@ -48,7 +49,7 @@ export const config: Partial<Config> = {
             },
         },
         assignee: {
-            label: 'Assignee',
+            label: t('Assignee'),
             type: 'select',
             valueSources: ['value'],
             operators: ['select_equals'],
@@ -59,58 +60,58 @@ export const config: Partial<Config> = {
             },
         },
         updated_date: {
-            label: 'Last updated',
+            label: t('Last updated'),
             type: 'datetime',
             operators: ['between', 'greater', 'greater_or_equal', 'less', 'less_or_equal'],
         },
         id: {
-            label: 'ID',
+            label: t('ID'),
             type: 'number',
             operators: ['equal', 'between', 'greater', 'greater_or_equal', 'less', 'less_or_equal'],
             fieldSettings: { min: 0 },
             valueSources: ['value'],
         },
         task_id: {
-            label: 'Task ID',
+            label: t('Task ID'),
             type: 'number',
             operators: ['equal', 'between', 'greater', 'greater_or_equal', 'less', 'less_or_equal'],
             fieldSettings: { min: 0 },
             valueSources: ['value'],
         },
         project_id: {
-            label: 'Project ID',
+            label: t('Project ID'),
             type: 'number',
             operators: ['equal', 'between', 'greater', 'greater_or_equal', 'less', 'less_or_equal'],
             fieldSettings: { min: 0 },
             valueSources: ['value'],
         },
         task_name: {
-            label: 'Task name',
+            label: t('Task name'),
             type: 'text',
             valueSources: ['value'],
             operators: ['like'],
         },
         project_name: {
-            label: 'Project name',
+            label: t('Project name'),
             type: 'text',
             valueSources: ['value'],
             operators: ['like'],
         },
         type: {
-            label: 'Job Type',
+            label: t('Job Type'),
             type: 'select',
             operators: ['select_equals'],
             valueSources: ['value'],
             fieldSettings: {
                 listValues: [
-                    { value: 'annotation', title: 'Annotation' },
-                    { value: 'ground_truth', title: 'Ground truth' },
-                    { value: 'consensus_replica', title: 'Consensus replica' },
+                    { value: 'annotation', title: t('Annotation') },
+                    { value: 'ground_truth', title: t('Ground truth') },
+                    { value: 'consensus_replica', title: t('Consensus replica') },
                 ],
             },
         },
         parent_job_id: {
-            label: 'Parent ID',
+            label: t('Parent ID'),
             type: 'number',
             operators: ['is_empty', 'is_not_empty', 'equal', 'between', 'greater', 'greater_or_equal', 'less', 'less_or_equal'],
             fieldSettings: { min: 0 },

@@ -14,6 +14,7 @@ import { registerComponentShortcuts } from 'actions/shortcuts-actions';
 import { ShortcutScope } from 'utils/enums';
 import { subKeyMap } from 'utils/component-subkeymap';
 import { useSelector } from 'react-redux';
+import { t } from 'cvat-i18n';
 
 export interface Props {
     updateActiveControl(activeControl: ActiveControl): void;
@@ -24,8 +25,8 @@ export interface Props {
 
 const componentShortcuts = {
     SWITCH_JOIN_MODE_STANDARD_CONTROLS: {
-        name: 'Join mode',
-        description: 'Activate or deactivate a mode where you can join polygons and masks',
+        name: t('Join mode'),
+        description: t('Activate or deactivate a mode where you can join polygons and masks'),
         sequences: ['j'],
         scope: ShortcutScope.STANDARD_WORKSPACE_CONTROLS,
     },
@@ -75,7 +76,7 @@ function JoinControl(props: Props): JSX.Element {
                 keyMap={subKeyMap(componentShortcuts, keyMap)}
                 handlers={handlers}
             />
-            <CVATTooltip title={`Join tool ${normalizedKeyMap.SWITCH_JOIN_MODE_STANDARD_CONTROLS}`} placement='right'>
+            <CVATTooltip title={t('Join tool {{SWITCH_JOIN_MODE_STANDARD_CONTROLS}}', { SWITCH_JOIN_MODE_STANDARD_CONTROLS: normalizedKeyMap.SWITCH_JOIN_MODE_STANDARD_CONTROLS })} placement='right'>
                 <Icon {...dynamicIconProps} component={JoinIcon} />
             </CVATTooltip>
         </>

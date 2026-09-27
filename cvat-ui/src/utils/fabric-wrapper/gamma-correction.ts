@@ -6,6 +6,7 @@ import { fabric } from 'fabric';
 import { SerializedImageFilter } from 'cvat-core-wrapper';
 import { ImageFilterAlias } from 'utils/image-processing';
 import FabricFilter from './fabric-wrapper';
+import { t } from 'cvat-i18n';
 
 export interface GammaFilterOptions {
     gamma: number[];
@@ -19,7 +20,7 @@ export default class GammaCorrection extends FabricFilter {
 
         const { gamma } = options;
         if (!Array.isArray(gamma) || gamma.length !== 3) {
-            throw Error(`Incorrect option for gamma filter, expected array: [R, G, B] got ${gamma}`);
+            throw Error(t('Incorrect option for gamma filter, expected array: [R, G, B] got {{gamma}}', { gamma }));
         }
 
         // @ts-ignore: Some filters are not typed yet https://github.com/DefinitelyTyped/DefinitelyTyped/issues/62371

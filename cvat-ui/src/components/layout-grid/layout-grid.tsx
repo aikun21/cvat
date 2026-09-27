@@ -12,11 +12,12 @@ import './styles.scss';
 import { ShortcutScope } from 'utils/enums';
 import { registerComponentShortcuts } from 'actions/shortcuts-actions';
 import { subKeyMap } from 'utils/component-subkeymap';
+import { t } from 'cvat-i18n';
 
 const componentShortcuts = {
     TOGGLE_ANNOTATION_PAGE: {
-        name: 'Toggle layout grid',
-        description: 'The grid is used to UI development',
+        name: t('Toggle layout grid'),
+        description: t('The grid is used to UI development'),
         sequences: ['ctrl+alt+enter'],
         scope: ShortcutScope.GENERAL,
     },

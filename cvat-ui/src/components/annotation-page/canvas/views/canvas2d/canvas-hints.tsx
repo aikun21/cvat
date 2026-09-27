@@ -7,6 +7,7 @@ import { InfoCircleTwoTone, LoadingOutlined } from '@ant-design/icons';
 import Button from 'antd/lib/button';
 import Text from 'antd/lib/typography/Text';
 import { CanvasHint } from 'cvat-canvas-wrapper';
+import { t } from 'cvat-i18n';
 
 const FORCE_MESSAGE_FLAG = 'force';
 
@@ -83,7 +84,7 @@ export default class CanvasTipsComponent extends React.PureComponent<{}, State> 
                             className='cvat-canvas-hints-hide-button'
                             type='link'
                         >
-                            Hide
+                            {t('Hide')}
                         </Button>
                     )}
                 </div>

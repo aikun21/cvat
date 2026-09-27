@@ -9,6 +9,7 @@ import Form from 'antd/lib/form';
 import SelectCloudStorage from 'components/select-cloud-storage/select-cloud-storage';
 
 import { StorageData, StorageLocation, CloudStorage } from 'cvat-core-wrapper';
+import { t } from 'cvat-i18n';
 
 const { Option } = Select;
 
@@ -84,14 +85,14 @@ export default function StorageField(props: Props): JSX.Element {
                         key={`${storageType}-${StorageLocation.LOCAL.toLowerCase()}`}
                         className={`cvat-select-${storageType}-location`}
                     >
-                        Local
+                        {t('Local')}
                     </Option>
                     <Option
                         value={StorageLocation.CLOUD_STORAGE}
                         key={`${storageType}-${StorageLocation.CLOUD_STORAGE.toLowerCase()}`}
                         className={`cvat-select-${storageType}-location`}
                     >
-                        Cloud storage
+                        {t('Cloud storage')}
                     </Option>
                 </Select>
             </Form.Item>

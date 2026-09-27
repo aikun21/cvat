@@ -11,6 +11,7 @@ import Modal from 'antd/lib/modal';
 
 import LabelForm from './label-form';
 import { fromSVGCoord, LabelOptColor } from './common';
+import { t } from 'cvat-i18n';
 
 interface ContextMenuProps {
     elementID: number;
@@ -96,7 +97,7 @@ function SkeletonElementContextMenu(props: ContextMenuProps): JSX.Element {
                         icon={<EditOutlined />}
                         key='configure_label'
                     >
-                        Configure
+                        {t('Configure')}
                     </Button>
                     <Button
                         type='link'
@@ -107,7 +108,7 @@ function SkeletonElementContextMenu(props: ContextMenuProps): JSX.Element {
                         icon={<DeleteOutlined />}
                         key='delete'
                     >
-                        Delete
+                        {t('Delete')}
                     </Button>
                 </div>
             )}

@@ -7,8 +7,10 @@ import React from 'react';
 import { Col } from 'antd/lib/grid';
 import Select from 'antd/lib/select';
 import Text from 'antd/lib/typography/Text';
+import { translateEnum } from 'utils/i18n-enums';
 
 import { StatesOrdering } from 'reducers';
+import { t } from 'cvat-i18n';
 
 interface StatesOrderingSelectorComponentProps {
     statesOrdering: StatesOrdering;
@@ -20,7 +22,7 @@ function StatesOrderingSelectorComponent(props: StatesOrderingSelectorComponentP
 
     return (
         <Col>
-            <Text>Sort by</Text>
+            <Text>{t('Sort by')}</Text>
             <Select
                 size='small'
                 className='cvat-objects-sidebar-ordering-selector'
@@ -29,19 +31,19 @@ function StatesOrderingSelectorComponent(props: StatesOrderingSelectorComponentP
                 onChange={changeStatesOrdering}
             >
                 <Select.Option key={StatesOrdering.ID_DESCENT} value={StatesOrdering.ID_DESCENT}>
-                    {StatesOrdering.ID_DESCENT}
+                    {translateEnum(StatesOrdering.ID_DESCENT)}
                 </Select.Option>
                 <Select.Option key={StatesOrdering.ID_ASCENT} value={StatesOrdering.ID_ASCENT}>
-                    {StatesOrdering.ID_ASCENT}
+                    {translateEnum(StatesOrdering.ID_ASCENT)}
                 </Select.Option>
                 <Select.Option key={StatesOrdering.UPDATED} value={StatesOrdering.UPDATED}>
-                    {StatesOrdering.UPDATED}
+                    {translateEnum(StatesOrdering.UPDATED)}
                 </Select.Option>
                 <Select.Option key={StatesOrdering.LAYER} value={StatesOrdering.LAYER}>
-                    {StatesOrdering.LAYER}
+                    {translateEnum(StatesOrdering.LAYER)}
                 </Select.Option>
                 <Select.Option key={StatesOrdering.LABEL_NAME} value={StatesOrdering.LABEL_NAME}>
-                    {StatesOrdering.LABEL_NAME}
+                    {translateEnum(StatesOrdering.LABEL_NAME)}
                 </Select.Option>
             </Select>
         </Col>

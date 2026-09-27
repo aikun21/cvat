@@ -12,6 +12,7 @@ import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 
 import { Issue } from 'cvat-core-wrapper';
 import CVATTooltip from 'components/common/cvat-tooltip';
+import { t } from 'cvat-i18n';
 
 interface Props {
     issue: Issue;
@@ -63,7 +64,7 @@ export default function HiddenIssueLabel(props: Props): ReactPortal {
 
     const elementID = `cvat-hidden-issue-label-${id}`;
     return ReactDOM.createPortal(
-        <CVATTooltip title={comments[0]?.message || 'No comments found'}>
+        <CVATTooltip title={comments[0]?.message || t('No comments found')}>
             <Tag
                 ref={ref}
                 id={elementID}

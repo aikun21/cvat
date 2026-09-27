@@ -31,6 +31,7 @@ import {
     Storage, StorageData, StorageLocation, Task,
     DimensionType,
 } from 'cvat-core-wrapper';
+import { t as tr } from 'cvat-i18n';
 
 type FormValues = {
     selectedFormat: string | undefined;
@@ -174,7 +175,7 @@ function ExportDatasetModal(props: Readonly<StateToProps>): JSX.Element {
     useEffect(() => {
         const loc = defaultStorageLocation ? defaultStorageLocation.split('_')[0] : 'local';
         const cloudId = defaultStorageCloudId !== undefined && defaultStorageCloudId !== null ? `№${defaultStorageCloudId}` : '';
-        setHelpMessage(`Export to ${loc} storage ${cloudId}`);
+        setHelpMessage(tr('Export to {{loc}} storage {{cloudId}}', { loc, cloudId }));
     }, [defaultStorageLocation, defaultStorageCloudId]);
 
     const closeModal = (): void => {
@@ -223,10 +224,9 @@ function ExportDatasetModal(props: Readonly<StateToProps>): JSX.Element {
                 closeModal();
                 const resource = values.saveImages ? 'Dataset' : 'Annotations';
                 const description =
-                    `Bulk ${resource.toLowerCase()} export was started. ` +
-                    'You can check progress and download the file [here](/requests).';
+                    tr('Bulk {{value}} export was started. You can check progress and download the file [here](/requests).', { value: resource.toLowerCase() });
                 Notification.info({
-                    message: `Bulk ${resource.toLowerCase()} export started`,
+                    message: tr('Bulk {{value}} export started', { value: resource.toLowerCase() }),
                     description: (
                         <CVATMarkdown history={history}>{description}</CVATMarkdown>
                     ),
@@ -250,10 +250,9 @@ function ExportDatasetModal(props: Readonly<StateToProps>): JSX.Element {
             );
             closeModal();
             const resource = values.saveImages ? 'Dataset' : 'Annotations';
-            const description = `${resource} export was started for ${instanceType}. ` +
-            'You can check progress and download the file [here](/requests).';
+            const description = tr('{{resource}} export was started for {{instanceType}}. You can check progress and download the file [here](/requests).', { resource, instanceType });
             Notification.info({
-                message: `${resource} export started`,
+                message: tr('{{resource}} export started', { resource }),
                 description: (
                     <CVATMarkdown history={history}>{description}</CVATMarkdown>
                 ),
@@ -294,10 +293,10 @@ function ExportDatasetModal(props: Readonly<StateToProps>): JSX.Element {
             title={
                 isBulkMode ? (
                     <Text strong>
-                        {`Export ${selectedInstances.length} ${instanceType}s as datasets`}
+                        {tr('Export {{length}} {{instanceType}}s as datasets', { length: selectedInstances.length, instanceType })}
                     </Text>
                 ) : (
-                    <Text strong>{`Export ${instanceType} as a dataset`}</Text>
+                    <Text strong>{tr('Export {{instanceType}} as a dataset', { instanceType })}</Text>
                 )
             }
             open={!!instance}
@@ -320,10 +319,10 @@ function ExportDatasetModal(props: Readonly<StateToProps>): JSX.Element {
             >
                 <Form.Item
                     name='selectedFormat'
-                    label={<Text strong>Export format</Text>}
-                    rules={[{ required: true, message: 'Format must be selected' }]}
+                    label={<Text strong>{tr('Export format')}</Text>}
+                    rules={[{ required: true, message: tr('Format must be selected') }]}
                 >
-                    <Select virtual={false} placeholder='Select dataset format' className='cvat-modal-export-select'>
+                    <Select virtual={false} placeholder={tr('Select dataset format')} className='cvat-modal-export-select'>
                         {sortedDumpers
                             .filter(
                                 (dumper: Dumper): boolean => dumper.dimension === instance?.dimension ||
@@ -353,15 +352,15 @@ function ExportDatasetModal(props: Readonly<StateToProps>): JSX.Element {
                         >
                             <Switch className='cvat-modal-export-save-images' />
                         </Form.Item>
-                        <Text strong>Save images</Text>
+                        <Text strong>{tr('Save images')}</Text>
                     </Space>
                 }
                 {isBulkMode ? (
-                    <Form.Item label={<Text strong>Name template</Text>} required>
+                    <Form.Item label={<Text strong>{tr('Name template')}</Text>} required>
                         <Input
                             value={nameTemplate}
                             onChange={(e) => setNameTemplate(e.target.value)}
-                            placeholder='dataset_{{id}}'
+                            placeholder={'dataset_{{id}}'}
                             suffix={exportExtension}
                             className='cvat-modal-export-filename-input'
                         />
@@ -373,16 +372,16 @@ function ExportDatasetModal(props: Readonly<StateToProps>): JSX.Element {
                                     />
                                 )}
                             >
-                                When forming the dataset name, a template is used.
+                                {tr('When forming the dataset name, a template is used.')}
                                 {' '}
                                 <QuestionCircleOutlined />
                             </Tooltip>
                         </Text>
                     </Form.Item>
                 ) : (
-                    <Form.Item label={<Text strong>Custom name</Text>} name='customName'>
+                    <Form.Item label={<Text strong>{tr('Custom name')}</Text>} name='customName'>
                         <Input
-                            placeholder='Custom name for a dataset'
+                            placeholder={tr('Custom name for a dataset')}
                             suffix={exportExtension}
                             className='cvat-modal-export-filename-input'
                         />
@@ -390,10 +389,10 @@ function ExportDatasetModal(props: Readonly<StateToProps>): JSX.Element {
                 )}
                 <TargetStorageField
                     instanceId={instance ? instance.id : null}
-                    switchDescription='Use default settings'
+                    switchDescription={tr('Use default settings')}
                     switchHelpMessage={helpMessage}
                     useDefaultStorage={isBulkMode ? false : useDefaultTargetStorage}
-                    storageDescription='Specify target storage for export dataset'
+                    storageDescription={tr('Specify target storage for export dataset')}
                     locationValue={targetStorage.location}
                     onChangeUseDefaultStorage={isBulkMode ? undefined : (value: boolean) => {
                         setUseDefaultTargetStorage(value);

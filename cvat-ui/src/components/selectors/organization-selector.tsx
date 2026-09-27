@@ -13,6 +13,7 @@ import { useInView } from 'react-intersection-observer';
 
 import { Organization } from 'cvat-core-wrapper';
 import { getOrganizationsAsync } from 'actions/organization-actions';
+import { t } from 'cvat-i18n';
 
 interface Props {
     setNewOrganization: (org: Organization | null) => void;
@@ -82,14 +83,14 @@ function OrganizationSelector(props: Props): JSX.Element {
     return (
         <AutoComplete
             defaultValue={searchPhrase}
-            placeholder='Select an organization'
+            placeholder={t('Select an organization')}
             showSearch
             onSearch={_.debounce(setSearchPhrase, 500)}
             options={[
                 ...(
                     (currentOrg) ? [{
                         value: '',
-                        label: 'Personal workspace',
+                        label: t('Personal workspace'),
                     }] : []
                 ),
                 ...searchResults

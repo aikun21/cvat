@@ -13,6 +13,7 @@ import CVATTooltip from 'components/common/cvat-tooltip';
 
 import { Source } from 'cvat-core-wrapper';
 import ItemAttribute from './object-item-attribute';
+import { t } from 'cvat-i18n';
 
 interface Props {
     readonly: boolean;
@@ -52,19 +53,19 @@ const sizeFields: {
         key: 'length',
         type: SizeType.LENGTH,
         label: 'L',
-        tooltip: 'Length along X axis',
+        tooltip: t('Length along X axis'),
     },
     {
         key: 'width',
         type: SizeType.WIDTH,
         label: 'W',
-        tooltip: 'Width along Y axis',
+        tooltip: t('Width along Y axis'),
     },
     {
         key: 'height',
         type: SizeType.HEIGHT,
         label: 'H',
-        tooltip: 'Height along Z axis',
+        tooltip: t('Height along Z axis'),
     },
 ];
 
@@ -111,7 +112,7 @@ function ItemAttributesComponent(props: Props): JSX.Element | null {
 
     const scoreTag = withScore ? (
         <CVATTooltip
-            title='Consensus score'
+            title={t('Consensus score')}
             align={{
                 ...baseTooltipAlign,
                 targetOffset: ['25%', '40%'],
@@ -124,7 +125,7 @@ function ItemAttributesComponent(props: Props): JSX.Element | null {
     ) : null;
     const votesTag = withVotes ? (
         <CVATTooltip
-            title='Number of votes'
+            title={t('Number of votes')}
             align={{
                 ...baseTooltipAlign,
                 targetOffset: ['40%', '40%'],
@@ -159,7 +160,7 @@ function ItemAttributesComponent(props: Props): JSX.Element | null {
                     key: 'details',
                     label: (
                         <Row style={{ width: '100%' }} align='middle' justify='space-between'>
-                            <Text style={{ fontSize: 10 }} type='secondary'>DETAILS</Text>
+                            <Text style={{ fontSize: 10 }} type='secondary'>{t('DETAILS')}</Text>
                             {scoreVotesElement}
                         </Row>
                     ),

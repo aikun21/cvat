@@ -13,6 +13,7 @@ import { ShapeType } from 'cvat-core-wrapper';
 import CVATTooltip from 'components/common/cvat-tooltip';
 import DrawShapePopoverContainer from 'containers/annotation-page/standard-workspace/controls-side-bar/draw-shape-popover';
 import withVisibilityHandling from './handle-popover-visibility';
+import { t } from 'cvat-i18n';
 
 export interface Props {
     canvasInstance: Canvas;
@@ -47,7 +48,7 @@ function DrawPolygonControl(props: Props): JSX.Element {
             placement='right'
             content={<DrawShapePopoverContainer shapeType={ShapeType.POLYGON} />}
         >
-            <CVATTooltip title='Draw a polygon' placement='right'>
+            <CVATTooltip title={t('Draw a polygon')} placement='right'>
                 <Icon {...dynamicIconProps} component={PolygonIcon} />
             </CVATTooltip>
         </CustomPopover>

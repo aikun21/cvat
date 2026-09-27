@@ -47,79 +47,80 @@ import { ShortcutScope } from 'utils/enums';
 import { registerComponentShortcuts } from 'actions/shortcuts-actions';
 import { subKeyMap } from 'utils/component-subkeymap';
 import { scrollAndExpandState } from 'utils/objects-sidebar';
+import { t } from 'cvat-i18n';
 
 const cvat = getCore();
 
 const componentShortcuts = {
     TILT_UP: {
-        name: 'Camera Roll Angle Up',
-        description: 'Increases camera roll angle',
+        name: t('Camera Roll Angle Up'),
+        description: t('Increases camera roll angle'),
         sequences: ['shift+up'],
         scope: ShortcutScope['3D_ANNOTATION_WORKSPACE'],
     },
     TILT_DOWN: {
-        name: 'Camera Roll Angle Down',
-        description: 'Decreases camera roll angle',
+        name: t('Camera Roll Angle Down'),
+        description: t('Decreases camera roll angle'),
         sequences: ['shift+down'],
         scope: ShortcutScope['3D_ANNOTATION_WORKSPACE'],
     },
     ROTATE_LEFT: {
-        name: 'Camera Pitch Angle Left',
-        description: 'Decreases camera pitch angle',
+        name: t('Camera Pitch Angle Left'),
+        description: t('Decreases camera pitch angle'),
         sequences: ['shift+left'],
         scope: ShortcutScope['3D_ANNOTATION_WORKSPACE'],
     },
     ROTATE_RIGHT: {
-        name: 'Camera Pitch Angle Right',
-        description: 'Increases camera pitch angle',
+        name: t('Camera Pitch Angle Right'),
+        description: t('Increases camera pitch angle'),
         sequences: ['shift+right'],
         scope: ShortcutScope['3D_ANNOTATION_WORKSPACE'],
     },
     MOVE_UP: {
-        name: 'Camera Move Up',
-        description: 'Move the camera up',
+        name: t('Camera Move Up'),
+        description: t('Move the camera up'),
         sequences: ['alt+u'],
         scope: ShortcutScope['3D_ANNOTATION_WORKSPACE'],
     },
     MOVE_DOWN: {
-        name: 'Camera Move Down',
-        description: 'Move the camera down',
+        name: t('Camera Move Down'),
+        description: t('Move the camera down'),
         sequences: ['alt+o'],
         scope: ShortcutScope['3D_ANNOTATION_WORKSPACE'],
     },
     MOVE_LEFT: {
-        name: 'Camera Move Left',
-        description: 'Move the camera left',
+        name: t('Camera Move Left'),
+        description: t('Move the camera left'),
         sequences: ['alt+j'],
         scope: ShortcutScope['3D_ANNOTATION_WORKSPACE'],
     },
     MOVE_RIGHT: {
-        name: 'Camera Move Right',
-        description: 'Move the camera right',
+        name: t('Camera Move Right'),
+        description: t('Move the camera right'),
         sequences: ['alt+l'],
         scope: ShortcutScope['3D_ANNOTATION_WORKSPACE'],
     },
     ZOOM_IN: {
-        name: 'Camera Zoom In',
-        description: 'Performs zoom in',
+        name: t('Camera Zoom In'),
+        description: t('Performs zoom in'),
         sequences: ['alt+i'],
         scope: ShortcutScope['3D_ANNOTATION_WORKSPACE'],
     },
     ZOOM_OUT: {
-        name: 'Camera Zoom Out',
-        description: 'Performs zoom out',
+        name: t('Camera Zoom Out'),
+        description: t('Performs zoom out'),
         sequences: ['alt+k'],
         scope: ShortcutScope['3D_ANNOTATION_WORKSPACE'],
     },
     NEXT_OBJECT: {
-        name: 'Next object',
-        description: 'Go to the next object and center it on the canvas',
+        name: t('Next object'),
+        description: t('Go to the next object and center it on the canvas'),
         sequences: ['tab'],
         scope: ShortcutScope.ANNOTATION_PAGE,
     },
     PREVIOUS_OBJECT: {
-        name: 'Previous object',
-        description: 'Go to the previous object and center it on the canvas',
+        name: t('Previous object'),
+        description: t('Go to the previous object and center it on the canvas'),
         sequences: ['shift+tab'],
         scope: ShortcutScope.ANNOTATION_PAGE,
     },
@@ -519,7 +520,7 @@ export const TopViewComponent = React.memo(
         return (
             <div className='cvat-canvas3d-orthographic-view cvat-canvas3d-topview'>
                 {!canvasIsReady && <Spinner />}
-                <div className='cvat-canvas3d-header'>Top</div>
+                <div className='cvat-canvas3d-header'>{t('Top')}</div>
                 <div
                     className='cvat-canvas3d-fullsize'
                     ref={ref}
@@ -546,7 +547,7 @@ export const SideViewComponent = React.memo(
         return (
             <div className='cvat-canvas3d-orthographic-view cvat-canvas3d-sideview'>
                 {!canvasIsReady && <Spinner />}
-                <div className='cvat-canvas3d-header'>Side</div>
+                <div className='cvat-canvas3d-header'>{t('Side')}</div>
                 <div
                     className='cvat-canvas3d-fullsize'
                     ref={ref}
@@ -573,7 +574,7 @@ export const FrontViewComponent = React.memo(
         return (
             <div className='cvat-canvas3d-orthographic-view cvat-canvas3d-frontview'>
                 {!canvasIsReady && <Spinner />}
-                <div className='cvat-canvas3d-header'>Front</div>
+                <div className='cvat-canvas3d-header'>{t('Front')}</div>
                 <div
                     className='cvat-canvas3d-fullsize'
                     ref={ref}

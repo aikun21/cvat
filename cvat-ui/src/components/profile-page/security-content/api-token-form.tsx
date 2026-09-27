@@ -14,6 +14,7 @@ import { Row, Col } from 'antd/lib/grid';
 import Typography from 'antd/lib/typography';
 
 import { ApiTokenModifiableFields, ApiToken } from 'cvat-core-wrapper';
+import { t } from 'cvat-i18n';
 
 interface Props {
     onSubmit: (data: ApiTokenModifiableFields) => void;
@@ -69,29 +70,29 @@ function ApiTokenForm({
             initialValues={initialValues}
         >
             <Typography.Title level={5}>
-                {isEditing ? 'Edit API Token' : 'Create API Token'}
+                {isEditing ? t('Edit API Token') : t('Create API Token')}
             </Typography.Title>
             <Form.Item
                 className='cvat-api-token-form-name'
-                label='Token Name'
+                label={t('Token Name')}
                 name='name'
                 rules={[
-                    { required: true, message: 'Please enter a token name' },
-                    { min: 3, message: 'Token name must be at least 3 characters' },
-                    { max: 50, message: 'Token name must not exceed 50 characters' },
+                    { required: true, message: t('Please enter a token name') },
+                    { min: 3, message: t('Token name must be at least 3 characters') },
+                    { max: 50, message: t('Token name must not exceed 50 characters') },
                 ]}
             >
-                <Input placeholder='Enter a descriptive name for this token' allowClear />
+                <Input placeholder={t('Enter a descriptive name for this token')} allowClear />
             </Form.Item>
             <Form.Item
                 className='cvat-api-token-form-expiration-date'
-                label='Expiration Date'
+                label={t('Expiration Date')}
                 name='expirationDate'
-                help='Leave this field empty if you do not want token to expire'
+                help={t('Leave this field empty if you do not want token to expire')}
             >
                 <DatePicker
                     style={{ width: '100%' }}
-                    placeholder='Select expiration date'
+                    placeholder={t('Select expiration date')}
                     disabledDate={(current) => current && current.valueOf() < Date.now()}
                     format='DD/MM/YYYY'
                 />
@@ -102,7 +103,7 @@ function ApiTokenForm({
                 valuePropName='checked'
             >
                 <Checkbox>
-                    Read-only
+                    {t('Read-only')}
                 </Checkbox>
             </Form.Item>
             <Row gutter={8} justify='end'>
@@ -112,7 +113,7 @@ function ApiTokenForm({
                         onClick={onCancel}
                         disabled={submitting}
                     >
-                        Cancel
+                        {t('Cancel')}
                     </Button>
                 </Col>
                 <Col>
@@ -122,7 +123,7 @@ function ApiTokenForm({
                         onClick={handleSubmit}
                         loading={submitting}
                     >
-                        {isEditing ? 'Update' : 'Save'}
+                        {isEditing ? t('Update') : t('Save')}
                     </Button>
                 </Col>
             </Row>

@@ -15,6 +15,7 @@ import Button from 'antd/lib/button';
 
 import { updateUserAsync } from 'actions/auth-actions';
 import validationRules from 'utils/validation-rules';
+import { t } from 'cvat-i18n';
 
 interface ProfileFormValues {
     username?: string;
@@ -67,7 +68,7 @@ function UserInfoCard(): JSX.Element {
     };
 
     return (
-        <Card title='Personal Information' className='cvat-profile-info-card'>
+        <Card title={t('Personal Information')} className='cvat-profile-info-card'>
             <Form
                 form={form}
                 layout='vertical'
@@ -77,7 +78,7 @@ function UserInfoCard(): JSX.Element {
                 <Row gutter={16}>
                     <Col span={12}>
                         <Form.Item
-                            label='First Name'
+                            label={t('First Name')}
                             name='firstName'
                             rules={validationRules.firstName}
                         >
@@ -86,7 +87,7 @@ function UserInfoCard(): JSX.Element {
                     </Col>
                     <Col span={12}>
                         <Form.Item
-                            label='Last Name'
+                            label={t('Last Name')}
                             name='lastName'
                             rules={validationRules.lastName}
                         >
@@ -95,14 +96,14 @@ function UserInfoCard(): JSX.Element {
                     </Col>
                 </Row>
                 <Form.Item
-                    label='Email'
+                    label={t('Email')}
                     name='email'
                     rules={validationRules.email}
                 >
                     <Input disabled />
                 </Form.Item>
                 <Form.Item
-                    label='Username'
+                    label={t('Username')}
                     name='username'
                     rules={validationRules.userName}
                 >
@@ -115,7 +116,7 @@ function UserInfoCard(): JSX.Element {
                             type='primary'
                             htmlType='submit'
                         >
-                            Save changes
+                            {t('Save changes')}
                         </Button>
                     </Row>
                 </Form.Item>

@@ -22,6 +22,7 @@ import { CombinedState } from 'reducers';
 import { switchMoveTaskModalVisible } from 'actions/tasks-actions';
 import { getCore, Task, Label } from 'cvat-core-wrapper';
 import LabelMapperItem, { LabelMapperItemValue } from './label-mapper-item';
+import { t } from 'cvat-i18n';
 
 const core = getCore();
 
@@ -76,13 +77,13 @@ function MoveTaskModal({
         }
 
         if (!projectId) {
-            notification.error({ message: 'Please, select a project' });
+            notification.error({ message: t('Please, select a project') });
             return;
         }
 
         if (Object.values(labelMap).some((map) => map.newLabelName === null)) {
             notification.error({
-                message: 'Please, specify mapping for all the labels',
+                message: t('Please, specify mapping for all the labels'),
             });
             return;
         }
@@ -112,7 +113,7 @@ function MoveTaskModal({
                     setIsUpdating(false);
                 }
             }).catch((error: Error) => notification.error({
-                message: 'Could not update the task',
+                message: t('Could not update the task'),
                 className: 'cvat-notification-notice-update-task-failed',
                 description: error.toString(),
             }));
@@ -132,7 +133,7 @@ function MoveTaskModal({
                     }
                 })
                 .catch((error: Error) => notification.error({
-                    message: 'Could not fetch task from the server',
+                    message: t('Could not fetch task from the server'),
                     description: error.toString(),
                 })).finally(() => {
                     if (mounted.current) {
@@ -185,9 +186,9 @@ function MoveTaskModal({
             okButtonProps={{ disabled: isUpdating }}
             title={(
                 <span>
-                    {`Move task ${taskInstance?.id} to project`}
+                    {t('Move task {{id}} to project', { id: taskInstance?.id })}
                     {/* TODO: replace placeholder */}
-                    <CVATTooltip title='Some moving process description here'>
+                    <CVATTooltip title={t('Some moving process description here')}>
                         <QuestionCircleOutlined className='ant-typography-secondary' />
                     </CVATTooltip>
                 </span>
@@ -196,7 +197,7 @@ function MoveTaskModal({
         >
             { taskFetching && <CVATLoadingSpinner size='large' /> }
             <Row align='middle'>
-                <Col>Project:</Col>
+                <Col>{t('Project:')}</Col>
                 <Col>
                     <ProjectSearch
                         value={projectId}
@@ -205,7 +206,7 @@ function MoveTaskModal({
                     />
                 </Col>
             </Row>
-            <Divider orientation='left'>Label mapping</Divider>
+            <Divider orientation='left'>{t('Label mapping')}</Divider>
             {!!Object.keys(labelMap).length &&
                 !isUpdating &&
                 taskInstance?.labels.map((label: any) => (

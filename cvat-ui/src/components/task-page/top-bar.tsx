@@ -12,6 +12,7 @@ import Text from 'antd/lib/typography/Text';
 import TaskActionsComponent from 'components/tasks-page/actions-menu';
 
 import { Task } from 'cvat-core-wrapper';
+import { t } from 'cvat-i18n';
 
 interface DetailsComponentProps {
     taskInstance: Task;
@@ -33,7 +34,7 @@ export default function DetailsComponent(props: DetailsComponentProps): JSX.Elem
                         size='large'
                     >
                         <LeftOutlined />
-                        Back to project
+                        {t('Back to project')}
                     </Button>
                 ) : (
                     <Button
@@ -43,7 +44,7 @@ export default function DetailsComponent(props: DetailsComponentProps): JSX.Elem
                         size='large'
                     >
                         <LeftOutlined />
-                        Back to tasks
+                        {t('Back to tasks')}
                     </Button>
                 )}
             </Col>
@@ -53,7 +54,7 @@ export default function DetailsComponent(props: DetailsComponentProps): JSX.Elem
                     onUpdateTask={onUpdateTask}
                     triggerElement={(
                         <Button size='middle' className='cvat-task-page-actions-button cvat-actions-menu-button'>
-                            <Text className='cvat-text-color'>Actions</Text>
+                            <Text className='cvat-text-color'>{t('Actions')}</Text>
                             <MoreOutlined className='cvat-menu-icon' />
                         </Button>
                     )}

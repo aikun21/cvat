@@ -14,6 +14,8 @@ import { ObjectType, ShapeType } from 'cvat-core-wrapper';
 import type { OrientationAngle } from 'utils/change-object-orientation';
 import ObjectItemElementComponent from './object-item-element';
 import ItemBasics from './object-item-basics';
+import { t } from 'cvat-i18n';
+import { formatObjectType } from 'utils/i18n-enums';
 
 interface Props {
     normalizedKeyMap: Record<string, string>;
@@ -97,10 +99,7 @@ function ObjectItemComponent(props: Props): JSX.Element {
         jobInstance,
     } = props;
 
-    const type =
-        objectType === ObjectType.TAG ?
-            ObjectType.TAG.toUpperCase() :
-            `${shapeType.toUpperCase()} ${objectType.toUpperCase()}`;
+    const type = formatObjectType(shapeType, objectType, objectType === ObjectType.TAG);
 
     const className = !activated ?
         `cvat-objects-sidebar-state-item${zLayerDragging ? ' cvat-objects-sidebar-state-item-dragging' : ''}` :
@@ -177,7 +176,7 @@ function ObjectItemComponent(props: Props): JSX.Element {
                         className='cvat-objects-sidebar-state-item-elements-collapse'
                         items={[{
                             key: 'elements',
-                            label: <Text style={{ fontSize: 10 }} type='secondary'>PARTS</Text>,
+                            label: <Text style={{ fontSize: 10 }} type='secondary'>{t('PARTS')}</Text>,
                             children: elements.map((element: number) => (
                                 <ObjectItemElementComponent
                                     key={element}

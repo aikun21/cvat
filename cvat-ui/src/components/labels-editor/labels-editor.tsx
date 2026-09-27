@@ -16,6 +16,7 @@ import ConstructorViewer, { CreatorType } from './constructor-viewer';
 import ConstructorCreator from './constructor-creator';
 import ConstructorUpdater from './constructor-updater';
 import { idGenerator, LabelOptColor } from './common';
+import { t } from 'cvat-i18n';
 
 enum ConstructorMode {
     SHOW = 'SHOW',
@@ -172,8 +173,8 @@ export default class LabelsEditor extends React.PureComponent<LabelsEditorProps,
             modal.confirm({
                 className: 'cvat-modal-delete-label',
                 icon: <ExclamationCircleOutlined />,
-                title: `Do you want to delete "${label.name}" label?`,
-                content: 'This action cannot be undone. All annotations associated to the label will be deleted.',
+                title: t('Do you want to delete "{{name}}" label?', { name: label.name }),
+                content: t('This action cannot be undone. All annotations associated to the label will be deleted.'),
                 type: 'warning',
                 okButtonProps: { type: 'primary', danger: true },
                 onOk: deleteLabel,
@@ -340,7 +341,7 @@ export default class LabelsEditor extends React.PureComponent<LabelsEditorProps,
                     label: (
                         <span>
                             <EditOutlined />
-                            <Text>Raw</Text>
+                            <Text>{t('Raw')}</Text>
                         </span>
                     ),
                     children: (
@@ -356,7 +357,7 @@ export default class LabelsEditor extends React.PureComponent<LabelsEditorProps,
                     label: (
                         <span>
                             <BuildOutlined />
-                            <Text>Constructor</Text>
+                            <Text>{t('Constructor')}</Text>
                         </span>
                     ),
                     children: configuratorContent,

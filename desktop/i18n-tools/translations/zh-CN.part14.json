@@ -1,0 +1,17 @@
+{
+    "GENERAL": "通用",
+    "ANNOTATION_PAGE": "标注页面",
+    "OBJECTS_SIDEBAR": "对象侧边栏",
+    "STANDARD_WORKSPACE": "标准工作区",
+    "STANDARD_WORKSPACE_CONTROLS": "标准工作区控件",
+    "ATTRIBUTE_ANNOTATION_WORKSPACE": "属性标注工作区",
+    "SINGLE_SHAPE_ANNOTATION_WORKSPACE": "单图形标注工作区",
+    "TAG_ANNOTATION_WORKSPACE": "标记标注工作区",
+    "REVIEW_WORKSPACE_CONTROLS": "审核工作区控件",
+    "3D_ANNOTATION_WORKSPACE": "3D 标注工作区",
+    "3D_ANNOTATION_WORKSPACE_CONTROLS": "3D 标注工作区控件",
+    "AUDIO_WORKSPACE_CONTROLS": "音频工作区控件",
+    "LABELS_EDITOR": "标签编辑器",
+    "minutes": "分钟",
+    "or": "或"
+}

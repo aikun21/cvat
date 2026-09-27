@@ -1,0 +1,21 @@
+{
+    "A manifest has been created": "清单文件已创建",
+    "Collection is being saved on the server": "正在将标注集合保存到服务器",
+    "Created by {{owner}} on {{created}}": "由 {{owner}} 创建于 {{created}}",
+    "Created objects are being saved on the server": "正在将新建的对象保存到服务器",
+    "Created on {{created}}": "创建于 {{created}}",
+    "CVAT is creating your task": "CVAT 正在创建任务",
+    "CVAT is preparing data chunks": "CVAT 正在准备数据分块",
+    "CVAT is uploading task data to the server": "CVAT 正在将任务数据上传到服务器",
+    "CVAT queued the task to import": "CVAT 已将任务加入导入队列",
+    "Deleted objects are being deleted from the server": "正在从服务器删除已删除的对象",
+    "Downloading input media": "正在下载输入媒体",
+    "Images processing failed": "图像处理失败",
+    "Media files are being extracted...": "正在解析媒体文件……",
+    "Preparing a manifest file": "正在准备清单文件",
+    "Task creation finished": "任务创建完成",
+    "The dataset is being uploaded to the server": "正在将数据集上传到服务器",
+    "Updated objects are being saved on the server": "正在将更新的对象保存到服务器",
+    "Validating the input manifest file": "正在校验输入的清单文件",
+    "You may close the window.": "你可以关闭此窗口。"
+}

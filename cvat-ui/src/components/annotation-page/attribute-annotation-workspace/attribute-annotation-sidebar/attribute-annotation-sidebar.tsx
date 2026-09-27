@@ -30,6 +30,7 @@ import AttributeEditor from './attribute-editor';
 import AttributeSwitcher from './attribute-switcher';
 import ObjectBasicsEditor from './object-basics-editor';
 import ObjectSwitcher from './object-switcher';
+import { t } from 'cvat-i18n';
 
 interface StateToProps {
     activatedStateID: number | null;
@@ -54,44 +55,44 @@ interface LabelAttrMap {
 
 const componentShortcuts = {
     NEXT_ATTRIBUTE: {
-        name: 'Next attribute',
-        description: 'Go to the next attribute',
+        name: t('Next attribute'),
+        description: t('Go to the next attribute'),
         sequences: ['down'],
         scope: ShortcutScope.ATTRIBUTE_ANNOTATION_WORKSPACE,
     },
     PREVIOUS_ATTRIBUTE: {
-        name: 'Previous attribute',
-        description: 'Go to the previous attribute',
+        name: t('Previous attribute'),
+        description: t('Go to the previous attribute'),
         sequences: ['up'],
         scope: ShortcutScope.ATTRIBUTE_ANNOTATION_WORKSPACE,
     },
     SWITCH_LOCK: {
-        name: 'Lock/unlock an object',
-        description: 'Change locked state for an active object',
+        name: t('Lock/unlock an object'),
+        description: t('Change locked state for an active object'),
         sequences: ['l'],
         scope: ShortcutScope.OBJECTS_SIDEBAR,
     },
     SWITCH_OCCLUDED: {
-        name: 'Switch occluded',
-        description: 'Change occluded property for an active object',
+        name: t('Switch occluded'),
+        description: t('Change occluded property for an active object'),
         sequences: ['q', '/'],
         scope: ShortcutScope.OBJECTS_SIDEBAR,
     },
     SWITCH_PINNED: {
-        name: 'Switch pinned property',
-        description: 'Change pinned property for an active object',
+        name: t('Switch pinned property'),
+        description: t('Change pinned property for an active object'),
         sequences: ['p'],
         scope: ShortcutScope.OBJECTS_SIDEBAR,
     },
     NEXT_KEY_FRAME: {
-        name: 'Next keyframe',
-        description: 'Go to the next keyframe of an active track',
+        name: t('Next keyframe'),
+        description: t('Go to the next keyframe of an active track'),
         sequences: ['r'],
         scope: ShortcutScope.OBJECTS_SIDEBAR,
     },
     PREV_KEY_FRAME: {
-        name: 'Previous keyframe',
-        description: 'Go to the previous keyframe of an active track',
+        name: t('Previous keyframe'),
+        description: t('Go to the previous keyframe of an active track'),
         sequences: ['e'],
         scope: ShortcutScope.OBJECTS_SIDEBAR,
     },
@@ -323,7 +324,7 @@ function AttributeAnnotationSidebar(props: StateToProps & DispatchToProps): JSX.
                     className='cvat-objects-sidebar-sider'
                     onClick={collapse}
                 >
-                    {sidebarCollapsed ? <MenuFoldOutlined title='Show' /> : <MenuUnfoldOutlined title='Hide' />}
+                    {sidebarCollapsed ? <MenuFoldOutlined title={t('Show')} /> : <MenuUnfoldOutlined title={t('Hide')} />}
                 </span>
                 <GlobalHotKeys keyMap={subKeyMap(componentShortcuts, keyMap)} handlers={handlers} />
                 <div className='cvat-sidebar-collapse-button-spacer' />
@@ -373,7 +374,7 @@ function AttributeAnnotationSidebar(props: StateToProps & DispatchToProps): JSX.
                     </>
                 ) : (
                     <div className='attribute-annotations-sidebar-not-found-wrapper'>
-                        <Text strong>No attributes found</Text>
+                        <Text strong>{t('No attributes found')}</Text>
                     </div>
                 )}
 
@@ -389,11 +390,11 @@ function AttributeAnnotationSidebar(props: StateToProps & DispatchToProps): JSX.
                 className='cvat-objects-sidebar-sider'
                 onClick={collapse}
             >
-                {sidebarCollapsed ? <MenuFoldOutlined title='Show' /> : <MenuUnfoldOutlined title='Hide' />}
+                {sidebarCollapsed ? <MenuFoldOutlined title={t('Show')} /> : <MenuUnfoldOutlined title={t('Hide')} />}
             </span>
             <div className='cvat-sidebar-collapse-button-spacer' />
             <div className='attribute-annotations-sidebar-not-found-wrapper'>
-                <Text strong>No objects found</Text>
+                <Text strong>{t('No objects found')}</Text>
             </div>
         </Layout.Sider>
     );

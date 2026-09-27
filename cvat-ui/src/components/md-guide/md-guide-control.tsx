@@ -9,6 +9,7 @@ import { useHistory } from 'react-router';
 import { Row, Col } from 'antd/lib/grid';
 import Text from 'antd/lib/typography/Text';
 import Button from 'antd/lib/button';
+import { t } from 'cvat-i18n';
 
 interface Props {
     instanceType: 'task' | 'project';
@@ -22,14 +23,14 @@ function MdGuideControl(props: Props): JSX.Element {
     return (
         <Row justify='start' className='cvat-md-guide-control-wrapper'>
             <Col span={24}>
-                <Text strong className='cvat-text-color'>{`${instanceType[0].toUpperCase()}${instanceType.slice(1)} description`}</Text>
+                <Text strong className='cvat-text-color'>{instanceType === 'project' ? t('Project description') : t('Task description')}</Text>
                 <br />
                 <Button
                     onClick={() => {
                         history.push(`/${instanceType}s/${id}/guide`);
                     }}
                 >
-                    Edit
+                    {t('Edit')}
                 </Button>
             </Col>
         </Row>

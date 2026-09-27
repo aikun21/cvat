@@ -19,6 +19,7 @@ import { shallowEqual } from 'utils/redux';
 import Input from 'antd/lib/input/Input';
 
 import { Storage, StorageData, StorageLocation } from 'cvat-core-wrapper';
+import { t } from 'cvat-i18n';
 
 type FormValues = {
     fileName?: string | undefined;
@@ -65,14 +66,14 @@ function ImportBackupModal(): JSX.Element {
                 return e?.fileList[0];
             }}
             name='dragger'
-            rules={[{ required: true, message: 'The file is required' }]}
+            rules={[{ required: true, message: t('The file is required') }]}
         >
             <Upload.Dragger
                 listType='text'
                 fileList={file ? [file] : ([] as any[])}
                 beforeUpload={(_file: RcFile): boolean => {
                     if (!['application/zip', 'application/x-zip-compressed'].includes(_file.type)) {
-                        message.error('Only ZIP archive is supported');
+                        message.error(t('Only ZIP archive is supported'));
                     } else {
                         setFile(_file);
                     }
@@ -85,7 +86,7 @@ function ImportBackupModal(): JSX.Element {
                 <p className='ant-upload-drag-icon'>
                     <InboxOutlined />
                 </p>
-                <p className='ant-upload-text'>Click or drag file to this area</p>
+                <p className='ant-upload-text'>{t('Click or drag file to this area')}</p>
             </Upload.Dragger>
         </Form.Item>
     );
@@ -103,12 +104,12 @@ function ImportBackupModal(): JSX.Element {
 
     const renderCustomName = (): JSX.Element => (
         <Form.Item
-            label={<Text strong>File name</Text>}
+            label={<Text strong>{t('File name')}</Text>}
             name='fileName'
-            rules={[{ validator: validateFileName }, { required: true, message: 'Please, specify a name' }]}
+            rules={[{ validator: validateFileName }, { required: true, message: t('Please, specify a name') }]}
         >
             <Input
-                placeholder='Backup file name'
+                placeholder={t('Backup file name')}
                 className='cvat-modal-import-filename-input'
             />
         </Form.Item>
@@ -127,7 +128,7 @@ function ImportBackupModal(): JSX.Element {
         (values: FormValues): void => {
             if (file === null && !values.fileName) {
                 Notification.error({
-                    message: 'No backup file specified',
+                    message: t('No backup file specified'),
                 });
                 return;
             }
@@ -145,7 +146,7 @@ function ImportBackupModal(): JSX.Element {
             );
 
             Notification.info({
-                message: `The ${instanceType} creating from the backup has been started`,
+                message: t('The {{instanceType}} creating from the backup has been started', { instanceType }),
                 className: 'cvat-notification-notice-import-backup-start',
             });
             closeModal();
@@ -157,7 +158,7 @@ function ImportBackupModal(): JSX.Element {
         <Modal
             title={(
                 <Text strong>
-                    {`Create ${instanceType} from backup`}
+                    {t('Create {{instanceType}} from backup', { instanceType })}
                 </Text>
             )}
             open={modalVisible}
@@ -174,7 +175,7 @@ function ImportBackupModal(): JSX.Element {
             >
                 <SourceStorageField
                     instanceId={null}
-                    storageDescription='Specify source storage with backup'
+                    storageDescription={t('Specify source storage with backup')}
                     locationValue={selectedSourceStorage.location}
                     onChangeStorage={(value: StorageData) => setSelectedSourceStorage(new Storage(value))}
                     onChangeLocationValue={(value: StorageLocation) => {

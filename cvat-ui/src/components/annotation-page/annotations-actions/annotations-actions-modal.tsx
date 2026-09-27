@@ -32,6 +32,7 @@ import { Canvas } from 'cvat-canvas-wrapper';
 import { fetchAnnotationsAsync } from 'actions/annotation-actions';
 import { clamp } from 'utils/math';
 import CVATTooltip from 'components/common/cvat-tooltip';
+import { t } from 'cvat-i18n';
 
 const core = getCore();
 
@@ -360,12 +361,12 @@ function AnnotationsActionsModalContent(props: Props): JSX.Element {
                 destroyOnClose
                 afterClose={onClose}
                 className='cvat-action-runner-content'
-                okText='Close'
+                okText={t('Close')}
                 cancelButtonProps={{ style: { display: 'none' } }}
                 onOk={() => dispatch(reducerActions.setVisible(false))}
             >
                 <Alert
-                    message='Annotation actions are not available for audio jobs'
+                    message={t('Annotation actions are not available for audio jobs')}
                     type='info'
                     showIcon
                 />
@@ -388,10 +389,10 @@ function AnnotationsActionsModalContent(props: Props): JSX.Element {
                     <Alert
                         message={(
                             targetObjectState ? (
-                                <Text> Selected action will be applied to the current object </Text>
+                                <Text> {t('Selected action will be applied to the current object')}{' '}</Text>
                             ) : (
                                 <div>
-                                    <Text>Actions allow executing certain algorithms on </Text>
+                                    <Text>{t('Actions allow executing certain algorithms on')}{' '}</Text>
                                     <Text strong>
                                         <a
                                             target='_blank'
@@ -413,7 +414,7 @@ function AnnotationsActionsModalContent(props: Props): JSX.Element {
                 <Col span={24} className='cvat-action-runner-list'>
                     <Row>
                         <Col span={24}>
-                            <Text strong className='cvat-text-color'>Select action</Text>
+                            <Text strong className='cvat-text-color'>{t('Select action')}</Text>
                             <hr />
                         </Col>
                         <Col span={24}>
@@ -448,11 +449,11 @@ function AnnotationsActionsModalContent(props: Props): JSX.Element {
                         <Col span={24} className='cvat-action-runner-frames'>
                             <Row>
                                 <Col span={24}>
-                                    <Text strong>Specify frames to apply the action </Text>
+                                    <Text strong>{t('Specify frames to apply the action')}{' '}</Text>
                                     <hr />
                                 </Col>
                                 <Col span={24}>
-                                    <Text> Starting from frame </Text>
+                                    <Text> {t('Starting from frame')}{' '}</Text>
                                     <InputNumber
                                         value={frameFrom}
                                         min={jobInstance.startFrame}
@@ -470,7 +471,7 @@ function AnnotationsActionsModalContent(props: Props): JSX.Element {
                                             }
                                         }}
                                     />
-                                    <Text> up to frame </Text>
+                                    <Text> {t('up to frame')}{' '}</Text>
                                     <InputNumber
                                         value={frameTo}
                                         min={frameFrom}
@@ -496,7 +497,7 @@ function AnnotationsActionsModalContent(props: Props): JSX.Element {
                                 <Col span={24} className='cvat-action-runner-frames-predefined'>
                                     <Row>
                                         <Col span={24}>
-                                            <Text strong>Or choose one of predefined options </Text>
+                                            <Text strong>{t('Or choose one of predefined options')}{' '}</Text>
                                             <hr />
                                         </Col>
                                         <Col span={24}>
@@ -507,7 +508,7 @@ function AnnotationsActionsModalContent(props: Props): JSX.Element {
                                                     dispatch(reducerActions.updateFrameTo(current));
                                                 }}
                                             >
-                                                Current frame
+                                                {t('Current frame')}
                                             </Button>
                                             <Button
                                                 onClick={() => {
@@ -515,7 +516,7 @@ function AnnotationsActionsModalContent(props: Props): JSX.Element {
                                                     dispatch(reducerActions.updateFrameTo(jobInstance.stopFrame));
                                                 }}
                                             >
-                                                All frames
+                                                {t('All frames')}
                                             </Button>
                                             <Button
                                                 onClick={() => {
@@ -524,7 +525,7 @@ function AnnotationsActionsModalContent(props: Props): JSX.Element {
                                                     dispatch(reducerActions.updateFrameTo(jobInstance.stopFrame));
                                                 }}
                                             >
-                                                From current
+                                                {t('From current')}
                                             </Button>
                                             <Button
                                                 onClick={() => {
@@ -533,7 +534,7 @@ function AnnotationsActionsModalContent(props: Props): JSX.Element {
                                                     dispatch(reducerActions.updateFrameTo(current));
                                                 }}
                                             >
-                                                Up to current
+                                                {t('Up to current')}
                                             </Button>
                                         </Col>
                                     </Row>
@@ -547,7 +548,7 @@ function AnnotationsActionsModalContent(props: Props): JSX.Element {
                     <Col span={24} className='cvat-action-runner-action-parameters'>
                         <Row>
                             <Col span={24}>
-                                <Text strong>Setup action parameters </Text>
+                                <Text strong>{t('Setup action parameters')}{' '}</Text>
                                 <hr />
                             </Col>
                             {Object.entries(activeAction.parameters)
@@ -638,7 +639,7 @@ function AnnotationsActionsModalContent(props: Props): JSX.Element {
                             }
                         }}
                     >
-                        { fetching ? 'Cancel' : 'Close'}
+                        { fetching ? t('Cancel') : t('Close')}
                     </Button>
                     <Button
                         className='cvat-action-runner-run-btn'
@@ -697,7 +698,7 @@ function AnnotationsActionsModalContent(props: Props): JSX.Element {
                             }
                         }}
                     >
-                        Run
+                        {t('Run')}
                     </Button>
                 </Col>
             </Row>

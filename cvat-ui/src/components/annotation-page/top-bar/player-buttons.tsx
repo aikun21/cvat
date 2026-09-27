@@ -31,6 +31,7 @@ import { registerComponentShortcuts } from 'actions/shortcuts-actions';
 import { subKeyMap } from 'utils/component-subkeymap';
 import { Chapter } from 'cvat-core/src/frames';
 import ChapterMenu from './chapter-menu';
+import { t } from 'cvat-i18n';
 
 interface Props {
     playing: boolean;
@@ -59,56 +60,56 @@ interface Props {
 
 const componentShortcuts = {
     NEXT_FRAME: {
-        name: 'Next frame',
-        description: 'Go to the next frame',
+        name: t('Next frame'),
+        description: t('Go to the next frame'),
         sequences: ['f'],
         scope: ShortcutScope.ANNOTATION_PAGE,
     },
     PREV_FRAME: {
-        name: 'Previous frame',
-        description: 'Go to the previous frame',
+        name: t('Previous frame'),
+        description: t('Go to the previous frame'),
         sequences: ['d'],
         scope: ShortcutScope.ANNOTATION_PAGE,
     },
     FORWARD_FRAME: {
-        name: 'Forward frame',
-        description: 'Go forward with a step',
+        name: t('Forward frame'),
+        description: t('Go forward with a step'),
         sequences: ['v'],
         scope: ShortcutScope.ANNOTATION_PAGE,
     },
     BACKWARD_FRAME: {
-        name: 'Backward frame',
-        description: 'Go backward with a step',
+        name: t('Backward frame'),
+        description: t('Go backward with a step'),
         sequences: ['c'],
         scope: ShortcutScope.ANNOTATION_PAGE,
     },
     SEARCH_FORWARD: {
-        name: 'Search forward',
-        description: 'Search the next frame that satisfies to the filters',
+        name: t('Search forward'),
+        description: t('Search the next frame that satisfies to the filters'),
         sequences: ['right'],
         scope: ShortcutScope.ANNOTATION_PAGE,
     },
     SEARCH_BACKWARD: {
-        name: 'Search backward',
-        description: 'Search the previous frame that satisfies to the filters',
+        name: t('Search backward'),
+        description: t('Search the previous frame that satisfies to the filters'),
         sequences: ['left'],
         scope: ShortcutScope.ANNOTATION_PAGE,
     },
     CHAPTER_BACKWARD: {
-        name: 'Chapter backward',
-        description: 'Go to the previous chapter',
+        name: t('Chapter backward'),
+        description: t('Go to the previous chapter'),
         sequences: ['x'],
         scope: ShortcutScope.ANNOTATION_PAGE,
     },
     CHAPTER_FORWARD: {
-        name: 'Chapter forward',
-        description: 'Go to the next chapter',
+        name: t('Chapter forward'),
+        description: t('Go to the next chapter'),
         sequences: ['b'],
         scope: ShortcutScope.ANNOTATION_PAGE,
     },
     PLAY_PAUSE: {
-        name: 'Play/pause',
-        description: 'Start/stop automatic changing frames',
+        name: t('Play/pause'),
+        description: t('Start/stop automatic changing frames'),
         sequences: ['space'],
         scope: ShortcutScope.ANNOTATION_PAGE,
     },
@@ -183,14 +184,14 @@ function PlayerButtons(props: Props): JSX.Element {
         } : {}),
     };
 
-    const prevRegularText = 'Go back';
-    const prevFilteredText = 'Go back with a filter';
-    const prevEmptyText = 'Go back to an empty frame';
-    const prevChapterText = 'Go to the previous chapter';
-    const nextRegularText = 'Go next';
-    const nextFilteredText = 'Go next with a filter';
-    const nextEmptyText = 'Go next to an empty frame';
-    const nextChapterText = 'Go to the next chapter';
+    const prevRegularText = t('Go back');
+    const prevFilteredText = t('Go back with a filter');
+    const prevEmptyText = t('Go back to an empty frame');
+    const prevChapterText = t('Go to the previous chapter');
+    const nextRegularText = t('Go next');
+    const nextFilteredText = t('Go next with a filter');
+    const nextEmptyText = t('Go next to an empty frame');
+    const nextChapterText = t('Go to the next chapter');
 
     let prevButton = <Icon className='cvat-player-previous-button' component={PreviousIcon} onClick={onPrevFrame} />;
     let prevButtonTooltipMessage = prevRegularText;
@@ -248,7 +249,7 @@ function PlayerButtons(props: Props): JSX.Element {
                 />
 
             )}
-            <CVATTooltip title='Go to the first frame'>
+            <CVATTooltip title={t('Go to the first frame')}>
                 <Icon
                     style={navIconStyle}
                     className='cvat-player-first-button'
@@ -256,7 +257,7 @@ function PlayerButtons(props: Props): JSX.Element {
                     onClick={onFirstFrame}
                 />
             </CVATTooltip>
-            <CVATTooltip title={`Go back with a step ${backwardShortcut}`}>
+            <CVATTooltip title={t('Go back with a step {{backwardShortcut}}', { backwardShortcut })}>
                 <Icon
                     style={navIconStyle}
                     className='cvat-player-backward-button'
@@ -306,7 +307,7 @@ function PlayerButtons(props: Props): JSX.Element {
             </Popover>
 
             {!playing ? (
-                <CVATTooltip title={`Play ${playPauseShortcut}`}>
+                <CVATTooltip title={t('Play {{playPauseShortcut}}', { playPauseShortcut })}>
                     <Icon
                         style={navIconStyle}
                         className='cvat-player-play-button'
@@ -315,7 +316,7 @@ function PlayerButtons(props: Props): JSX.Element {
                     />
                 </CVATTooltip>
             ) : (
-                <CVATTooltip title={`Pause ${playPauseShortcut}`}>
+                <CVATTooltip title={t('Pause {{playPauseShortcut}}', { playPauseShortcut })}>
                     <Icon
                         style={navIconStyle}
                         className='cvat-player-pause-button'
@@ -365,7 +366,7 @@ function PlayerButtons(props: Props): JSX.Element {
                     {nextButton}
                 </CVATTooltip>
             </Popover>
-            <CVATTooltip title={`Go next with a step ${forwardShortcut}`}>
+            <CVATTooltip title={t('Go next with a step {{forwardShortcut}}', { forwardShortcut })}>
                 <Icon
                     style={navIconStyle}
                     className='cvat-player-forward-button'
@@ -373,7 +374,7 @@ function PlayerButtons(props: Props): JSX.Element {
                     onClick={onForward}
                 />
             </CVATTooltip>
-            <CVATTooltip title='Go to the last frame'>
+            <CVATTooltip title={t('Go to the last frame')}>
                 <Icon
                     style={navIconStyle}
                     className='cvat-player-last-button'

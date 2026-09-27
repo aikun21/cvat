@@ -41,6 +41,7 @@ import GroupControl, { Props as GroupControlProps } from './group-control';
 import JoinControl, { Props as JoinControlProps } from './join-control';
 import SplitControl, { Props as SplitControlProps } from './split-control';
 import SliceControl, { Props as SliceControlProps } from './slice-control';
+import { t } from 'cvat-i18n';
 
 type Label = CombinedState['annotation']['job']['labels'][0];
 
@@ -63,57 +64,57 @@ interface Props {
 
 const componentShortcuts = {
     CLOCKWISE_ROTATION_STANDARD_CONTROLS: {
-        name: 'Rotate clockwise',
-        description: 'Change active rectangle or ellipse orientation clockwise by 90°, or rotate the image if none is active',
+        name: t('Rotate clockwise'),
+        description: t('Change active rectangle or ellipse orientation clockwise by 90°, or rotate the image if none is active'),
         sequences: ['ctrl+r'],
         scope: ShortcutScope.STANDARD_WORKSPACE_CONTROLS,
     },
     ANTICLOCKWISE_ROTATION_STANDARD_CONTROLS: {
-        name: 'Rotate anticlockwise',
-        description: 'Change active rectangle or ellipse orientation counterclockwise by 90°, or rotate the image if none is active',
+        name: t('Rotate anticlockwise'),
+        description: t('Change active rectangle or ellipse orientation counterclockwise by 90°, or rotate the image if none is active'),
         sequences: ['ctrl+shift+r'],
         scope: ShortcutScope.STANDARD_WORKSPACE_CONTROLS,
     },
     PASTE_SHAPE: {
-        name: 'Paste shape',
-        description: 'Paste a shape from internal CVAT clipboard',
+        name: t('Paste shape'),
+        description: t('Paste a shape from internal CVAT clipboard'),
         sequences: ['ctrl+v', 'command+v'],
         scope: ShortcutScope.OBJECTS_SIDEBAR,
     },
     SWITCH_DRAW_MODE_STANDARD_CONTROLS: {
-        name: 'Draw mode',
+        name: t('Draw mode'),
         description:
-            'Repeat the latest procedure of drawing with the same parameters',
+            t('Repeat the latest procedure of drawing with the same parameters'),
         sequences: ['n'],
         scope: ShortcutScope.STANDARD_WORKSPACE_CONTROLS,
     },
     SWITCH_REDRAW_MODE_STANDARD_CONTROLS: {
-        name: 'Redraw shape',
-        description: 'Remove selected shape and redraw it from scratch',
+        name: t('Redraw shape'),
+        description: t('Remove selected shape and redraw it from scratch'),
         sequences: ['shift+n'],
         scope: ShortcutScope.STANDARD_WORKSPACE_CONTROLS,
     },
     SWITCH_GROUP_MODE_STANDARD_CONTROLS: {
-        name: 'Group mode',
-        description: 'Activate or deactivate mode to grouping shapes',
+        name: t('Group mode'),
+        description: t('Activate or deactivate mode to grouping shapes'),
         sequences: ['g'],
         scope: ShortcutScope.STANDARD_WORKSPACE_CONTROLS,
     },
     RESET_GROUP_STANDARD_CONTROLS: {
-        name: 'Reset group',
-        description: 'Reset group for selected shapes (in group mode)',
+        name: t('Reset group'),
+        description: t('Reset group for selected shapes (in group mode)'),
         sequences: ['shift+g'],
         scope: ShortcutScope.STANDARD_WORKSPACE_CONTROLS,
     },
     SWITCH_MERGE_MODE_STANDARD_CONTROLS: {
-        name: 'Merge mode',
-        description: 'Activate or deactivate mode to merging shapes',
+        name: t('Merge mode'),
+        description: t('Activate or deactivate mode to merging shapes'),
         sequences: ['m'],
         scope: ShortcutScope.STANDARD_WORKSPACE_CONTROLS,
     },
     SWITCH_SPLIT_MODE_STANDARD_CONTROLS: {
-        name: 'Split mode',
-        description: 'Activate or deactivate mode to splitting shapes',
+        name: t('Split mode'),
+        description: t('Activate or deactivate mode to splitting shapes'),
         sequences: ['alt+m'],
         scope: ShortcutScope.STANDARD_WORKSPACE_CONTROLS,
     },

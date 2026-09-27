@@ -7,6 +7,7 @@ import Button from 'antd/lib/button';
 import Text from 'antd/lib/typography/Text';
 import { LeftOutlined } from '@ant-design/icons';
 import { useGoBack } from 'utils/hooks';
+import { t } from 'cvat-i18n';
 
 function GoBackButton(): JSX.Element {
     const goBack = useGoBack();
@@ -15,7 +16,7 @@ function GoBackButton(): JSX.Element {
             <Button style={{ marginRight: 8 }} onClick={goBack} className='cvat-back-btn'>
                 <LeftOutlined />
             </Button>
-            <Text style={{ userSelect: 'none' }} strong>Back</Text>
+            <Text style={{ userSelect: 'none' }} strong>{t('Back')}</Text>
         </>
     );
 }

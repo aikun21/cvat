@@ -18,6 +18,7 @@ import {
     Label, ObjectType, ShapeType, LabelType,
 } from 'cvat-core-wrapper';
 import openCVWrapper from 'utils/opencv-wrapper/opencv-wrapper';
+import { t } from 'cvat-i18n';
 
 interface OwnProps {
     shapeType: ShapeType;
@@ -141,13 +142,13 @@ class DrawShapePopoverContainer extends React.PureComponent<Props, State> {
             return true;
         }
 
-        const hide = message.loading('Initializing OpenCV for rotated shape drawing...', 0);
+        const hide = message.loading(t('Initializing OpenCV for rotated shape drawing...'), 0);
         try {
             await openCVWrapper.initialize(() => {});
             return true;
         } catch (error: any) {
             notification.error({
-                message: 'Could not initialize OpenCV',
+                message: t('Could not initialize OpenCV'),
                 description: error.toString(),
             });
             return false;

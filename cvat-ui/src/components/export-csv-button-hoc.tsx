@@ -13,6 +13,7 @@ import { CombinedState } from 'reducers';
 import IncrementalCSVWriter, { CSVColumn, downloadCSV } from 'utils/csv-writer';
 import { exportToCSVAsync } from 'actions/csv-export-actions';
 import { filterNull, NonNullableProperties } from 'utils/filter-null';
+import { t } from 'cvat-i18n';
 
 interface CSVExportButtonConfig<T, Q> {
     resourceName: string;
@@ -76,16 +77,14 @@ function createCSVExportButton<T, Q>(
                 resourceName: config.resourceName,
                 onSuccess: (totalCount: number, exportedFilename: string) => {
                     notification.success({
-                        message: 'Export completed',
-                        description: (
-                            `Successfully exported ${totalCount} ${config.resourceName} to ${exportedFilename}`
-                        ),
+                        message: t('Export completed'),
+                        description: (t('Successfully exported {{totalCount}} {{resourceName}} to {{exportedFilename}}', { totalCount, resourceName: config.resourceName, exportedFilename })),
                     });
                 },
                 onError: (error: Error) => {
                     notification.error({
-                        message: 'CSV export failed',
-                        description: error.message || 'An unknown error occurred during export',
+                        message: t('CSV export failed'),
+                        description: error.message || t('An unknown error occurred during export'),
                     });
                 },
             }));

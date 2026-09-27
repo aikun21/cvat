@@ -12,6 +12,7 @@ import { Canvas3d } from 'cvat-canvas3d-wrapper';
 import { CombinedState } from 'reducers';
 import CVATTooltip from 'components/common/cvat-tooltip';
 import { useSelector } from 'react-redux';
+import { t } from 'cvat-i18n';
 
 export interface Props {
     canvasInstance: Canvas | Canvas3d;
@@ -32,11 +33,9 @@ function SplitControl(props: Props): JSX.Element {
         <Icon className='cvat-split-track-control cvat-disabled-canvas-control' component={SplitIcon} />
     ) : (
         <CVATTooltip
-            title={`Split a track ${
-                canvasInstance instanceof Canvas3d ?
+            title={t('Split a track {{value}}', { value: canvasInstance instanceof Canvas3d ?
                     normalizedKeyMap.SWITCH_SPLIT_MODE_STANDARD_3D_CONTROLS :
-                    normalizedKeyMap.SWITCH_SPLIT_MODE_STANDARD_CONTROLS
-            }`}
+                    normalizedKeyMap.SWITCH_SPLIT_MODE_STANDARD_CONTROLS })}
             placement='right'
         >
             <Icon {...dynamicIconProps} component={SplitIcon} />

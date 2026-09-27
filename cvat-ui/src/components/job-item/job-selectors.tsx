@@ -6,6 +6,8 @@ import React from 'react';
 import Select from 'antd/lib/select';
 import { JobStage, JobState } from 'cvat-core-wrapper';
 import { handleDropdownKeyDown } from 'utils/dropdown-utils';
+import { t } from 'cvat-i18n';
+import { translateEnum } from 'utils/i18n-enums';
 
 interface JobStateSelectorProps {
     value: JobState | null;
@@ -20,12 +22,12 @@ export function JobStateSelector({ value, onSelect }: Readonly<JobStateSelectorP
             value={value}
             onChange={onSelect}
             onKeyDown={handleDropdownKeyDown}
-            placeholder='Select a state'
+            placeholder={t('Select a state')}
         >
-            <Select.Option value={JobState.NEW}>{JobState.NEW}</Select.Option>
-            <Select.Option value={JobState.IN_PROGRESS}>{JobState.IN_PROGRESS}</Select.Option>
-            <Select.Option value={JobState.REJECTED}>{JobState.REJECTED}</Select.Option>
-            <Select.Option value={JobState.COMPLETED}>{JobState.COMPLETED}</Select.Option>
+            <Select.Option value={JobState.NEW}>{translateEnum(JobState.NEW)}</Select.Option>
+            <Select.Option value={JobState.IN_PROGRESS}>{translateEnum(JobState.IN_PROGRESS)}</Select.Option>
+            <Select.Option value={JobState.REJECTED}>{translateEnum(JobState.REJECTED)}</Select.Option>
+            <Select.Option value={JobState.COMPLETED}>{translateEnum(JobState.COMPLETED)}</Select.Option>
         </Select>
     );
 }
@@ -43,16 +45,16 @@ export function JobStageSelector({ value, onSelect }: Readonly<JobStageSelectorP
             value={value}
             onChange={onSelect}
             onKeyDown={handleDropdownKeyDown}
-            placeholder='Select a stage'
+            placeholder={t('Select a stage')}
         >
             <Select.Option value={JobStage.ANNOTATION}>
-                {JobStage.ANNOTATION}
+                {translateEnum(JobStage.ANNOTATION)}
             </Select.Option>
             <Select.Option value={JobStage.VALIDATION}>
-                {JobStage.VALIDATION}
+                {translateEnum(JobStage.VALIDATION)}
             </Select.Option>
             <Select.Option value={JobStage.ACCEPTANCE}>
-                {JobStage.ACCEPTANCE}
+                {translateEnum(JobStage.ACCEPTANCE)}
             </Select.Option>
         </Select>
     );

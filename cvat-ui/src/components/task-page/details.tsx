@@ -26,6 +26,7 @@ import BugTrackerEditor from './bug-tracker-editor';
 import CloudStorageEditor from './cloud-storage-editor';
 import LabelsEditorComponent from '../labels-editor/labels-editor';
 import ProjectSubsetField from '../create-task-page/project-subset-field';
+import { t } from 'cvat-i18n';
 
 interface OwnProps {
     task: Task;
@@ -156,7 +157,7 @@ class DetailsComponent extends React.PureComponent<Props, State> {
         const { consensusEnabled } = this.state;
         const owner = taskInstance.owner ? taskInstance.owner.username : null;
         const assignee = taskInstance.assignee ? taskInstance.assignee : null;
-        const created = dayjs(taskInstance.createdDate).format('MMMM Do YYYY');
+        const created = dayjs(taskInstance.createdDate).format(t('MMMM Do YYYY'));
         const assigneeSelect = (
             <UserSelector
                 value={assignee}
@@ -175,14 +176,14 @@ class DetailsComponent extends React.PureComponent<Props, State> {
                         {owner && (
                             <div>
                                 <Text type='secondary'>
-                                    {`Task #${taskInstance.id} Created by ${owner} on ${created}`}
+                                    {t('Task #{{id}} Created by {{owner}} on {{created}}', { id: taskInstance.id, owner, created })}
                                 </Text>
                             </div>
                         )}
                         {consensusEnabled && <CVATTag type={TagType.CONSENSUS} />}
                     </Col>
                     <Col>
-                        <Text type='secondary'>Assigned to</Text>
+                        <Text type='secondary'>{t('Assigned to')}</Text>
                         {assigneeSelect}
                     </Col>
                 </Row>
@@ -224,7 +225,7 @@ class DetailsComponent extends React.PureComponent<Props, State> {
         return (
             <Row>
                 <Col span={24}>
-                    <Text className='cvat-text-color'>Subset:</Text>
+                    <Text className='cvat-text-color'>{t('Subset:')}</Text>
                 </Col>
                 <Col span={24}>
                     <ProjectSubsetField

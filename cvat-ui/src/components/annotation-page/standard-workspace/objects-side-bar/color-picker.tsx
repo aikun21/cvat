@@ -13,6 +13,7 @@ import { SketchPicker } from 'react-color';
 
 import { getCore } from 'cvat-core-wrapper';
 import CVATTooltip from 'components/common/cvat-tooltip';
+import { t } from 'cvat-i18n';
 
 const core = getCore();
 
@@ -78,7 +79,7 @@ function ColorPicker(props: Props, ref: React.Ref<any>): JSX.Element {
                                         changeVisible(false);
                                     }}
                                 >
-                                    Reset
+                                    {t('Reset')}
                                 </Button>
                             )}
                         </Col>
@@ -89,7 +90,7 @@ function ColorPicker(props: Props, ref: React.Ref<any>): JSX.Element {
                                     changeVisible(false);
                                 }}
                             >
-                                Cancel
+                                {t('Cancel')}
                             </Button>
                         </Col>
                         <Col span={6}>
@@ -101,7 +102,7 @@ function ColorPicker(props: Props, ref: React.Ref<any>): JSX.Element {
                                     changeVisible(false);
                                 }}
                             >
-                                Ok
+                                {t('Ok')}
                             </Button>
                         </Col>
                     </Row>
@@ -110,10 +111,10 @@ function ColorPicker(props: Props, ref: React.Ref<any>): JSX.Element {
             title={(
                 <Row justify='space-between' align='middle'>
                     <Col span={12}>
-                        <Text strong>Select color</Text>
+                        <Text strong>{t('Select color')}</Text>
                     </Col>
                     <Col span={4}>
-                        <CVATTooltip title='Close'>
+                        <CVATTooltip title={t('Close')}>
                             <Button
                                 className='cvat-color-picker-close-button'
                                 type='link'

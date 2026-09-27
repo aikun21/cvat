@@ -19,6 +19,7 @@ import type { OrientationAngle } from 'utils/change-object-orientation';
 import { ObjectType, ShapeType } from 'cvat-core-wrapper';
 import ItemMenu from './object-item-menu';
 import ColorPicker from './color-picker';
+import { t } from 'cvat-i18n';
 
 interface LayerPickerProps {
     children: React.ReactNode;
@@ -67,17 +68,17 @@ function LayerPicker(props: LayerPickerProps): JSX.Element {
                         type='primary'
                         onClick={submitLayer}
                     >
-                        OK
+                        {t('OK')}
                     </Button>
                 </div>
             )}
             title={(
                 <Row justify='space-between' align='middle'>
                     <Col span={14}>
-                        <Text strong>Move to layer</Text>
+                        <Text strong>{t('Move to layer')}</Text>
                     </Col>
                     <Col span={4}>
-                        <CVATTooltip title='Close'>
+                        <CVATTooltip title={t('Close')}>
                             <Button
                                 className='cvat-object-item-menu-to-layer-close-button'
                                 type='link'
@@ -305,7 +306,7 @@ function ItemTopComponent(props: Props): JSX.Element {
                     labels={labels}
                     value={labelID}
                     onChange={changeLabel}
-                    tooltip='Change current label'
+                    tooltip={t('Change current label')}
                     className='cvat-objects-sidebar-state-item-label-selector'
                     popupClassName='cvat-objects-sidebar-state-item-label-dropdown'
                     popupMatchSelectWidth={false}

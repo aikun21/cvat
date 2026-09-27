@@ -19,6 +19,7 @@ Including another URLconf
 """
 
 from django.apps import apps
+from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 
@@ -35,7 +36,8 @@ if apps.is_installed("cvat.apps.log_viewer"):
 if apps.is_installed("cvat.apps.events"):
     urlpatterns.append(path("api/", include("cvat.apps.events.urls")))
 
-if apps.is_installed("cvat.apps.lambda_manager"):
+# Desktop build has no serverless (Nuclio) backend; a 404 tells the UI there are no models.
+if apps.is_installed("cvat.apps.lambda_manager") and not getattr(settings, "DESKTOP_MODE", False):
     urlpatterns.append(path("", include("cvat.apps.lambda_manager.urls")))
 
 if apps.is_installed("cvat.apps.webhooks"):
@@ -58,3 +60,17 @@ if apps.is_installed("cvat.apps.access_tokens"):
 
 if apps.is_installed("cvat.apps.growth"):
     urlpatterns.append(path("api/", include("cvat.apps.growth.urls")))
+
+# Desktop build: Django serves the UI. The root must come before the engine's
+# legacy "" redirect, the catch-all must stay last.
+if getattr(settings, "DESKTOP_MODE", False) and settings.DESKTOP_UI_ROOT:
+    from django.urls import re_path
+    from django.views.static import serve as serve_static
+
+    from cvat.desktop.ui import serve_ui
+
+    urlpatterns.insert(0, path("", serve_ui))
+    urlpatterns.append(
+        re_path(r"^static/(?P<path>.*)$", serve_static, {"document_root": settings.STATIC_ROOT})
+    )
+    urlpatterns.append(path("", include("cvat.desktop.ui")))

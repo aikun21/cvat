@@ -14,6 +14,7 @@ import { TaskNotFoundComponent } from 'components/common/not-found';
 import { useIsMounted } from 'utils/hooks';
 import { getCore, Task } from 'cvat-core-wrapper';
 import JobForm from './job-form';
+import { t } from 'cvat-i18n';
 
 const core = getCore();
 
@@ -33,7 +34,7 @@ function CreateJobPage(): JSX.Element {
                 }).catch((error: Error) => {
                     if (isMounted()) {
                         notification.error({
-                            message: 'Could not fetch requested task from the server',
+                            message: t('Could not fetch requested task from the server'),
                             description: error.toString(),
                         });
                     }
@@ -44,8 +45,8 @@ function CreateJobPage(): JSX.Element {
                 });
         } else {
             notification.error({
-                message: 'Could not receive the requested task from the server',
-                description: `Requested task id "${id}" is not valid`,
+                message: t('Could not receive the requested task from the server'),
+                description: t('Requested task id "{{id}}" is not valid', { id }),
             });
             setFetchingTask(false);
         }
@@ -63,7 +64,7 @@ function CreateJobPage(): JSX.Element {
         <div className='cvat-create-job-page'>
             <Row justify='center' align='middle'>
                 <Col>
-                    <Text className='cvat-title'>Add a new job</Text>
+                    <Text className='cvat-title'>{t('Add a new job')}</Text>
                 </Col>
             </Row>
             <Row justify='center' align='top'>

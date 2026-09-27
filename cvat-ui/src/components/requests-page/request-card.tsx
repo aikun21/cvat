@@ -20,6 +20,7 @@ import { useContextMenuClick } from 'utils/hooks';
 
 import StatusMessage from './request-status';
 import RequestActionsComponent from './actions-menu';
+import { t } from 'cvat-i18n';
 
 export interface Props {
     request: Request;
@@ -55,13 +56,13 @@ function constructName(operation: Request['operation']): string | null {
     } = operation;
 
     if (target === 'project' && projectID) {
-        return `Project #${projectID}`;
+        return t('Project #{{id}}', { id: projectID });
     }
     if (target === 'task' && taskID) {
-        return `Task #${taskID}`;
+        return t('Task #{{id}}', { id: taskID });
     }
     if (target === 'job' && jobID) {
-        return `Job #${jobID}`;
+        return t('Job #{{id}}', { id: jobID });
     }
     return null;
 }
@@ -79,10 +80,10 @@ function renderEllipsisText(text: string, type?: BaseType): JSX.Element {
 }
 
 function constructTimestamps(request: Request): JSX.Element {
-    const started = dayjs(request.startedDate).format('MMM Do YY, H:mm');
-    const finished = dayjs(request.finishedDate).format('MMM Do YY, H:mm');
-    const created = dayjs(request.createdDate).format('MMM Do YY, H:mm');
-    const expired = dayjs(request.expiryDate).format('MMM Do YY, H:mm');
+    const started = dayjs(request.startedDate).format(t('MMM Do YY, H:mm'));
+    const finished = dayjs(request.finishedDate).format(t('MMM Do YY, H:mm'));
+    const created = dayjs(request.createdDate).format(t('MMM Do YY, H:mm'));
+    const expired = dayjs(request.expiryDate).format(t('MMM Do YY, H:mm'));
     const { operation: { type }, url } = request;
 
     switch (request.status) {
@@ -92,10 +93,10 @@ function constructTimestamps(request: Request): JSX.Element {
                 return (
                     <>
                         <Row>
-                            {renderEllipsisText(`Started by ${request.owner.username} on ${started}`, 'secondary')}
+                            {renderEllipsisText(t('Started by {{username}} on {{started}}', { username: request.owner.username, started }), 'secondary')}
                         </Row>
                         <Row>
-                            <Text type='secondary'>{`Expires on ${expired}`}</Text>
+                            <Text type='secondary'>{t('Expires on {{expired}}', { expired })}</Text>
                         </Row>
                     </>
                 );
@@ -103,10 +104,10 @@ function constructTimestamps(request: Request): JSX.Element {
             return (
                 <>
                     <Row>
-                        {renderEllipsisText(`Started by ${request.owner.username} on ${started}`, 'secondary')}
+                        {renderEllipsisText(t('Started by {{username}} on {{started}}', { username: request.owner.username, started }), 'secondary')}
                     </Row>
                     <Row>
-                        <Text type='secondary'>{`Finished on ${finished}`}</Text>
+                        <Text type='secondary'>{t('Finished on {{finished}}', { finished })}</Text>
                     </Row>
                 </>
             );
@@ -114,11 +115,11 @@ function constructTimestamps(request: Request): JSX.Element {
         case RQStatus.FAILED: {
             return (request.startedDate ? (
                 <Row>
-                    {renderEllipsisText(`Started by ${request.owner.username} on ${started}`, 'secondary')}
+                    {renderEllipsisText(t('Started by {{username}} on {{started}}', { username: request.owner.username, started }), 'secondary')}
                 </Row>
             ) : (
                 <Row>
-                    {renderEllipsisText(`Enqueued by ${request.owner.username} on ${created}`, 'secondary')}
+                    {renderEllipsisText(t('Enqueued by {{username}} on {{created}}', { username: request.owner.username, created }), 'secondary')}
                 </Row>
             ));
         }
@@ -126,10 +127,10 @@ function constructTimestamps(request: Request): JSX.Element {
             return (
                 <>
                     <Row>
-                        {renderEllipsisText(`Enqueued by ${request.owner.username} on ${created}`, 'secondary')}
+                        {renderEllipsisText(t('Enqueued by {{username}} on {{created}}', { username: request.owner.username, created }), 'secondary')}
                     </Row>
                     <Row>
-                        <Text type='secondary'>{`Started on ${started}`}</Text>
+                        <Text type='secondary'>{t('Started on {{started}}', { started })}</Text>
                     </Row>
                 </>
             );
@@ -137,7 +138,7 @@ function constructTimestamps(request: Request): JSX.Element {
         default: {
             return (
                 <Row>
-                    {renderEllipsisText(`Enqueued by ${request.owner.username} on ${created}`, 'secondary')}
+                    {renderEllipsisText(t('Enqueued by {{username}} on {{created}}', { username: request.owner.username, created }), 'secondary')}
                 </Row>
             );
         }
@@ -238,7 +239,7 @@ function RequestCard(props: Readonly<Props>): JSX.Element {
                             {operation?.lightweight && (
                                 <Row>
                                     <Col className='cvat-lightweight-label'>
-                                        <Text type='secondary'>Lightweight backup</Text>
+                                        <Text type='secondary'>{t('Lightweight backup')}</Text>
                                     </Col>
                                 </Row>
                             )}

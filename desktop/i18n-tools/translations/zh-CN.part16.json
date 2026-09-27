@@ -1,0 +1,15 @@
+{
+    "job": "作业",
+    "jobs": "作业",
+    "task": "任务",
+    "tasks": "任务",
+    "project": "项目",
+    "projects": "项目",
+    "dataset": "数据集",
+    "annotations": "标注",
+    "backup": "备份",
+    "Dataset": "数据集",
+    "Annotations": "标注",
+    "Backup": "备份",
+    "Annotation": "标注"
+}

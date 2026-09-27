@@ -32,6 +32,7 @@ import {
 import { switchToolsBlockerState } from './settings-actions';
 import { updateJobAsync } from './jobs-actions';
 import { loadAudioDataAsync } from './audio-actions';
+import { t } from 'cvat-i18n';
 
 interface AnnotationsParameters {
     filters: object[];
@@ -784,7 +785,7 @@ export function changeFrameAsync(
 
         try {
             if (toFrame < job.startFrame || toFrame > job.stopFrame) {
-                throw Error(`Required frame ${toFrame} is out of the current job`);
+                throw Error(t('Required frame {{toFrame}} is out of the current job', { toFrame }));
             }
 
             if (toFrame === frame && !forceUpdate) {

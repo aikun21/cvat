@@ -14,6 +14,7 @@ import {
     RequestsActions, updateRequestProgress,
 } from './requests-actions';
 import { getInstanceType } from './common';
+import { translateMessage } from 'utils/i18n-enums';
 
 const core = getCore();
 
@@ -101,7 +102,7 @@ export const importDatasetAsync = (
                         convMaskToPoly,
                         updateStatusCallback: (message: string, progress: number) => (
                             dispatch(importActions.importDatasetUpdateStatus(
-                                instance, Math.floor(progress * 100), message,
+                                instance, Math.floor(progress * 100), translateMessage(message),
                             ))
                         ),
                     },

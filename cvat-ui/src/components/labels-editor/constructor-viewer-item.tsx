@@ -11,6 +11,7 @@ import CVATTooltip from 'components/common/cvat-tooltip';
 import { computeTextColor } from 'utils/compute-text-color';
 import config from 'config';
 import { LabelOptColor } from './common';
+import { t } from 'cvat-i18n';
 
 interface ConstructorViewerItemProps {
     label: LabelOptColor;
@@ -30,7 +31,7 @@ export default function ConstructorViewerItem(props: ConstructorViewerItemProps)
     return (
         <div style={{ background: backgroundColor }} className='cvat-constructor-viewer-item'>
             <Text style={{ color: textColor }}>{label.name}</Text>
-            <CVATTooltip title='Update attributes'>
+            <CVATTooltip title={t('Update attributes')}>
                 <span
                     style={{ color: textColor }}
                     role='button'
@@ -41,7 +42,7 @@ export default function ConstructorViewerItem(props: ConstructorViewerItemProps)
                     <EditOutlined />
                 </span>
             </CVATTooltip>
-            <CVATTooltip title='Delete label'>
+            <CVATTooltip title={t('Delete label')}>
                 <span
                     style={{ color: textColor }}
                     role='button'

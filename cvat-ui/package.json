@@ -43,6 +43,7 @@
     "dayjs": "^1.11.18",
     "dotenv-webpack": "^8.0.1",
     "error-stack-parser": "^2.0.6",
+    "i18next": "^25.10.10",
     "json-logic-js": "^2.0.2",
     "mousetrap": "^1.6.5",
     "onnxruntime-web": "1.23.2",

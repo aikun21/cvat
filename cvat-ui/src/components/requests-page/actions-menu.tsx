@@ -11,6 +11,7 @@ import { Request, RQStatus } from 'cvat-core-wrapper';
 import { cancelRequestAsync } from 'actions/requests-async-actions';
 import { makeBulkOperationAsync } from 'actions/bulk-actions';
 import { CombinedState } from 'reducers';
+import { t } from 'cvat-i18n';
 
 interface Props {
     requestInstance: Request;
@@ -86,7 +87,7 @@ function RequestActionsComponent(props: Readonly<Props>): JSX.Element | null {
             async (request) => {
                 await dispatch(cancelRequestAsync(request));
             },
-            (request, idx, total) => `Canceling request #${request.id} (${idx + 1}/${total})`,
+            (request, idx, total) => t('Canceling request #{{id}} ({{value}}/{{total}})', { id: request.id, value: idx + 1, total }),
         ));
     }, [requestsToAct]);
 

@@ -10,6 +10,7 @@ import { connect } from 'react-redux';
 import { getApplicationKeyMap } from 'utils/mousetrap-react';
 import { shortcutsActions } from 'actions/shortcuts-actions';
 import { CombinedState } from 'reducers';
+import { t } from 'cvat-i18n';
 
 interface StateToProps {
     visible: boolean;
@@ -54,18 +55,18 @@ function ShortcutsDialog(props: StateToProps & DispatchToProps): JSX.Element | n
 
     const columns = [
         {
-            title: 'Name',
+            title: t('Name'),
             dataIndex: 'name',
             key: 'name',
         },
         {
-            title: 'Shortcut',
+            title: t('Shortcut'),
             dataIndex: 'shortcut',
             key: 'shortcut',
             render: splitToRows,
         },
         {
-            title: 'Description',
+            title: t('Description'),
             dataIndex: 'description',
             key: 'description',
         },
@@ -82,7 +83,7 @@ function ShortcutsDialog(props: StateToProps & DispatchToProps): JSX.Element | n
 
     return (
         <Modal
-            title='Active list of shortcuts'
+            title={t('Active list of shortcuts')}
             open={visible}
             closable={false}
             width={800}

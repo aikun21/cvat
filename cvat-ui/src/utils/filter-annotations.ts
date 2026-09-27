@@ -5,6 +5,7 @@
 import { getCVATStore } from 'cvat-store';
 import { CombinedState, Workspace } from 'reducers';
 import { ObjectState, ObjectType } from 'cvat-core-wrapper';
+import { t } from 'cvat-i18n';
 
 export interface FilterAnnotationsParams {
     workspace: Workspace;
@@ -19,7 +20,7 @@ export function filterAnnotations(annotations: ObjectState[], params: FilterAnno
     } = params;
 
     if (Array.isArray(exclude) && Array.isArray(include)) {
-        throw Error('Can not filter annotations with exclude and include filters simultaneously');
+        throw Error(t('Can not filter annotations with exclude and include filters simultaneously'));
     }
 
     const store = getCVATStore();

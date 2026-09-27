@@ -6,6 +6,7 @@ import React, { useCallback } from 'react';
 import Button from 'antd/lib/button';
 import { useDispatch } from 'react-redux';
 import { selectionActions } from 'actions/selection-actions';
+import { t } from 'cvat-i18n';
 
 interface ResourceSelectionInfoProps {
     selectedCount: number;
@@ -32,7 +33,7 @@ export function ResourceSelectionInfo(
                 size='small'
                 type='link'
             >
-                Select all
+                {t('Select all')}
             </Button>
         );
     } else if (selectedCount > 0) {
@@ -44,7 +45,7 @@ export function ResourceSelectionInfo(
                 size='small'
                 type='link'
             >
-                Deselect
+                {t('Deselect')}
             </Button>
         );
     }
@@ -54,7 +55,7 @@ export function ResourceSelectionInfo(
             {actionButton}
             {selectedCount > 1 && (
                 <span className='cvat-resource-selection-count'>
-                    {`Selected: ${selectedCount}`}
+                    {t('Selected: {{selectedCount}}', { selectedCount })}
                 </span>
             )}
         </span>

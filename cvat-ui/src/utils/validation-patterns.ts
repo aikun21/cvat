@@ -3,35 +3,36 @@
 //
 // SPDX-License-Identifier: MIT
 
+import { t } from 'cvat-i18n';
 const validationPatterns = {
     validatePasswordLength: {
         pattern: /^(?=.{8,256}$)/,
-        message: 'Password must be between 8 and 256 characters',
+        message: t('Password must be between 8 and 256 characters'),
     },
 
     passwordContainsNumericCharacters: {
         pattern: /(?=.*[0-9])/,
-        message: 'Password must have at least 1 numeric characters',
+        message: t('Password must have at least 1 numeric characters'),
     },
 
     passwordContainsUpperCaseCharacter: {
         pattern: /(?=.*[A-Z])/,
-        message: 'Password must have at least 1 uppercase alphabetical character',
+        message: t('Password must have at least 1 uppercase alphabetical character'),
     },
 
     passwordContainsLowerCaseCharacter: {
         pattern: /(?=.*[a-z])/,
-        message: 'Password must have at least 1 lowercase alphabetical character',
+        message: t('Password must have at least 1 lowercase alphabetical character'),
     },
 
     validateUsernameLength: {
         pattern: /^.{5,150}$/u,
-        message: 'Username must be between 5 and 150 characters',
+        message: t('Username must be between 5 and 150 characters'),
     },
 
     validateUsernameCharacters: {
         pattern: /^[\p{L}\p{N}_@.+-]+$/u,
-        message: 'Only letters, numbers, and @/./+/-/_ characters are available',
+        message: t('Only letters, numbers, and @/./+/-/_ characters are available'),
     },
 
     /*
@@ -47,38 +48,38 @@ const validationPatterns = {
     validateName: {
 
         pattern: /^(\p{L}|\p{Pd}|\p{Cf}|\p{Pc}|['\s]){2,}$/gu,
-        message: 'Invalid name',
+        message: t('Invalid name'),
     },
 
     validateAttributeName: {
         pattern: /\S+/,
-        message: 'Invalid name',
+        message: t('Invalid name'),
     },
 
     validateLabelName: {
         pattern: /\S+/,
-        message: 'Invalid name',
+        message: t('Invalid name'),
     },
 
     validateAttributeValue: {
         pattern: /\S+/,
-        message: 'Invalid attribute value',
+        message: t('Invalid attribute value'),
     },
 
     validateURL: {
 
         pattern: /^(https?:\/\/)[^\s$.?#].[^\s]*$/, // url, ip
-        message: 'URL is not valid',
+        message: t('URL is not valid'),
     },
 
     validateOrganizationSlug: {
         pattern: /^[a-zA-Z\d]+$/,
-        message: 'Only Latin characters and numbers are allowed',
+        message: t('Only Latin characters and numbers are allowed'),
     },
 
     validatePhoneNumber: {
         pattern: /^[+]*[-\s0-9]*$/g,
-        message: 'Input phone number is not correct',
+        message: t('Input phone number is not correct'),
     },
 };
 

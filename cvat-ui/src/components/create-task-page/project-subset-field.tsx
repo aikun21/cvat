@@ -7,6 +7,7 @@ import Autocomplete from 'antd/lib/auto-complete';
 
 import config from 'config';
 import { getCore } from 'cvat-core-wrapper';
+import { t } from 'cvat-i18n';
 
 const core = getCore();
 
@@ -62,7 +63,7 @@ export default function ProjectSubsetField(props: Props): JSX.Element {
     return (
         <Autocomplete
             value={internalValue}
-            placeholder='Input subset'
+            placeholder={t('Input subset')}
             className='cvat-project-search-field cvat-project-subset-field'
             onSearch={setInternalValue}
             onSelect={(_value) => {

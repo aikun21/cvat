@@ -19,6 +19,7 @@ import { registerComponentShortcuts } from 'actions/shortcuts-actions';
 import { subKeyMap } from 'utils/component-subkeymap';
 import { useResetShortcutsOnUnmount } from 'utils/hooks';
 import { getCVATStore } from 'cvat-store';
+import { t } from 'cvat-i18n';
 
 const componentShortcuts: Record<string, KeyMapItem> = {};
 
@@ -26,8 +27,8 @@ const makeKey = (index: number) => `SWITCH_LABEL_${index}`;
 
 for (const index of [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]) {
     componentShortcuts[makeKey(index)] = {
-        name: 'Switch label',
-        description: 'Change label of a selected object or default label of the next created object if no one object is activated',
+        name: t('Switch label'),
+        description: t('Change label of a selected object or default label of the next created object if no one object is activated'),
         sequences: [`ctrl+${index}`],
         nonActive: true,
         scope: ShortcutScope.OBJECTS_SIDEBAR,
@@ -70,9 +71,8 @@ function LabelsListComponent(): JSX.Element {
                 updatedComponentShortcuts[key] = {
                     ...updatedComponentShortcuts[key],
                     nonActive: false,
-                    name: `Switch label to ${labelName}`,
-                    description: `Changes the label to ${labelName} for the activated
-                        object or for the next drawn object if no objects are activated`,
+                    name: t('Switch label to {{labelName}}', { labelName }),
+                    description: t('Changes the label to {{labelName}} for the activated object or for the next drawn object if no objects are activated', { labelName }),
                 };
             }
         }
@@ -118,7 +118,7 @@ function LabelsListComponent(): JSX.Element {
                 }
 
                 message.destroy();
-                message.success(`Default label has been changed to "${label.name}"`);
+                message.success(t('Default label has been changed to "{{name}}"', { name: label.name }));
             }
         }
     };
@@ -135,7 +135,7 @@ function LabelsListComponent(): JSX.Element {
         <div className='cvat-objects-sidebar-labels-list'>
             <GlobalHotKeys keyMap={subKeyMap(componentShortcuts, keyMap)} handlers={handlers} />
             <div className='cvat-objects-sidebar-labels-list-header'>
-                <Text>{`Items: ${labels.length}`}</Text>
+                <Text>{t('Items: {{length}}', { length: labels.length })}</Text>
             </div>
             {labelIDs.map(
                 (labelID: number): JSX.Element => (

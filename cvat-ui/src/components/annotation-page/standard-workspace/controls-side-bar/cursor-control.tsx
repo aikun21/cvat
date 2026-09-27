@@ -16,6 +16,7 @@ import { ShortcutScope } from 'utils/enums';
 import { registerComponentShortcuts } from 'actions/shortcuts-actions';
 import { subKeyMap } from 'utils/component-subkeymap';
 import { useSelector } from 'react-redux';
+import { t } from 'cvat-i18n';
 
 export interface Props {
     canvasInstance: Canvas | Canvas3d;
@@ -25,8 +26,8 @@ export interface Props {
 
 const componentShortcuts = {
     CANCEL: {
-        name: 'Cancel',
-        description: 'Cancel any active canvas mode',
+        name: t('Cancel'),
+        description: t('Cancel any active canvas mode'),
         sequences: ['esc'],
         scope: ShortcutScope.STANDARD_WORKSPACE_CONTROLS,
     },
@@ -60,7 +61,7 @@ function CursorControl(props: Props): JSX.Element {
                 keyMap={subKeyMap(componentShortcuts, keyMap)}
                 handlers={handlers}
             />
-            <CVATTooltip title={`Cursor ${cursorShortkey}`} placement='right'>
+            <CVATTooltip title={t('Cursor {{cursorShortkey}}', { cursorShortkey })} placement='right'>
                 <Icon
                     component={CursorIcon}
                     className={

@@ -11,6 +11,7 @@ import type { Label } from 'cvat-core-wrapper';
 import LabelSelector from 'components/label-selector/label-selector';
 import { PlusOutlined } from '@ant-design/icons';
 import CVATTooltip from 'components/common/cvat-tooltip';
+import { t } from 'cvat-i18n';
 
 interface Props {
     labels: Label[];
@@ -30,13 +31,13 @@ function SetupTagPopover(props: Props): JSX.Element {
             <Row justify='start'>
                 <Col>
                     <Text className='cvat-text-color' strong>
-                        Setup tag
+                        {t('Setup tag')}
                     </Text>
                 </Col>
             </Row>
             <Row justify='start'>
                 <Col>
-                    <Text className='cvat-text-color'>Label</Text>
+                    <Text className='cvat-text-color'>{t('Label')}</Text>
                 </Col>
             </Row>
             <Row justify='start'>
@@ -47,7 +48,7 @@ function SetupTagPopover(props: Props): JSX.Element {
                         onChange={onChangeLabel}
                         onEnterPress={() => onSetup()}
                     />
-                    <CVATTooltip title={`Press ${repeatShapeShortcut} to add a tag again`}>
+                    <CVATTooltip title={t('Press {{repeatShapeShortcut}} to add a tag again', { repeatShapeShortcut })}>
                         <Button
                             type='primary'
                             className='cvat-add-tag-button'

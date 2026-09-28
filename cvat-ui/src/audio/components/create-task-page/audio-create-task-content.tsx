@@ -35,6 +35,7 @@ import QualityConfigurationForm, {
     ValidationMode,
 } from 'components/create-task-page/quality-configuration-form';
 import { CreateTaskData } from 'components/create-task-page/create-task-content';
+import { t } from 'cvat-i18n';
 
 type TabName = 'local' | 'share' | 'remote' | 'cloudStorage';
 const core = getCore();
@@ -93,7 +94,7 @@ const defaultState: State = {
 };
 
 const NON_AUDIO_ERROR = 'Wrong list of files. Only audio files are allowed for an audio task. ';
-const LOCAL_AUDIO_FILES_HINT = 'You can upload an audio file';
+const LOCAL_AUDIO_FILES_HINT = t('You can upload an audio file');
 
 function localFilesHaveNonAudio(files: File[]): boolean {
     const meaningful = files.filter((f) => !f.name.endsWith('.jsonl'));
@@ -334,8 +335,8 @@ class AudioCreateTaskContent extends React.PureComponent<Props & RouteComponentP
 
         if (!this.validateFiles()) {
             notification.error({
-                message: 'Could not create a task',
-                description: 'A task must contain at least one file',
+                message: t('Could not create a task'),
+                description: t('A task must contain at least one file'),
                 className: 'cvat-notification-create-task-fail',
             });
             reject();
@@ -384,7 +385,7 @@ class AudioCreateTaskContent extends React.PureComponent<Props & RouteComponentP
             }).then(resolve)
             .catch((error: Error | ValidateErrorEntity): void => {
                 notification.error({
-                    message: 'Could not create a task',
+                    message: t('Could not create a task'),
                     description: formFieldsError(error).map((text: string): JSX.Element => <div>{text}</div>),
                     className: 'cvat-notification-create-task-fail',
                 });
@@ -409,7 +410,7 @@ class AudioCreateTaskContent extends React.PureComponent<Props & RouteComponentP
             .then(this.createOneTask)
             .then(() => {
                 notification.info({
-                    message: 'The task has been created',
+                    message: t('The task has been created'),
                     className: 'cvat-notification-create-task-success',
                 });
             })
@@ -444,7 +445,7 @@ class AudioCreateTaskContent extends React.PureComponent<Props & RouteComponentP
         return (
             <>
                 <Col span={24}>
-                    <Text className='cvat-text-color'>Project</Text>
+                    <Text className='cvat-text-color'>{t('Project')}</Text>
                 </Col>
                 <Col span={24}>
                     <ProjectSearchField onSelect={this.handleProjectIdChange} value={projectId} />
@@ -460,7 +461,7 @@ class AudioCreateTaskContent extends React.PureComponent<Props & RouteComponentP
             return (
                 <>
                     <Col span={24}>
-                        <Text className='cvat-text-color'>Subset</Text>
+                        <Text className='cvat-text-color'>{t('Subset')}</Text>
                     </Col>
                     <Col span={24}>
                         <ProjectSubsetField
@@ -484,10 +485,10 @@ class AudioCreateTaskContent extends React.PureComponent<Props & RouteComponentP
             return (
                 <>
                     <Col span={24}>
-                        <Text className='cvat-text-color'>Labels</Text>
+                        <Text className='cvat-text-color'>{t('Labels')}</Text>
                     </Col>
                     <Col span={24}>
-                        <Text type='secondary'>Project labels will be used</Text>
+                        <Text type='secondary'>{t('Project labels will be used')}</Text>
                     </Col>
                 </>
             );
@@ -495,7 +496,7 @@ class AudioCreateTaskContent extends React.PureComponent<Props & RouteComponentP
 
         return (
             <Col span={24}>
-                <Text className='cvat-text-color'>Labels</Text>
+                <Text className='cvat-text-color'>{t('Labels')}</Text>
                 <LabelsEditor
                     enableSkeletonCreator={false}
                     enableFromModelCreator={false}
@@ -516,7 +517,7 @@ class AudioCreateTaskContent extends React.PureComponent<Props & RouteComponentP
             <>
                 <Col span={24}>
                     <Text type='danger'>* </Text>
-                    <Text className='cvat-text-color'>Select files</Text>
+                    <Text className='cvat-text-color'>{t('Select files')}</Text>
                     <FileManagerComponent
                         localFilesHint={LOCAL_AUDIO_FILES_HINT}
                         onChangeActiveKey={this.changeFileManagerTab}
@@ -562,7 +563,7 @@ class AudioCreateTaskContent extends React.PureComponent<Props & RouteComponentP
                     className='cvat-advanced-configuration-wrapper'
                     items={[{
                         key: '1',
-                        label: <Text className='cvat-title'>Advanced configuration</Text>,
+                        label: <Text className='cvat-title'>{t('Advanced configuration')}</Text>,
                         children: (
                             <AdvancedConfigurationForm
                                 activeFileManagerTab={activeFileManagerTab}
@@ -601,7 +602,7 @@ class AudioCreateTaskContent extends React.PureComponent<Props & RouteComponentP
                     className='cvat-quality-configuration-wrapper'
                     items={[{
                         key: '1',
-                        label: <Text className='cvat-title'>Quality</Text>,
+                        label: <Text className='cvat-title'>{t('Quality')}</Text>,
                         children: (
                             <QualityConfigurationForm
                                 ref={this.qualityConfigurationComponent}
@@ -635,7 +636,7 @@ class AudioCreateTaskContent extends React.PureComponent<Props & RouteComponentP
                         onClick={this.handleSubmitAndOpen}
                         disabled={!!uploadFileErrorMessage}
                     >
-                        Submit & Open
+                        {t('Submit & Open')}
                     </Button>
                 </Col>
                 <Col>
@@ -645,7 +646,7 @@ class AudioCreateTaskContent extends React.PureComponent<Props & RouteComponentP
                         onClick={this.handleSubmitAndContinue}
                         disabled={!!uploadFileErrorMessage}
                     >
-                        Submit & Continue
+                        {t('Submit & Continue')}
                     </Button>
                 </Col>
             </Row>
@@ -656,7 +657,7 @@ class AudioCreateTaskContent extends React.PureComponent<Props & RouteComponentP
         return (
             <Row justify='start' align='middle' className='cvat-create-task-content'>
                 <Col span={24}>
-                    <Text className='cvat-title'>Basic configuration</Text>
+                    <Text className='cvat-title'>{t('Basic configuration')}</Text>
                 </Col>
 
                 {this.renderBasicBlock()}

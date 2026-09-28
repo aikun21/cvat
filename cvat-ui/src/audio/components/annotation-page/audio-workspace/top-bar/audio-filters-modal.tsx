@@ -18,6 +18,7 @@ import Modal from 'antd/lib/modal';
 import { CombinedState } from 'reducers';
 import { Label } from 'cvat-core-wrapper';
 import { changeAnnotationsFilters, fetchAnnotationsAsync, showFilters } from 'actions/annotation-actions';
+import { t } from 'cvat-i18n';
 
 const { FieldDropdown } = AntdWidgets;
 
@@ -86,7 +87,7 @@ function AudioFiltersModalComponent(): JSX.Element {
     useEffect(() => {
         const fields: Record<string, any> = {
             label: {
-                label: 'Label',
+                label: t('Label'),
                 type: 'select',
                 valueSources: ['value'] as ('value')[],
                 fieldSettings: {
@@ -97,13 +98,13 @@ function AudioFiltersModalComponent(): JSX.Element {
                 },
             },
             serverID: {
-                label: 'ServerID',
+                label: t('ServerID'),
                 type: 'number',
                 hideForCompare: true,
                 fieldSettings: { min: 0 },
             },
             attr: {
-                label: 'Attributes',
+                label: t('Attributes'),
                 type: '!struct',
                 subfields: getAttributesSubfields(labels),
                 fieldSettings: {
@@ -111,22 +112,22 @@ function AudioFiltersModalComponent(): JSX.Element {
                 },
             },
             duration: {
-                label: 'Duration (ms)',
+                label: t('Duration (ms)'),
                 type: 'number',
                 fieldSettings: { min: 0 },
             },
             start: {
-                label: 'Start (ms)',
+                label: t('Start (ms)'),
                 type: 'number',
                 fieldSettings: { min: 0 },
             },
             end: {
-                label: 'End (ms)',
+                label: t('End (ms)'),
                 type: 'number',
                 fieldSettings: { min: 0 },
             },
             source: {
-                label: 'Source',
+                label: t('Source'),
                 type: 'select',
                 fieldSettings: {
                     listValues: [
@@ -256,14 +257,14 @@ function AudioFiltersModalComponent(): JSX.Element {
                     onClick={() => applyFilters([])}
                     className='cvat-filters-modal-clear-button'
                 >
-                    Clear filters
+                    {t('Clear filters')}
                 </Button>,
                 <Button
                     key='cancel'
                     onClick={() => dispatch(showFilters(false))}
                     className='cvat-filters-modal-cancel-button'
                 >
-                    Cancel
+                    {t('Cancel')}
                 </Button>,
                 <Button
                     key='submit'
@@ -272,7 +273,7 @@ function AudioFiltersModalComponent(): JSX.Element {
                     onClick={confirmModal}
                     className='cvat-filters-modal-submit-button'
                 >
-                    Submit
+                    {t('Submit')}
                 </Button>,
             ]}
         >
@@ -293,7 +294,7 @@ function AudioFiltersModalComponent(): JSX.Element {
                         type='text'
                         className='cvat-filters-modal-recently-used-button'
                     >
-                        Recently used
+                        {t('Recently used')}
                         {' '}
                         <DownOutlined />
                     </Button>

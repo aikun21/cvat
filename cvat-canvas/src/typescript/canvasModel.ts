@@ -122,6 +122,8 @@ export interface Configuration {
     hideEditedObject?: boolean;
     focusedObjectPadding?: number;
     snapRadius?: number;
+    // display names for object sources in the object text (e.g. translations), keyed by source value
+    sourceNames?: Record<string, string>;
 }
 
 export interface BrushTool {
@@ -972,6 +974,10 @@ export class CanvasModelImpl extends MasterImpl implements CanvasModel {
     }
 
     public configure(configuration: Configuration): void {
+        if (configuration.sourceNames && typeof configuration.sourceNames === 'object') {
+            this.data.configuration.sourceNames = { ...configuration.sourceNames };
+        }
+
         if (typeof configuration.displayAllText === 'boolean') {
             this.data.configuration.displayAllText = configuration.displayAllText;
         }

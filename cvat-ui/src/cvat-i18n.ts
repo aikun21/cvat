@@ -44,6 +44,7 @@ export const isChinese = language.startsWith('zh');
 // The words themselves are listed in utils/i18n-enums.ts.
 const TRANSLATED_PLACEHOLDERS = new Set([
     'instanceType', 'newInstanceType', 'resource', 'resToPrint', 'annotationEntity', 'resourceName',
+    'shapeType',
 ]);
 
 export function t(key: string, options?: Record<string, unknown>): string {

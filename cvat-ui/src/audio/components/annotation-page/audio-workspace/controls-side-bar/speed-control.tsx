@@ -6,6 +6,7 @@ import React from 'react';
 import { DashboardOutlined } from '@ant-design/icons';
 
 import AudioSliderControl from './audio-slider-control';
+import { t } from 'cvat-i18n';
 
 export interface Props {
     playbackRate: number;
@@ -18,7 +19,7 @@ function SpeedControl(props: Props): JSX.Element {
     return (
         <AudioSliderControl
             icon={<DashboardOutlined />}
-            tooltip='Speed'
+            tooltip={t('Speed')}
             value={playbackRate}
             min={0.1}
             max={4}

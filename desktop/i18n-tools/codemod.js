@@ -325,7 +325,16 @@ function processFile(file, report) {
 
     if (!edits.length) return { changed: false, keys };
 
-    edits.sort((a, b) => b.start - a.start);
+    // two rules may match the same literal (e.g. message.success(`...`)): keep the outermost edit
+    edits.sort((a, b) => a.start - b.start || b.end - a.end);
+    const accepted = [];
+    for (const e of edits) {
+        const last = accepted[accepted.length - 1];
+        if (last && e.start < last.end) continue;
+        accepted.push(e);
+    }
+    edits.length = 0;
+    edits.push(...accepted.reverse());
     let out = source;
     for (const e of edits) out = out.slice(0, e.start) + e.text + out.slice(e.end);
 

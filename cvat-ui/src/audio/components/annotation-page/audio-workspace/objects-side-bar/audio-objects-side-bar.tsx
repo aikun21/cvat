@@ -13,6 +13,7 @@ import { CombinedState } from 'reducers';
 import { collapseSidebar as collapseSidebarAction } from 'actions/annotation-actions';
 import AudioAppearanceBlock from 'audio/components/annotation-page/audio-workspace/audio-appearance-block';
 import AudioLabelsList from './audio-labels-list';
+import { t } from 'cvat-i18n';
 
 interface OwnProps {
     objectsList: JSX.Element;
@@ -80,7 +81,7 @@ function AudioObjectsSideBar(props: StateToProps & DispatchToProps & OwnProps): 
                 className='cvat-objects-sidebar-sider'
                 onClick={collapse}
             >
-                {sidebarCollapsed ? <MenuFoldOutlined title='Show' /> : <MenuUnfoldOutlined title='Hide' />}
+                {sidebarCollapsed ? <MenuFoldOutlined title={t('Show')} /> : <MenuUnfoldOutlined title={t('Hide')} />}
             </span>
 
             <Tabs
@@ -89,11 +90,11 @@ function AudioObjectsSideBar(props: StateToProps & DispatchToProps & OwnProps): 
                 className='cvat-objects-sidebar-tabs'
                 items={[{
                     key: 'objects',
-                    label: 'Objects',
+                    label: t('Objects'),
                     children: objectsList,
                 }, {
                     key: 'labels',
-                    label: 'Labels',
+                    label: t('Labels'),
                     forceRender: true,
                     children: <AudioLabelsList />,
                 }]}

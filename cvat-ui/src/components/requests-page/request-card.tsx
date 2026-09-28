@@ -21,6 +21,7 @@ import { useContextMenuClick } from 'utils/hooks';
 import StatusMessage from './request-status';
 import RequestActionsComponent from './actions-menu';
 import { t } from 'cvat-i18n';
+import { translateRequestType } from 'utils/i18n-enums';
 
 export interface Props {
     request: Request;
@@ -68,7 +69,8 @@ function constructName(operation: Request['operation']): string | null {
 }
 
 function constructTypeText(type: string): string {
-    return type.split(':').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    return translateRequestType(type) ??
+        type.split(':').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 }
 
 function renderEllipsisText(text: string, type?: BaseType): JSX.Element {

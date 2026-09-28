@@ -14,6 +14,7 @@ import { filterApplicableForTypes } from 'utils/filter-applicable-labels';
 import AudioIntervalActions, { AudioIntervalActionShortcuts } from './audio-interval-actions';
 import AudioIntervalMoreActions from './audio-interval-more-actions';
 import { intervalDurationSeconds, intervalEndSeconds, intervalStartSeconds } from './utils/audio-interval';
+import { t } from 'cvat-i18n';
 
 interface Props {
     interval: AudioIntervalState;
@@ -59,7 +60,7 @@ export default function AudioIntervalHeader({
             labels={labelsForSelector}
             value={interval.label.id ?? null}
             disabled={isReadonly}
-            tooltip='Change current label'
+            tooltip={t('Change current label')}
             onChange={(label: Label) => {
                 if (label.id != null) {
                     onChangeLabel(label.id);
@@ -68,7 +69,7 @@ export default function AudioIntervalHeader({
         />
     );
     const sourceLabel = source ? (
-        <span className='cvat-audio-interval-header-source' title={`Source: ${source}`}>
+        <span className='cvat-audio-interval-header-source' title={t('Source: {{source}}', { source })}>
             ({source})
         </span>
     ) : null;

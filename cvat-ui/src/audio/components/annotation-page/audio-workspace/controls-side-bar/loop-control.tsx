@@ -12,6 +12,7 @@ import GlobalHotKeys from 'utils/mousetrap-react';
 import { ShortcutScope } from 'utils/enums';
 import { registerComponentShortcuts } from 'actions/shortcuts-actions';
 import { subKeyMap } from 'utils/component-subkeymap';
+import { t } from 'cvat-i18n';
 
 export interface Props {
     loop: boolean;
@@ -21,8 +22,8 @@ export interface Props {
 
 const componentShortcuts = {
     TOGGLE_AUDIO_LOOP: {
-        name: 'Toggle interval loop playback',
-        description: 'Toggle loop playback for the active audio interval',
+        name: t('Toggle interval loop playback'),
+        description: t('Toggle loop playback for the active audio interval'),
         sequences: ['r'],
         scope: ShortcutScope.AUDIO_WORKSPACE_CONTROLS,
     },
@@ -51,7 +52,7 @@ function LoopControl(props: Props): JSX.Element {
                 keyMap={subKeyMap(componentShortcuts, keyMap)}
                 handlers={handlers}
             />
-            <CVATTooltip title={`Loop interval playback${loop ? ' (on)' : ''} ${loopShortcut}`} placement='right'>
+            <CVATTooltip title={t('Loop interval playback{{value}} {{loopShortcut}}', { value: loop ? ' (on)' : '', loopShortcut })} placement='right'>
                 <RetweetOutlined
                     className={
                         loop ?

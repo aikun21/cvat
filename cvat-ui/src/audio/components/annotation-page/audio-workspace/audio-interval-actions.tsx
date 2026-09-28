@@ -26,6 +26,7 @@ import {
     SeekToStartIcon,
 } from 'icons';
 import { intervalID } from './utils/audio-interval';
+import { t } from 'cvat-i18n';
 
 interface Props {
     interval: AudioIntervalState;
@@ -140,7 +141,7 @@ export default function AudioIntervalActions({
                     <Row gutter={4}>
                         <Col>
                             <AudioIntervalActionButton
-                                title={`Set playback to interval start ${shortcuts.setPlaybackToStart}`}
+                                title={t('Set playback to interval start {{setPlaybackToStart}}', { setPlaybackToStart: shortcuts.setPlaybackToStart })}
                                 className={actionClassName}
                                 onAction={handleSetPlaybackToStart}
                             >
@@ -149,7 +150,7 @@ export default function AudioIntervalActions({
                         </Col>
                         <Col>
                             <AudioIntervalActionButton
-                                title={`Play interval as range ${shortcuts.playInterval}`}
+                                title={t('Play interval as range {{playInterval}}', { playInterval: shortcuts.playInterval })}
                                 className={playActionClassName}
                                 onAction={handlePlayInterval}
                             >
@@ -158,7 +159,7 @@ export default function AudioIntervalActions({
                         </Col>
                         <Col>
                             <AudioIntervalActionButton
-                                title={`Set playback to interval end ${shortcuts.setPlaybackToEnd}`}
+                                title={t('Set playback to interval end {{setPlaybackToEnd}}', { setPlaybackToEnd: shortcuts.setPlaybackToEnd })}
                                 className={actionClassName}
                                 onAction={handleSetPlaybackToEnd}
                             >

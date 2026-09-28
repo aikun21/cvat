@@ -90,6 +90,8 @@ const ENUM_NAMES: Record<string, () => string> = {
     manual: () => t('manual'),
     'semi-auto': () => t('semi-auto'),
     auto: () => t('auto'),
+    file: () => t('file'),
+    consensus: () => t('consensus'),
     // background request status
     queued: () => t('queued'),
     started: () => t('started'),
@@ -131,6 +133,23 @@ export function translateMessage(message: string | null | undefined): string {
     if (exact) return exact();
     const prefix = Object.keys(MESSAGES).find((key) => message.startsWith(`${key} `));
     return prefix ? `${MESSAGES[prefix]()}${message.slice(prefix.length)}` : message;
+}
+
+// Background request types shown on the requests page ("export:annotations" etc.)
+const REQUEST_TYPES: Record<string, () => string> = {
+    'create:task': () => t('Create task'),
+    'export:annotations': () => t('Export annotations'),
+    'export:dataset': () => t('Export dataset'),
+    'export:backup': () => t('Export backup'),
+    'import:annotations': () => t('Import annotations'),
+    'import:dataset': () => t('Import dataset'),
+    'import:backup': () => t('Import backup'),
+    'autoannotate:task': () => t('Automatic annotation'),
+};
+
+export function translateRequestType(type: string): string | null {
+    const name = REQUEST_TYPES[type];
+    return name ? name() : null;
 }
 
 export function capitalize(value: string): string {

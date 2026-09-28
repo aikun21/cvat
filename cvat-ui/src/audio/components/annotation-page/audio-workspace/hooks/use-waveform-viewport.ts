@@ -19,6 +19,7 @@ import {
     centeredScrollOffsetForTime, limitZoom,
 } from '../../../../utils/waveform-geometry';
 import type { WaveSurferRuntime } from './use-audio-waveform';
+import { t } from 'cvat-i18n';
 
 const ZOOM_BASIC_COEF = 6 / 5;
 const ZOOM_ADJUST_COEF = 1 / 10;
@@ -377,7 +378,7 @@ export function useWaveformViewport(
 
         if (intervalDoesNotFit) {
             message.destroy();
-            message.warning('The interval is too long to fully fit. Showing its beginning instead.');
+            message.warning(t('The interval is too long to fully fit. Showing its beginning instead.'));
         }
         dispatch(audioActions.completeFitAudioInterval(fitIntervalRequest));
     }, [ready, fitIntervalRequest, fitInterval, duration, containerWidth]);

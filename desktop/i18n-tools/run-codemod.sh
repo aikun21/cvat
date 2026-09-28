@@ -13,4 +13,4 @@ node "$ROOT/desktop/i18n-tools/codemod.js" \
   $C/requests-page $C/shortcuts-dialog $C/global-error-boundary $C/resource-sorting-filtering $C/label-selector \
   $C/selectors $C/bulk-wrapper.tsx $C/bulk-progress.tsx $C/dropdown-menu.tsx $C/md-guide $C/move-task-modal \
   $C/server-unavailable $C/cvat-app.tsx $C/storage $C/profile-page $C/logout-component.tsx $C/layout-grid \
-  $C/export-csv-button-hoc.tsx containers reducers actions utils "$@"
+  $C/export-csv-button-hoc.tsx containers reducers actions utils audio "$@"

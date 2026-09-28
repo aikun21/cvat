@@ -9,6 +9,7 @@ import InputNumber from 'antd/lib/input-number';
 import Collapse from 'antd/lib/collapse';
 
 import type { RemoveAnnotationsConfirmProps } from 'components/annotation-page/top-bar/remove-annotations-confirm';
+import { t } from 'cvat-i18n';
 
 type TimeValue = {
     minutes?: number;
@@ -89,13 +90,13 @@ function AudioRemoveAnnotationsConfirm(props: RemoveAnnotationsConfirmProps): JS
         <Modal
             destroyOnClose
             open={open}
-            title='Remove Audio Annotations'
+            title={t('Remove Audio Annotations')}
             className='cvat-modal-confirm-remove-annotation cvat-modal-confirm-remove-audio-annotation'
             okButtonProps={{
                 type: 'primary',
                 danger: true,
             }}
-            okText='Remove'
+            okText={t('Remove')}
             onCancel={onClose}
             onOk={() => {
                 const from = timeToMilliseconds(removeFrom);
@@ -109,10 +110,10 @@ function AudioRemoveAnnotationsConfirm(props: RemoveAnnotationsConfirmProps): JS
             }}
         >
             <div>
-                <Text>You are about to remove audio intervals from this job. </Text>
-                <Text>Without a range, all audio intervals will be removed. </Text>
-                <Text>To remove intervals only in a time span, set the range below. </Text>
-                <Text>Changes take effect only when you save the job.</Text>
+                <Text>{t('You are about to remove audio intervals from this job.')}{' '}</Text>
+                <Text>{t('Without a range, all audio intervals will be removed.')}{' '}</Text>
+                <Text>{t('To remove intervals only in a time span, set the range below.')}{' '}</Text>
+                <Text>{t('Changes take effect only when you save the job.')}</Text>
                 <br />
                 <br />
                 <br />
@@ -120,11 +121,11 @@ function AudioRemoveAnnotationsConfirm(props: RemoveAnnotationsConfirmProps): JS
                     bordered={false}
                     items={[{
                         key: 1,
-                        label: <Text>Select Time Range</Text>,
+                        label: <Text>{t('Select Time Range')}</Text>,
                         children: (
                             <div className='cvat-audio-remove-annotations-time-range'>
-                                <AudioTimeInput label='From' value={removeFrom} onChange={setRemoveFrom} />
-                                <AudioTimeInput label='To' value={removeUpTo} onChange={setRemoveUpTo} />
+                                <AudioTimeInput label={t('From')} value={removeFrom} onChange={setRemoveFrom} />
+                                <AudioTimeInput label={t('To')} value={removeUpTo} onChange={setRemoveUpTo} />
                             </div>
                         ),
                     }]}

@@ -14,17 +14,18 @@ import { shallowEqual, ThunkDispatch } from 'utils/redux';
 
 import { intervalEndSeconds, intervalStartSeconds } from '../utils/audio-interval';
 import { WaveformViewport } from './use-waveform-viewport';
+import { t } from 'cvat-i18n';
 
 const componentShortcuts = {
     NEXT_OBJECT: {
-        name: 'Next object',
-        description: 'Go to the next audio interval and center it on the waveform',
+        name: t('Next object'),
+        description: t('Go to the next audio interval and center it on the waveform'),
         sequences: ['tab'],
         scope: ShortcutScope.ANNOTATION_PAGE,
     },
     PREVIOUS_OBJECT: {
-        name: 'Previous object',
-        description: 'Go to the previous audio interval and center it on the waveform',
+        name: t('Previous object'),
+        description: t('Go to the previous audio interval and center it on the waveform'),
         sequences: ['shift+tab'],
         scope: ShortcutScope.ANNOTATION_PAGE,
     },

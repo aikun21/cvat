@@ -167,14 +167,14 @@ export default function JobActionsItems(
     menuItems.push([{
         key: MenuKeys.EDIT_STATE,
         onClick: () => startEditField('state'),
-        label: <CVATMenuEditLabel>{withCount('State', MenuKeys.EDIT_STATE)}</CVATMenuEditLabel>,
+        label: <CVATMenuEditLabel>{withCount(t('State'), MenuKeys.EDIT_STATE)}</CVATMenuEditLabel>,
         disabled: isDisabled(MenuKeys.EDIT_STATE),
     }, 90]);
 
     menuItems.push([{
         key: MenuKeys.EDIT_STAGE,
         onClick: () => startEditField('stage'),
-        label: <CVATMenuEditLabel>{withCount('Stage', MenuKeys.EDIT_STAGE)}</CVATMenuEditLabel>,
+        label: <CVATMenuEditLabel>{withCount(t('Stage'), MenuKeys.EDIT_STAGE)}</CVATMenuEditLabel>,
         disabled: isDisabled(MenuKeys.EDIT_STAGE),
     }, 100]);
 
@@ -189,7 +189,7 @@ export default function JobActionsItems(
         menuItems.push([{
             key: MenuKeys.DELETE,
             onClick: onDeleteJob,
-            label: withCount('Delete', MenuKeys.DELETE),
+            label: withCount(t('Delete'), MenuKeys.DELETE),
             disabled: isDisabled(MenuKeys.DELETE),
         }, 120]);
     }

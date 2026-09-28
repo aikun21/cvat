@@ -107,7 +107,7 @@ export default function ProjectActionsItems(
     menuItems.push([{
         key: 'delete',
         onClick: onDeleteProject,
-        label: withCount('Delete', 'delete'),
+        label: withCount(t('Delete'), 'delete'),
         disabled: isDisabled('delete'),
     }, 80]);
 

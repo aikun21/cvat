@@ -207,10 +207,10 @@ class AdvancedConfigurationForm extends React.PureComponent<Props> {
                         ...this.getFrameFilter(values),
                         sourceStorage: values.useProjectSourceStorage ?
                             new Storage(project.sourceStorage || { location: StorageLocation.LOCAL }) :
-                            new Storage(values.sourceStorage),
+                            new Storage(values.sourceStorage ?? { location: StorageLocation.LOCAL }),
                         targetStorage: values.useProjectTargetStorage ?
                             new Storage(project.targetStorage || { location: StorageLocation.LOCAL }) :
-                            new Storage(values.targetStorage),
+                            new Storage(values.targetStorage ?? { location: StorageLocation.LOCAL }),
                     });
                 });
             }
@@ -221,8 +221,9 @@ class AdvancedConfigurationForm extends React.PureComponent<Props> {
                         onSubmit({
                             ...this.getValuesWithoutFrameStep(values),
                             ...this.getFrameFilter(values),
-                            sourceStorage: new Storage(values.sourceStorage),
-                            targetStorage: new Storage(values.targetStorage),
+                            // the storage fields are not rendered in the desktop build (local only)
+                            sourceStorage: new Storage(values.sourceStorage ?? { location: StorageLocation.LOCAL }),
+                            targetStorage: new Storage(values.targetStorage ?? { location: StorageLocation.LOCAL }),
                         })
                     ),
                 );

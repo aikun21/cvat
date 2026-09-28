@@ -3623,7 +3623,7 @@ export class CanvasViewImpl implements CanvasView, Listener {
             .text((block): void => {
                 block.tspan(`${withLabel ? label.name : ''} ` +
                 `${withID ? clientID : ''} ` +
-                `${withSource ? `(${source})` : ''}`).style({
+                `${withSource ? `(${this.configuration.sourceNames?.[source] ?? source})` : ''}`).style({
                     'text-transform': 'uppercase',
                 });
 

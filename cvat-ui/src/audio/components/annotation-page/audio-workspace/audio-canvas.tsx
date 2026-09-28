@@ -16,6 +16,7 @@ import { useAudioWaveform } from './hooks/use-audio-waveform';
 import { useAudioIntervalAnnotations } from './hooks/use-audio-interval-annotations';
 import { useWaveformHeight } from './hooks/use-waveform-height';
 import AudioWaveformControls from './audio-waveform-controls';
+import { t } from 'cvat-i18n';
 
 const MINIMAP_CONTAINER_ID = 'minimap';
 
@@ -98,7 +99,7 @@ function AudioCanvasWrapper(): JSX.Element {
             <div className='cvat-audio-canvas-wrapper'>
                 <div className='cvat-audio-placeholder'>
                     <p className='cvat-audio-placeholder-text'>
-                        {`Failed to load audio: ${audioError}`}
+                        {t('Failed to load audio: {{audioError}}', { audioError })}
                     </p>
                 </div>
             </div>
@@ -113,7 +114,7 @@ function AudioCanvasWrapper(): JSX.Element {
             <div className='cvat-audio-canvas-wrapper'>
                 <div className='cvat-audio-placeholder'>
                     <p className='cvat-audio-placeholder-text'>
-                        No audio data available for this job.
+                        {t('No audio data available for this job.')}
                     </p>
                 </div>
             </div>

@@ -73,6 +73,7 @@ import { subKeyMap } from 'utils/component-subkeymap';
 import ImageSetupsContent from './image-setups-content';
 import CanvasTipsComponent from './canvas-hints';
 import { t } from 'cvat-i18n';
+import { translateEnum } from 'utils/i18n-enums';
 
 const cvat = getCore();
 const MAX_DISTANCE_TO_OPEN_SHAPE = 50;
@@ -464,6 +465,9 @@ class CanvasWrapperComponent extends React.PureComponent<Props> {
             textContent,
             resetZoom,
             focusedObjectPadding,
+            sourceNames: Object.fromEntries(
+                ['manual', 'semi-auto', 'auto', 'file', 'consensus'].map((source) => [source, translateEnum(source)]),
+            ),
         });
 
         this.initialSetup();

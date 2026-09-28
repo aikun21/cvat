@@ -17,6 +17,7 @@ import { Workspace } from 'reducers';
 
 import MDEditor from '@uiw/react-md-editor';
 import rehypeSanitize from 'rehype-sanitize';
+import { t } from 'cvat-i18n';
 
 interface Props {
     showStatistics(): void;
@@ -64,8 +65,8 @@ function AudioRightGroup(props: Props): JSX.Element {
             }
         }).catch((error: unknown) => {
             notification.error({
-                message: 'Could not receive annotation guide',
-                description: error instanceof Error ? error.message : 'Unknown error',
+                message: t('Could not receive annotation guide'),
+                description: error instanceof Error ? error.message : t('Unknown error'),
             });
         });
     }, [jobInstance]);
@@ -117,7 +118,7 @@ function AudioRightGroup(props: Props): JSX.Element {
                 }}
             >
                 <Icon component={FullscreenIcon} />
-                Fullscreen
+                {t('Fullscreen')}
             </Button>
             { jobInstance.guideId !== null && (
                 <Button
@@ -126,7 +127,7 @@ function AudioRightGroup(props: Props): JSX.Element {
                     onClick={openGuide}
                 >
                     <Icon component={GuideIcon} />
-                    Guide
+                    {t('Guide')}
                 </Button>
             )}
             <Button
@@ -135,7 +136,7 @@ function AudioRightGroup(props: Props): JSX.Element {
                 onClick={showStatistics}
             >
                 <InfoCircleOutlined />
-                Info
+                {t('Info')}
             </Button>
             <Button
                 type='link'
@@ -145,7 +146,7 @@ function AudioRightGroup(props: Props): JSX.Element {
                 onClick={showFilters}
             >
                 <Icon component={FilterIcon} />
-                Filters
+                {t('Filters')}
             </Button>
             <div>
                 <Select

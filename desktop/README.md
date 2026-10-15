@@ -40,6 +40,7 @@ CVAT 视频标注.exe (Electron, desktop/electron/main.js)
 | `cvat/urls.py` | 桌面模式下由 Django 提供界面；不注册 AI 模型 (lambda) 接口 |
 | `cvat-ui/src/cvat-i18n.ts`, `locales/zh-CN.json` | 界面国际化（i18next），英文原文作为键 |
 | `cvat-ui/src/utils/i18n-enums.ts` | 枚举值（作业状态、图形类型等）与服务器进度消息的显示名称 |
+| `cvat/apps/dataset_manager/video_split.py` | 导出时按时长切分视频（导出对话框的“视频分段”，接口参数 `video_split=<秒>`）：每段小视频连同自己的标注放在单独的文件夹里，帧号按段重新从 0 开始 |
 | `cvat-ui/src/utils/environment.ts` | `isDesktop`：构建时 `CVAT_DESKTOP=true`，隐藏云存储、组织、AI 模型、分析、质量控制、共识等入口 |
 
 ## 开发

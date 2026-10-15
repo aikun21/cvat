@@ -87,5 +87,5 @@ cvat-ui/dist
 /desktop/staging/
 /desktop/vendor/
 /desktop/electron/node_modules/
-/desktop/electron/release/
+/desktop/electron/release*/
 /desktop/i18n-tools/manual-review.txt

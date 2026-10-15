@@ -326,6 +326,7 @@ class ExportCacheManager:
         instance_timestamp: float,
         save_images: bool,
         format_name: str,
+        video_split: int | None = None,
     ) -> str:
         from .formats.registry import EXPORT_FORMATS
 
@@ -335,6 +336,9 @@ class ExportCacheManager:
         file_type = ExportFileType.DATASET if save_images else ExportFileType.ANNOTATIONS
 
         normalized_format_name = make_file_name(to_snake_case(format_name))
+        if video_split:
+            # exports with different clip durations are different files
+            normalized_format_name += f"_split{video_split}s"
         filename = cls.FILE_NAME_TEMPLATE_WITH_INSTANCE.format(
             instance_type=instance_type,
             instance_id=instance_id,

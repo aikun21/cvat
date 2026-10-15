@@ -89,13 +89,14 @@ export const exportDatasetAsync = (
     useDefaultSettings: boolean,
     targetStorage: Storage,
     name?: string,
+    videoSplit?: number,
 ): ThunkAction => async (dispatch) => {
     const resource = saveImages ? 'dataset' : 'annotations';
     const instanceType = getInstanceType(instance);
 
     try {
         const rqID = await instance.annotations
-            .exportDataset(format, saveImages, useDefaultSettings, targetStorage, name);
+            .exportDataset(format, saveImages, useDefaultSettings, targetStorage, name, videoSplit);
 
         if (rqID) {
             const result = await core.requests.listen(rqID, {

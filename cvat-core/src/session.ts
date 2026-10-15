@@ -246,6 +246,7 @@ function buildDuplicatedAPI(prototype): void {
                     useDefaultSettings: boolean,
                     targetStorage: Storage,
                     customName?: string,
+                    videoSplit?: number,
                 ) {
                     const result = await PluginRegistry.apiWrapper.call(
                         this,
@@ -255,6 +256,7 @@ function buildDuplicatedAPI(prototype): void {
                         useDefaultSettings,
                         targetStorage,
                         customName,
+                        videoSplit,
                     );
                     return result;
                 },
@@ -481,6 +483,7 @@ export class Session {
             useDefaultSettings: boolean,
             targetStorage: Storage,
             name?: string,
+            videoSplit?: number,
         ) => Promise<string | void>;
     };
 

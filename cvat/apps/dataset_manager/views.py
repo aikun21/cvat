@@ -18,6 +18,7 @@ from rq_scheduler import Scheduler
 
 import cvat.apps.dataset_manager.project as project
 import cvat.apps.dataset_manager.task as task
+import cvat.apps.dataset_manager.video_split as video_split_
 from cvat.apps.engine.log import ServerLogManager
 from cvat.apps.engine.models import Job, Project, Task
 from cvat.apps.engine.rq import ExportRQMeta
@@ -129,6 +130,7 @@ def export(
     job_id: int | None = None,
     server_url: str | None = None,
     save_images: bool = False,
+    video_split: int | None = None,
 ):
     if task_id is not None:
         logger = slogger.task[task_id]
@@ -164,6 +166,7 @@ def export(
             instance_timestamp=instance_update_time.timestamp(),
             save_images=save_images,
             format_name=dst_format,
+            video_split=video_split,
         )
 
         # acquire a lock 2 times instead of using one long lock:
@@ -185,14 +188,25 @@ def export(
             temp_subdir = osp.join(temp_dir, "subdir")
             os.makedirs(temp_subdir, exist_ok=True)
 
-            export_fn(
-                db_instance.id,
-                temp_file,
-                format_name=dst_format,
-                server_url=server_url,
-                save_images=save_images,
-                temp_dir=temp_subdir,
-            )
+            if video_split:
+                video_split_.export_with_video_split(
+                    db_instance,
+                    temp_file,
+                    format_name=dst_format,
+                    split_seconds=video_split,
+                    server_url=server_url,
+                    save_images=save_images,
+                    temp_dir=temp_subdir,
+                )
+            else:
+                export_fn(
+                    db_instance.id,
+                    temp_file,
+                    format_name=dst_format,
+                    server_url=server_url,
+                    save_images=save_images,
+                    temp_dir=temp_subdir,
+                )
 
             with get_export_cache_lock(
                 output_path,
@@ -219,38 +233,28 @@ def export(
     return output_path
 
 
-def export_job_annotations(job_id: int, dst_format: str, *, server_url: str | None = None):
-    return export(dst_format=dst_format, job_id=job_id, server_url=server_url, save_images=False)
+def export_job_annotations(job_id: int, dst_format: str, **kwargs):
+    return export(dst_format=dst_format, job_id=job_id, save_images=False, **kwargs)
 
 
-def export_job_as_dataset(job_id: int, dst_format: str, *, server_url: str | None = None):
-    return export(dst_format=dst_format, job_id=job_id, server_url=server_url, save_images=True)
+def export_job_as_dataset(job_id: int, dst_format: str, **kwargs):
+    return export(dst_format=dst_format, job_id=job_id, save_images=True, **kwargs)
 
 
-def export_task_as_dataset(task_id: int, dst_format: str, *, server_url: str | None = None):
-    return export(dst_format=dst_format, task_id=task_id, server_url=server_url, save_images=True)
+def export_task_as_dataset(task_id: int, dst_format: str, **kwargs):
+    return export(dst_format=dst_format, task_id=task_id, save_images=True, **kwargs)
 
 
-def export_task_annotations(task_id: int, dst_format: str, *, server_url: str | None = None):
-    return export(dst_format=dst_format, task_id=task_id, server_url=server_url, save_images=False)
+def export_task_annotations(task_id: int, dst_format: str, **kwargs):
+    return export(dst_format=dst_format, task_id=task_id, save_images=False, **kwargs)
 
 
-def export_project_as_dataset(project_id: int, dst_format: str, *, server_url: str | None = None):
-    return export(
-        dst_format=dst_format,
-        project_id=project_id,
-        server_url=server_url,
-        save_images=True,
-    )
+def export_project_as_dataset(project_id: int, dst_format: str, **kwargs):
+    return export(dst_format=dst_format, project_id=project_id, save_images=True, **kwargs)
 
 
-def export_project_annotations(project_id: int, dst_format: str, *, server_url: str | None = None):
-    return export(
-        dst_format=dst_format,
-        project_id=project_id,
-        server_url=server_url,
-        save_images=False,
-    )
+def export_project_annotations(project_id: int, dst_format: str, **kwargs):
+    return export(dst_format=dst_format, project_id=project_id, save_images=False, **kwargs)
 
 
 def get_export_formats():

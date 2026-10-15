@@ -398,10 +398,19 @@ class RequestIdWithOptionalLightweight(RequestId):
 
 
 @attrs.frozen(kw_only=True, slots=False)
+class RequestIdWithOptionalVideoSplit(RequestId):
+    # clip duration in seconds, when a dataset is exported with video splitting
+    video_split: int | None = attrs.field(
+        converter=lambda x: x if x is None else int(x), default=None
+    )
+
+
+@attrs.frozen(kw_only=True, slots=False)
 class ExportRequestId(
     RequestIdWithOptionalSubresource,  # subresource is optional because export queue works also with events
     RequestIdWithOptionalFormat,
     RequestIdWithOptionalLightweight,
+    RequestIdWithOptionalVideoSplit,
 ):
     ACTION_DEFAULT_VALUE: ClassVar[str] = "export"
     ACTION_ALLOWED_VALUES: ClassVar[tuple[str]] = (ACTION_DEFAULT_VALUE,)

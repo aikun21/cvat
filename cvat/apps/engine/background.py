@@ -26,6 +26,7 @@ from rq.job import JobStatus as RQJobStatus
 
 import cvat.apps.dataset_manager as dm
 from cvat.apps.dataset_manager.util import TmpDirManager, get_export_cache_lock
+from cvat.apps.dataset_manager.video_split import MAX_SPLIT_SECONDS, MIN_SPLIT_SECONDS
 from cvat.apps.dataset_manager.views import get_export_callback
 from cvat.apps.engine.backup import (
     ProjectExporter,
@@ -47,6 +48,7 @@ from cvat.apps.engine.location import (
 from cvat.apps.engine.log import ServerLogManager
 from cvat.apps.engine.models import (
     Data,
+    DimensionType,
     Job,
     Project,
     RequestAction,
@@ -54,6 +56,7 @@ from cvat.apps.engine.models import (
     RequestTarget,
     StorageChoice,
     Task,
+    TaskMode,
 )
 from cvat.apps.engine.permissions import get_cloud_storage_for_import_or_export
 from cvat.apps.engine.rq import (
@@ -268,16 +271,27 @@ class DatasetExporter(BaseResourceExporter):
     class ExportArgs(BaseResourceExporter.ExportArgs):
         format: str
         save_images: bool
+        video_split: int | None = None  # clip duration in seconds
 
     def init_request_args(self) -> None:
         super().init_request_args()
         save_images = is_dataset_export(self.request)
         format_name = self.request.query_params.get("format", "")
 
+        video_split = self.request.query_params.get("video_split") or None
+        if video_split is not None:
+            try:
+                video_split = int(video_split)
+            except ValueError as ex:
+                raise serializers.ValidationError(
+                    "The video_split parameter must be an integer number of seconds"
+                ) from ex
+
         self.export_args: DatasetExporter.ExportArgs = self.ExportArgs(
             **self.export_args.to_dict(),
             format=format_name,
             save_images=save_images,
+            video_split=video_split,
         )
 
     def validate_request(self):
@@ -291,6 +305,28 @@ class DatasetExporter(BaseResourceExporter):
         elif not format_desc.ENABLED:
             raise MethodNotAllowed(self.request.method, detail="Format is disabled")
 
+        if self.export_args.video_split is not None:
+            self._validate_video_split(format_desc)
+
+    def _validate_video_split(self, format_desc) -> None:
+        if not MIN_SPLIT_SECONDS <= self.export_args.video_split <= MAX_SPLIT_SECONDS:
+            raise serializers.ValidationError(
+                "The video_split parameter must be between "
+                f"{MIN_SPLIT_SECONDS} and {MAX_SPLIT_SECONDS} seconds"
+            )
+
+        if format_desc.DIMENSION != DimensionType.DIM_2D:
+            raise serializers.ValidationError("Video splitting is not supported for this format")
+
+        db_task = None
+        if isinstance(self.db_instance, Task):
+            db_task = self.db_instance
+        elif isinstance(self.db_instance, Job):
+            db_task = self.db_instance.segment.task
+
+        if db_task is not None and db_task.mode != TaskMode.INTERPOLATION:
+            raise serializers.ValidationError("Video splitting is available only for video tasks")
+
     def build_request_id(self):
         return ExportRequestId(
             action=RequestAction.EXPORT,
@@ -303,6 +339,7 @@ class DatasetExporter(BaseResourceExporter):
                 else RequestSubresource.ANNOTATIONS
             ),
             format=self.export_args.format,
+            video_split=self.export_args.video_split,
         ).render()
 
     def validate_request_id(self, request_id, /) -> None:
@@ -331,6 +368,8 @@ class DatasetExporter(BaseResourceExporter):
         self.callback_kwargs = {
             "server_url": self.request.build_absolute_uri("").rstrip("/"),
         }
+        if self.export_args.video_split is not None:
+            self.callback_kwargs["video_split"] = self.export_args.video_split
 
     def finalize_request(self):
         handle_dataset_export(
@@ -355,6 +394,9 @@ class DatasetExporter(BaseResourceExporter):
                 is_annotation_file=not self.export_args.save_images,
                 extension=(EXPORT_FORMATS[self.export_args.format].EXT).lower(),
             )
+            if self.export_args.video_split is not None:
+                name, ext = osp.splitext(filename)
+                filename = f"{name}_split_{self.export_args.video_split}s{ext}"
 
         return filename
 

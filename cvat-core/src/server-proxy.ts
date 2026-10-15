@@ -1040,6 +1040,7 @@ function exportDataset(instanceType: 'projects' | 'jobs' | 'tasks') {
         useDefaultSettings: boolean,
         targetStorage: Storage,
         name?: string,
+        videoSplit?: number,
     ) {
         const { backendAPI } = config;
         const baseURL = `${backendAPI}/${instanceType}/${id}/dataset/export`;
@@ -1047,6 +1048,7 @@ function exportDataset(instanceType: 'projects' | 'jobs' | 'tasks') {
             ...enableOrganization(),
             ...configureStorage(targetStorage, useDefaultSettings),
             ...(name ? { filename: name } : {}),
+            ...(videoSplit ? { video_split: videoSplit } : {}),
             format,
             save_images: saveImages,
         };

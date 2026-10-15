@@ -15,6 +15,7 @@ import { DownloadOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import Text from 'antd/lib/typography/Text';
 import Select from 'antd/lib/select';
 import Input from 'antd/lib/input';
+import InputNumber from 'antd/lib/input-number';
 import Form from 'antd/lib/form';
 import Switch from 'antd/lib/switch';
 import Space from 'antd/lib/space';
@@ -36,6 +37,8 @@ import { t as tr } from 'cvat-i18n';
 type FormValues = {
     selectedFormat: string | undefined;
     saveImages: boolean;
+    splitVideo: boolean;
+    splitSeconds: number;
     customName: string | undefined;
     targetStorage: StorageData;
     useProjectTargetStorage: boolean;
@@ -44,6 +47,8 @@ type FormValues = {
 const initialValues: FormValues = {
     selectedFormat: undefined,
     saveImages: false,
+    splitVideo: false,
+    splitSeconds: 10,
     customName: undefined,
     targetStorage: {
         location: StorageLocation.LOCAL,
@@ -53,6 +58,17 @@ const initialValues: FormValues = {
 };
 
 const DEFAULT_EXPORT_EXTENSION = '.zip';
+const MIN_SPLIT_SECONDS = 1;
+const MAX_SPLIT_SECONDS = 3600;
+
+// videos can be split into clips only in 2D video tasks, a project may contain them
+function canSplitVideo(target: ProjectOrTaskOrJob | null): boolean {
+    if (!target) return false;
+    if (target instanceof Project) {
+        return target.dimension === null || target.dimension === DimensionType.DIMENSION_2D;
+    }
+    return target.dimension === DimensionType.DIMENSION_2D && target.mode === 'interpolation';
+}
 
 function normalizeExportExtension(extension: string | undefined): string {
     if (!extension) return DEFAULT_EXPORT_EXTENSION;
@@ -76,6 +92,7 @@ function ExportDatasetModal(props: Readonly<StateToProps>): JSX.Element {
     const [instanceType, setInstanceType] = useState('');
     const [useDefaultTargetStorage, setUseDefaultTargetStorage] = useState(true);
     const [selectedFormat, setSelectedFormat] = useState<string>();
+    const [splitVideo, setSplitVideo] = useState(false);
     const [form] = Form.useForm();
     const [targetStorage, setTargetStorage] = useState<StorageData>({
         location: StorageLocation.LOCAL,
@@ -140,6 +157,8 @@ function ExportDatasetModal(props: Readonly<StateToProps>): JSX.Element {
         selectedInstances.some((selectedInstance) => selectedInstance.dimension !== DimensionType.DIMENSION_1D) :
         instance?.dimension !== DimensionType.DIMENSION_1D;
 
+    const canSplit = isBulkMode ? selectedInstances.some(canSplitVideo) : canSplitVideo(instance);
+
     const [nameTemplate, setNameTemplate] = useState('dataset_task_{{id}}');
 
     useEffect(() => {
@@ -182,6 +201,7 @@ function ExportDatasetModal(props: Readonly<StateToProps>): JSX.Element {
         setUseDefaultTargetStorage(true);
         setTargetStorage({ location: StorageLocation.LOCAL });
         setSelectedFormat(undefined);
+        setSplitVideo(false);
         form.resetFields();
         if (instance) {
             dispatch(exportActions.closeExportDatasetModal(instance));
@@ -193,6 +213,9 @@ function ExportDatasetModal(props: Readonly<StateToProps>): JSX.Element {
             const exportExtension = getExportExtension(dumpers, values.selectedFormat);
             const shouldSaveImages = (target: ProjectOrTaskOrJob): boolean => (
                 target.dimension !== DimensionType.DIMENSION_1D && values.saveImages
+            );
+            const getVideoSplit = (target: ProjectOrTaskOrJob): number | undefined => (
+                values.splitVideo && canSplitVideo(target) ? values.splitSeconds : undefined
             );
             if (isBulkMode) {
                 dispatch(makeBulkOperationAsync<ProjectOrTaskOrJob>(
@@ -214,6 +237,7 @@ function ExportDatasetModal(props: Readonly<StateToProps>): JSX.Element {
                                     cloudStorageId: values.targetStorage?.cloudStorageId,
                                 }),
                                 exportName,
+                                getVideoSplit(inst),
                             ),
                         );
                     },
@@ -246,6 +270,7 @@ function ExportDatasetModal(props: Readonly<StateToProps>): JSX.Element {
                         cloudStorageId: defaultStorageCloudId,
                     }) : new Storage(targetStorage),
                     values.customName ? appendExportExtension(values.customName, exportExtension) : undefined,
+                    getVideoSplit(instance as ProjectOrTaskOrJob),
                 ),
             );
             closeModal();
@@ -315,6 +340,9 @@ function ExportDatasetModal(props: Readonly<StateToProps>): JSX.Element {
                     if ('selectedFormat' in changedValues) {
                         setSelectedFormat(changedValues.selectedFormat);
                     }
+                    if ('splitVideo' in changedValues) {
+                        setSplitVideo(!!changedValues.splitVideo);
+                    }
                 }}
             >
                 <Form.Item
@@ -354,6 +382,51 @@ function ExportDatasetModal(props: Readonly<StateToProps>): JSX.Element {
                         </Form.Item>
                         <Text strong>{tr('Save images')}</Text>
                     </Space>
+                }
+                {
+                    canSplit && (
+                        <div className='cvat-modal-export-split-video'>
+                            <Space>
+                                <Form.Item
+                                    className='cvat-modal-export-switch-use-default-storage'
+                                    name='splitVideo'
+                                    valuePropName='checked'
+                                >
+                                    <Switch className='cvat-modal-export-split-video-switch' />
+                                </Form.Item>
+                                <Text strong>{tr('Split video into clips')}</Text>
+                                <Tooltip
+                                    title={tr('Each video is cut into clips of the specified duration. Every clip is put into its own folder together with its annotations in the selected format.')}
+                                >
+                                    <QuestionCircleOutlined />
+                                </Tooltip>
+                            </Space>
+                            {
+                                splitVideo && (
+                                    <Form.Item
+                                        name='splitSeconds'
+                                        label={<Text strong>{tr('Clip duration (seconds)')}</Text>}
+                                        rules={[{
+                                            required: true,
+                                            type: 'integer',
+                                            min: MIN_SPLIT_SECONDS,
+                                            max: MAX_SPLIT_SECONDS,
+                                            message: tr('Enter an integer from {{min}} to {{max}}', {
+                                                min: MIN_SPLIT_SECONDS, max: MAX_SPLIT_SECONDS,
+                                            }),
+                                        }]}
+                                    >
+                                        <InputNumber
+                                            min={MIN_SPLIT_SECONDS}
+                                            max={MAX_SPLIT_SECONDS}
+                                            precision={0}
+                                            className='cvat-modal-export-split-seconds'
+                                        />
+                                    </Form.Item>
+                                )
+                            }
+                        </div>
+                    )
                 }
                 {isBulkMode ? (
                     <Form.Item label={<Text strong>{tr('Name template')}</Text>} required>

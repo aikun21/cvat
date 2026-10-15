@@ -124,8 +124,11 @@ export default function implementProject(Project: typeof ProjectClass): typeof P
             useDefaultSettings: Parameters<typeof ProjectClass.prototype.annotations.exportDataset>[2],
             targetStorage: Parameters<typeof ProjectClass.prototype.annotations.exportDataset>[3],
             customName: Parameters<typeof ProjectClass.prototype.annotations.exportDataset>[4],
+            videoSplit?: Parameters<typeof ProjectClass.prototype.annotations.exportDataset>[5],
         ): ReturnType<typeof ProjectClass.prototype.annotations.exportDataset> {
-            const rqID = await exportDataset(this, format, saveImages, useDefaultSettings, targetStorage, customName);
+            const rqID = await exportDataset(
+                this, format, saveImages, useDefaultSettings, targetStorage, customName, videoSplit,
+            );
             return rqID;
         },
     });

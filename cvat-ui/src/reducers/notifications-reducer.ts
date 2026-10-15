@@ -587,7 +587,7 @@ export default function (state = defaultState, action: AnyAction): Notifications
             } = action.payload;
             let description = t('Export {{resource}} for {{instanceType}} {{id}} is finished. ', { resource, instanceType, id: instance.id });
             if (target === StorageLocation.LOCAL) {
-                description += 'You can [download it here](/requests).';
+                description += t('You can [download it here](/requests).');
             } else if (target === StorageLocation.CLOUD_STORAGE) {
                 description =
                     t('Export {{resource}} for {{instanceType}} {{id}} has been uploaded to cloud storage.', { resource, instanceType, id: instance.id });
@@ -632,7 +632,7 @@ export default function (state = defaultState, action: AnyAction): Notifications
             } = action.payload;
             let description = t('Backup for the {{instanceType}} {{id}} is finished. ', { instanceType, id: instance.id });
             if (target === StorageLocation.LOCAL) {
-                description += 'You can [download it here](/requests).';
+                description += t('You can [download it here](/requests).');
             } else if (target === StorageLocation.CLOUD_STORAGE) {
                 description =
                     t('Backup for the {{instanceType}} {{id}} has been uploaded to cloud storage.', { instanceType, id: instance.id });

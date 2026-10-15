@@ -4,13 +4,22 @@
 # Requirements: Node.js + corepack (yarn), the development venv (.venv, see desktop/README.md)
 # which provides uv and the standalone Python 3.12 it was created from.
 #
-# Usage: powershell -ExecutionPolicy Bypass -File desktop/build.ps1 [-SkipUI] [-SkipPython]
-param([switch]$SkipUI, [switch]$SkipPython)
+# Usage: powershell -ExecutionPolicy Bypass -File desktop/build.ps1 [-SkipUI] [-SkipPython] [-Output <dir>]
+#   -Output: directory inside desktop/electron for the results (default: release)
+param([switch]$SkipUI, [switch]$SkipPython, [string]$Output = "release")
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
 $desktop = $PSScriptRoot
 $staging = Join-Path $desktop "staging"
 $uv = Join-Path $root ".venv\Scripts\uv.exe"
+
+# Packaging recreates <output>\win-unpacked. An app started from there runs in portable mode
+# and keeps its database and videos in win-unpacked\data, which must not be deleted silently.
+$unpackedData = Join-Path $desktop "electron\$Output\win-unpacked\data"
+if (Test-Path $unpackedData) {
+    throw "$unpackedData contains application data that packaging would delete. " +
+        "Move this folder to a safe place first, or build into another directory with -Output <dir>."
+}
 
 function Invoke-Checked([string]$what, [scriptblock]$block) {
     Write-Host "==> $what"
@@ -95,7 +104,9 @@ Invoke-Checked "Compiling Python files" {
 # 7. Electron app + installer
 Push-Location "$desktop\electron"
 if (-not (Test-Path node_modules)) { Invoke-Checked "Installing Electron" { npm install } }
-Invoke-Checked "Packaging" { npm run dist }
+Invoke-Checked "Packaging" {
+    node node_modules\electron-builder\cli.js --win "-c.directories.output=$Output"
+}
 Pop-Location
 
-Write-Host "Done: $desktop\electron\release"
+Write-Host "Done: $desktop\electron\$Output"

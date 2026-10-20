@@ -17,21 +17,21 @@ import { CompactPicker } from 'react-color';
 
 import { clamp } from 'utils/math';
 import { BackJumpIcon, ForwardJumpIcon } from 'icons';
-import { FrameSpeed } from 'reducers';
+import { PLAYBACK_RATES, formatPlaybackRate } from 'utils/playback';
 import config from 'config';
 import { usePlugins } from 'utils/hooks';
 import { t } from 'cvat-i18n';
 
 interface Props {
     frameStep: number;
-    frameSpeed: FrameSpeed;
+    playbackRate: number;
     resetZoom: boolean;
     rotateAll: boolean;
     smoothImage: boolean;
     showDeletedFrames: boolean;
     canvasBackgroundColor: string;
     onChangeFrameStep(step: number): void;
-    onChangeFrameSpeed(speed: FrameSpeed): void;
+    onChangePlaybackRate(rate: number): void;
     onSwitchResetZoom(enabled: boolean): void;
     onSwitchRotateAll(rotateAll: boolean): void;
     onChangeCanvasBackgroundColor(color: string): void;
@@ -42,14 +42,14 @@ interface Props {
 export default function PlayerSettingsComponent(props: Props): JSX.Element {
     const {
         frameStep,
-        frameSpeed,
+        playbackRate,
         resetZoom,
         rotateAll,
         smoothImage,
         showDeletedFrames,
         canvasBackgroundColor,
         onChangeFrameStep,
-        onChangeFrameSpeed,
+        onChangePlaybackRate,
         onSwitchResetZoom,
         onSwitchRotateAll,
         onSwitchSmoothImage,
@@ -92,49 +92,15 @@ export default function PlayerSettingsComponent(props: Props): JSX.Element {
     items.push([(
         <Row key='player-speed' align='middle' className='cvat-player-settings-speed cvat-player-setting'>
             <Col>
-                <Text className='cvat-text-color'> {t('Player speed')}{' '}</Text>
+                <Text className='cvat-text-color'> {t('Playback rate')}{' '}</Text>
                 <Select
                     className='cvat-player-settings-speed-select'
-                    value={frameSpeed}
-                    onChange={(speed: FrameSpeed): void => {
-                        onChangeFrameSpeed(speed);
+                    value={playbackRate}
+                    onChange={(rate: number): void => {
+                        onChangePlaybackRate(rate);
                     }}
-                >
-                    <Select.Option
-                        key='fastest'
-                        value={FrameSpeed.Fastest}
-                        className='cvat-player-settings-speed-fastest'
-                    >
-                        {t('Fastest')}
-                    </Select.Option>
-                    <Select.Option key='fast' value={FrameSpeed.Fast} className='cvat-player-settings-speed-fast'>
-                        {t('Fast')}
-                    </Select.Option>
-                    <Select.Option
-                        key='usual'
-                        value={FrameSpeed.Usual}
-                        className='cvat-player-settings-speed-usual'
-                    >
-                        {t('Usual')}
-                    </Select.Option>
-                    <Select.Option key='slow' value={FrameSpeed.Slow} className='cvat-player-settings-speed-slow'>
-                        {t('Slow')}
-                    </Select.Option>
-                    <Select.Option
-                        key='slower'
-                        value={FrameSpeed.Slower}
-                        className='cvat-player-settings-speed-slower'
-                    >
-                        {t('Slower')}
-                    </Select.Option>
-                    <Select.Option
-                        key='slowest'
-                        value={FrameSpeed.Slowest}
-                        className='cvat-player-settings-speed-slowest'
-                    >
-                        {t('Slowest')}
-                    </Select.Option>
-                </Select>
+                    options={PLAYBACK_RATES.map((rate) => ({ value: rate, label: formatPlaybackRate(rate) }))}
+                />
             </Col>
         </Row>
     ), 10]);

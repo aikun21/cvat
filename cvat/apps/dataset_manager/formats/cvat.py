@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+import itertools
 import os
 import os.path as osp
 import zipfile
@@ -33,6 +34,7 @@ from cvat.apps.dataset_manager.bindings import (
     JobData,
     NoMediaInAnnotationFileError,
     ProjectData,
+    SourceVideoFrames,
     TaskData,
     detect_dataset,
     get_defaulted_subset,
@@ -1569,30 +1571,44 @@ def dump_media_files(
     frame_provider = make_frame_provider(instance_data.db_instance)
 
     ext = ""
+    source_video = None
     if instance_data.meta[instance_data.META_FIELD]["mode"] == TaskMode.INTERPOLATION:
         ext = frame_provider.VIDEO_FRAME_EXT
-
-    frames = frame_provider.iterate_frames(
-        start_frame=instance_data.start,
-        stop_frame=instance_data.stop,
-        quality=FrameQuality.ORIGINAL,
-        out_type=FrameOutputType.BUFFER,
-    )
+        # video frames are decoded from the uploaded video itself,
+        # the original-quality chunks are re-encoded and differ slightly from it
+        db_task = instance_data.db_instance
+        if isinstance(instance_data, JobData):
+            db_task = db_task.segment.task
+        source_video = SourceVideoFrames(db_task)
+        frames = itertools.repeat(None)
+    else:
+        frames = frame_provider.iterate_frames(
+            start_frame=instance_data.start,
+            stop_frame=instance_data.stop,
+            quality=FrameQuality.ORIGINAL,
+            out_type=FrameOutputType.BUFFER,
+        )
     included_frames = instance_data.get_included_frames()
 
-    for frame_id, frame in zip(instance_data.rel_range, frames):
-        # exclude deleted frames and honeypots
-        if frame_id not in included_frames:
-            continue
-        frame_name = (
-            instance_data.frame_info[frame_id]["path"]
-            if project_data is None
-            else project_data.frame_info[(instance_data.db_instance.id, frame_id)]["path"]
-        )
-        img_path = osp.join(img_dir, frame_name + ext)
-        os.makedirs(osp.dirname(img_path), exist_ok=True)
-        with open(img_path, "wb") as f:
-            f.write(frame.data.getvalue())
+    try:
+        for frame_id, frame in zip(instance_data.rel_range, frames):
+            # exclude deleted frames and honeypots
+            if frame_id not in included_frames:
+                continue
+            frame_name = (
+                instance_data.frame_info[frame_id]["path"]
+                if project_data is None
+                else project_data.frame_info[(instance_data.db_instance.id, frame_id)]["path"]
+            )
+            img_path = osp.join(img_dir, frame_name + ext)
+            os.makedirs(osp.dirname(img_path), exist_ok=True)
+            with open(img_path, "wb") as f:
+                f.write(
+                    source_video.get_png(frame_id) if source_video else frame.data.getvalue()
+                )
+    finally:
+        if source_video:
+            source_video.close()
 
 
 def _export_task_or_job(dst_file, temp_dir, instance_data, anno_callback, save_images=False):

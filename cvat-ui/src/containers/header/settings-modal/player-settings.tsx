@@ -7,18 +7,18 @@ import { connect } from 'react-redux';
 import PlayerSettingsComponent from 'components/header/settings-modal/player-settings';
 import {
     changeFrameStep,
-    changeFrameSpeed,
+    changePlaybackRate,
     switchResetZoom,
     switchRotateAll,
     changeCanvasBackgroundColor,
     switchSmoothImage,
     switchShowingDeletedFrames,
 } from 'actions/settings-actions';
-import { CombinedState, FrameSpeed } from 'reducers';
+import { CombinedState } from 'reducers';
 
 interface StateToProps {
     frameStep: number;
-    frameSpeed: FrameSpeed;
+    playbackRate: number;
     resetZoom: boolean;
     rotateAll: boolean;
     smoothImage: boolean;
@@ -28,7 +28,7 @@ interface StateToProps {
 
 interface DispatchToProps {
     onChangeFrameStep(step: number): void;
-    onChangeFrameSpeed(speed: FrameSpeed): void;
+    onChangePlaybackRate(rate: number): void;
     onSwitchResetZoom(enabled: boolean): void;
     onSwitchRotateAll(rotateAll: boolean): void;
     onChangeCanvasBackgroundColor(color: string): void;
@@ -49,8 +49,8 @@ function mapDispatchToProps(dispatch: any): DispatchToProps {
         onChangeFrameStep(step: number): void {
             dispatch(changeFrameStep(step));
         },
-        onChangeFrameSpeed(speed: FrameSpeed): void {
-            dispatch(changeFrameSpeed(speed));
+        onChangePlaybackRate(rate: number): void {
+            dispatch(changePlaybackRate(rate));
         },
         onSwitchResetZoom(enabled: boolean): void {
             dispatch(switchResetZoom(enabled));

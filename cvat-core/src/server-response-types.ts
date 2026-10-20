@@ -387,6 +387,7 @@ export interface SerializedFramesMetaData {
     stop_frame: number;
     storage: DataStorageLocation;
     cloud_storage_id: number | null;
+    fps?: number | null;
 }
 
 export interface SerializedAPISchema {

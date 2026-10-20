@@ -88,7 +88,8 @@ export const AUDIO_ADVANCED_CONFIGURATION_SECTIONS = [
 
 const initialValues: AdvancedConfiguration = {
     imageQuality: 70,
-    useZipChunks: true,
+    // desktop: video chunks are several times smaller than zip chunks and are decoded by hardware
+    useZipChunks: !isDesktop,
     useCache: true,
     copyData: false,
     sortingMethod: SortingMethod.LEXICOGRAPHICAL,

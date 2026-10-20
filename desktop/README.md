@@ -40,7 +40,16 @@ CVAT 视频标注.exe (Electron, desktop/electron/main.js)
 | `cvat/urls.py` | 桌面模式下由 Django 提供界面；不注册 AI 模型 (lambda) 接口 |
 | `cvat-ui/src/cvat-i18n.ts`, `locales/zh-CN.json` | 界面国际化（i18next），英文原文作为键 |
 | `cvat-ui/src/utils/i18n-enums.ts` | 枚举值（作业状态、图形类型等）与服务器进度消息的显示名称 |
+| `cvat-core/src/opencv/tracker-kalman.ts` | 跟踪器 TrackerKalman：相机运动补偿（光流 + RANSAC 仿射）+ ByteTrack 的卡尔曼滤波（xyah）+ 模板匹配与马氏距离门限；框保持用户所画框的大小和边距，尺寸只随镜头缩放变化，模板只用与初始外观高度相似的画面缓慢更新（防止框缩到目标最暗/最亮的部分或滑出目标），在 OpenCV 工具的“跟踪”页中默认选中 |
+| `cvat-ui/.../annotations-actions/tracker-mil.ts`, `cvat-core/src/annotations-actions/end-tracks.ts` | 跟踪结果按容差简化关键帧（Douglas-Peucker），跟丢或出画处自动加出画关键帧；新操作“从当前帧结束轨迹（出画）” |
+| `create-task-page` | 桌面版新建任务默认不使用 zip 分块（视频分块小得多，可硬件解码） |
+| `cvat-core/src/frames.ts`（`ChunkStore`） | 打开 2D 作业（视频分块和 zip 分块）时在后台下载全部分块并保存在内存（上限 1.5 GB），从当前帧所在分块开始，用户正在等的分块优先 |
+| `cvat-data/src/ts/cvat-data.ts` | 用 WebCodecs（硬件解码）解码分块，失败时自动退回 Broadway.js；解码缓存按最近使用淘汰 |
+| `cvat/settings/desktop.py`, `cvat/desktop/cache_cleanup.py` | 分块缓存不再一天过期、不再限制 300 个文件，删除任务时一并删除；`main.js` 启动多个分块 worker 并行生成 |
+| `cvat-ui/src/utils/playback.ts` | 播放速率（0.25x–8x，1x 为视频原始帧率，接口 `data/meta` 新增 `fps`），超过 30 帧/秒时跳帧以保持实时 |
 | `cvat/apps/dataset_manager/video_split.py` | 导出时按时长切分视频（导出对话框的“视频分段”，接口参数 `video_split=<秒>`）：每段小视频连同自己的标注放在单独的文件夹里，帧号按段重新从 0 开始 |
+| `create-task-page/video-split-modal.tsx`, `cvat/desktop/video_preview.py` | 批量创建任务时可把视频切成多段，每个勾选的段按 `start_frame`/`stop_frame` 单独建任务，名称为“模板名-段号”；浏览器不能播放的视频（如 MPEG-TS）由本地服务转成 MP4 预览（H.264 只换封装，其他编码转成小尺寸 H.264） |
+| `cvat-core/src/frames.ts`（`config.jobChunkQuality`）, `dataset_manager/bindings.py`（`SourceVideoFrames`）, `formats/cvat.py` | 画质：标注页使用原始质量分块（原分辨率，不再缩到 540p）；导出的帧图片直接从上传的视频解码，与原视频逐像素一致；导出的分段小视频用 CRF 12（视觉无损） |
 | `cvat-ui/src/utils/environment.ts` | `isDesktop`：构建时 `CVAT_DESKTOP=true`，隐藏云存储、组织、AI 模型、分析、质量控制、共识等入口 |
 
 ## 开发
@@ -71,6 +80,18 @@ powershell -ExecutionPolicy Bypass -File desktop\build.ps1
 ```
 
 产物在 `desktop\electron\release\`：安装包 `CVATDesktop-Setup-<版本>.exe`，绿色版 `CVATDesktop-<版本>-portable-win-x64.zip`（解压后双击 `CVATDesktop.exe`）。
+
+打包速度（不含界面构建，界面约 2–3 分钟）：
+
+| 命令 | 产物 | 耗时 |
+| --- | --- | --- |
+| `build.ps1 -Target dir` | 只生成 `release\win-unpacked`（可直接运行，适合日常测试） | 约 1 分钟 |
+| `build.ps1` | 安装包 + zip（并行生成） | 约 6.5 分钟 |
+
+- Python 运行时、静态文件、数据库模板和 OPA 策略包在输入（依赖清单、迁移、权限规则等）不变时直接复用，指纹记在 `desktop\staging\*.stamp`；`-Clean` 强制全部重建。
+- electron-builder 直接使用 `node_modules\electron\dist`（不再解压下载包），跳过对仓库 yarn 工作区的依赖扫描（`build/no-node-modules.js`）和签名（没有证书）。
+- zip 用 Deflate 5 级（默认 7 级要压 3 遍），体积只多 1–2%。
+- 以上耗时是把仓库目录加入 Windows Defender 排除项之后测的。不排除时 Defender 会扫描打包读取的 3.6 万个小文件，完整打包约 12 分钟、`-Target dir` 约 1.5 分钟。
 
 ## 汉化流程
 

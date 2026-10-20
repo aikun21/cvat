@@ -1059,6 +1059,7 @@ export interface PlayerSettingsState {
     canvasBackgroundColor: string;
     frameStep: number;
     frameSpeed: FrameSpeed;
+    playbackRate: number; // relative to the frame rate of the video, see utils/playback.ts
     resetZoom: boolean;
     rotateAll: boolean;
     smoothImage: boolean;

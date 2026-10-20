@@ -11,6 +11,8 @@ const config = {
     },
     origin: '',
     uploadChunkSize: 100,
+    // quality of the chunks shown in 2D jobs, the desktop build uses the original quality
+    jobChunkQuality: 'compressed' as 'compressed' | 'original',
     opencvPath: '',
     removeUnderlyingMaskPixels: {
         enabled: false,

@@ -16,12 +16,12 @@ import notification from 'antd/lib/notification';
 import Text from 'antd/lib/typography/Text';
 import Modal from 'antd/lib/modal';
 import Alert from 'antd/lib/alert';
+import Radio from 'antd/lib/radio';
 import InputNumber from 'antd/lib/input-number';
 import Switch from 'antd/lib/switch';
 import Table from 'antd/lib/table';
 import QuestionCircleOutlined from '@ant-design/icons/lib/icons/QuestionCircleOutlined';
 
-import config from 'config';
 import { createAction, ActionUnion, shallowEqual } from 'utils/redux';
 import { getCVATStore } from 'cvat-store';
 import {
@@ -244,6 +244,28 @@ const componentStorage = createStore(reducer, {
     targetObjectState: null,
 });
 
+// action names are also their identifiers, so they are translated only when shown
+function actionLabel(name: string): string {
+    const labels: Record<string, string> = {
+        'Remove filtered shapes': t('Remove filtered shapes'),
+        'Propagate shapes': t('Propagate shapes'),
+        'Simplify polygons and polylines': t('Simplify polygons and polylines'),
+        'End tracks on the current frame': t('End tracks on the current frame'),
+    };
+    return labels[name] ?? name;
+}
+
+// parameter names are also keys of the parameters, so they are translated only when shown
+function parameterLabel(name: string): string {
+    const labels: Record<string, string> = {
+        'Target frame': t('Target frame'),
+        'Convert rectangle shapes to tracks': t('Convert rectangle shapes to tracks'),
+        'Keyframe tolerance (px)': t('Keyframe tolerance (px)'),
+        Distance: t('Distance'),
+    };
+    return labels[name] ?? name;
+}
+
 function ActionParameterComponent(props: ActionParameterProps & {
     onChange: (value: string) => void;
 }): JSX.Element {
@@ -320,6 +342,19 @@ function AnnotationsActionsModalContent(props: Props): JSX.Element {
         progress, progressMessage, frameFrom, frameTo, actionParameters, modalVisible,
     } = useSelector((state: State) => ({ ...state }), shallowEqual);
 
+    // the object activated (clicked) in the annotation view when the dialog was opened:
+    // by default the action runs on it, the user can switch to all filtered annotations
+    const [selectedObjectState] = useState<ObjectState | null>(() => {
+        if (defaultTargetObjectState) {
+            return null;
+        }
+
+        const { activatedStateID, states } = storage.getState().annotation.annotations;
+        return activatedStateID === null ? null :
+            (states.find((state: ObjectState) => state.clientID === activatedStateID) ?? null);
+    });
+    const initialTargetObjectState = defaultTargetObjectState ?? selectedObjectState;
+
     const filteredActions = targetObjectState ? actions
         .filter((_action) => _action.isApplicableForObject(targetObjectState)) : actions;
     const jobInstance = storage.getState().annotation.job.instance as Job;
@@ -339,7 +374,7 @@ function AnnotationsActionsModalContent(props: Props): JSX.Element {
                 const defaultAction = list.find((action) => action.name === defaultAnnotationAction);
                 if (
                     defaultAction &&
-                    (!defaultTargetObjectState || defaultAction.isApplicableForObject(defaultTargetObjectState))
+                    (!initialTargetObjectState || defaultAction.isApplicableForObject(initialTargetObjectState))
                 ) {
                     dispatch(reducerActions.setActiveAnnotationsAction(defaultAction));
                 }
@@ -348,7 +383,7 @@ function AnnotationsActionsModalContent(props: Props): JSX.Element {
             dispatch(reducerActions.setVisible(true));
             dispatch(reducerActions.updateFrameFrom(jobInstance.startFrame));
             dispatch(reducerActions.updateFrameTo(jobInstance.stopFrame));
-            dispatch(reducerActions.updateTargetObjectState(defaultTargetObjectState ?? null));
+            dispatch(reducerActions.updateTargetObjectState(initialTargetObjectState ?? null));
         });
     }, [jobInstance]);
 
@@ -388,21 +423,32 @@ function AnnotationsActionsModalContent(props: Props): JSX.Element {
                 <Col span={24} className='cvat-action-runner-info'>
                     <Alert
                         message={(
-                            targetObjectState ? (
+                            defaultTargetObjectState ? (
                                 <Text> {t('Selected action will be applied to the current object')}{' '}</Text>
                             ) : (
                                 <div>
                                     <Text>{t('Actions allow executing certain algorithms on')}{' '}</Text>
-                                    <Text strong>
-                                        <a
-                                            target='_blank'
-                                            rel='noopener noreferrer'
-                                            href={config.FILTERS_GUIDE_URL}
+                                    <Radio.Group
+                                        size='small'
+                                        disabled={fetching}
+                                        className='cvat-action-runner-scope'
+                                        value={targetObjectState ? 'selected' : 'filtered'}
+                                        onChange={(event) => {
+                                            dispatch(reducerActions.updateTargetObjectState(
+                                                event.target.value === 'selected' ? selectedObjectState : null,
+                                            ));
+                                        }}
+                                    >
+                                        <CVATTooltip
+                                            title={selectedObjectState ? null :
+                                                t('Click an object in the annotation view first')}
                                         >
-                                            filtered
-                                        </a>
-                                    </Text>
-                                    <Text> annotations. </Text>
+                                            <Radio.Button value='selected' disabled={!selectedObjectState}>
+                                                {t('Selected annotation')}
+                                            </Radio.Button>
+                                        </CVATTooltip>
+                                        <Radio.Button value='filtered'>{t('Filtered annotations')}</Radio.Button>
+                                    </Radio.Group>
                                 </div>
                             )
                         )}
@@ -432,10 +478,10 @@ function AnnotationsActionsModalContent(props: Props): JSX.Element {
                                     (annotationFunction: BaseAction): JSX.Element => (
                                         <Select.Option
                                             value={annotationFunction.name}
-                                            title={annotationFunction.name}
+                                            title={actionLabel(annotationFunction.name)}
                                             key={annotationFunction.name}
                                         >
-                                            {annotationFunction.name}
+                                            {actionLabel(annotationFunction.name)}
                                         </Select.Option>
                                     ),
                                 )}
@@ -592,12 +638,12 @@ function AnnotationsActionsModalContent(props: Props): JSX.Element {
                                                     title={renderTooltip()}
                                                     overlayStyle={{ maxWidth: 500 }}
                                                 >
-                                                    <Text>{name}</Text>
+                                                    <Text>{parameterLabel(name)}</Text>
                                                     {' '}
                                                     <QuestionCircleOutlined />
                                                 </CVATTooltip>
                                             ) : (
-                                                <Text>{name}</Text>
+                                                <Text>{parameterLabel(name)}</Text>
                                             )}
                                             <ActionParameterComponent
                                                 onChange={(value: string) => {

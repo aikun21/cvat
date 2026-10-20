@@ -9,6 +9,7 @@ import HistogramEqualizationImplementation from './histogram-equalization';
 import TrackerMILImplementation, {
     type TrackerMILInterface,
 } from './tracker-mil';
+import TrackerKalmanImplementation from './tracker-kalman';
 import type { ImageProcessing } from './image-processing';
 
 enum MatType {
@@ -46,6 +47,9 @@ export interface OpenCVInterface {
     };
     tracking: {
         trackerMIL: {
+            model: () => TrackerMILInterface;
+        };
+        trackerKalman: {
             model: () => TrackerMILInterface;
         };
     };
@@ -242,6 +246,9 @@ export function createOpenCVInterface(cv: any): OpenCVInterface {
         tracking: {
             trackerMIL: {
                 model: () => new TrackerMILImplementation(cv),
+            },
+            trackerKalman: {
+                model: () => new TrackerKalmanImplementation(cv),
             },
         },
 

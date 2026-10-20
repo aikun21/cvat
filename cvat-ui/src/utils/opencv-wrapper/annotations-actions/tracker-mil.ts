@@ -21,19 +21,72 @@ function imageBitmapToImageData(imageBitmap: ImageBitmap): ImageData {
     return ctx.getImageData(0, 0, canvas.width, canvas.height);
 }
 
-export default class OpenCVTrackerMIL extends BaseCollectionAction {
+// compressed chunks may be downscaled, while shape points are in the original frame size
+function imageScale(frameData: { width: number; height: number }, imageData: ImageData): [number, number] {
+    return [imageData.width / frameData.width, imageData.height / frameData.height];
+}
+
+interface TrackedPosition {
+    frame: number;
+    points: number[];
+}
+
+// Indices of the positions to keep as keyframes, so that linear interpolation between them
+// (as CVAT interpolates rectangles) differs from every tracked position by at most `tolerance` pixels
+// (Douglas-Peucker simplification over frames)
+function simplifyKeyframes(positions: TrackedPosition[], tolerance: number): number[] {
+    if (tolerance <= 0 || positions.length <= 2) {
+        return positions.map((_, idx) => idx);
+    }
+
+    const keep = new Set([0, positions.length - 1]);
+    const stack: [number, number][] = [[0, positions.length - 1]];
+    while (stack.length) {
+        const [first, last] = stack.pop() as [number, number];
+        let worst = -1;
+        let worstDeviation = tolerance;
+        for (let k = first + 1; k < last; k++) {
+            const ratio = (positions[k].frame - positions[first].frame) /
+                (positions[last].frame - positions[first].frame);
+            const deviation = Math.max(...positions[k].points.map((value, idx) => {
+                const from = positions[first].points[idx];
+                return Math.abs(value - (from + (positions[last].points[idx] - from) * ratio));
+            }));
+            if (deviation > worstDeviation) {
+                worst = k;
+                worstDeviation = deviation;
+            }
+        }
+
+        if (worst !== -1) {
+            keep.add(worst);
+            stack.push([first, worst], [worst, last]);
+        }
+    }
+
+    return [...keep].sort((a, b) => a - b);
+}
+
+// runs one of the OpenCV trackers (see OpenCVWrapper.tracking) as an annotations action
+export default class OpenCVTrackerAction extends BaseCollectionAction {
     #instance: Job | Task | null;
     #targetFrame: number;
     #convertRectangleShapesToTracks: boolean;
+    #keyframeTolerance: number;
     readonly #openCVWrapper: any;
+    readonly #trackerKey: string;
     readonly #name: string;
 
-    public constructor(openCVWrapper: any) {
+    public constructor(openCVWrapper: any, trackerKey: 'trackerMIL' | 'trackerKalman') {
         super();
-        this.#convertRectangleShapesToTracks = false;
+        // a drawn rectangle usually should become a track of the object
+        this.#convertRectangleShapesToTracks = true;
+        // tracks get keyframes only where the movement changes, so they can still be edited
+        this.#keyframeTolerance = 1;
         this.#targetFrame = 0;
         this.#instance = null;
-        this.#name = openCVWrapper.tracking.trackerMIL.name;
+        this.#trackerKey = trackerKey;
+        this.#name = openCVWrapper.tracking[trackerKey].name;
         this.#openCVWrapper = openCVWrapper;
     }
 
@@ -41,6 +94,74 @@ export default class OpenCVTrackerMIL extends BaseCollectionAction {
         this.#instance = instance;
         this.#targetFrame = +parameters['Target frame'];
         this.#convertRectangleShapesToTracks = parameters['Convert rectangle shapes to tracks'] === 'true';
+        this.#keyframeTolerance = Math.max(0, +(parameters['Keyframe tolerance (px)'] ?? this.#keyframeTolerance) || 0);
+    }
+
+    // Writes tracked positions to a track. Keyframes are added only where needed for the interpolation,
+    // existing keyframes in the tracked range get the tracked positions, and where the tracker lost
+    // the object (it left the image or was not found) the object becomes outside.
+    #writeTrack(
+        track: Track,
+        objectState: ObjectState,
+        startFrame: number,
+        initialPoints: number[],
+        results: { frame: number; points: number[] | null }[],
+    ): void {
+        const setKeyframe = (frame: number, points: number[], outside: boolean): void => {
+            const existing = track.shapes.find((shape) => shape.frame === frame);
+            if (existing) {
+                existing.points = points;
+                existing.outside = outside;
+            } else {
+                track.shapes.push({
+                    frame,
+                    attributes: [],
+                    occluded: objectState.occluded,
+                    outside,
+                    points,
+                    rotation: 0,
+                    z_order: objectState.zOrder,
+                    type: objectState.shapeType,
+                });
+            }
+        };
+
+        // the start frame becomes a keyframe, otherwise the interpolation before the first tracked
+        // keyframe would start from an earlier keyframe
+        if (!track.shapes.some((shape) => shape.frame === startFrame)) {
+            setKeyframe(startFrame, initialPoints, false);
+        }
+
+        let positions: TrackedPosition[] = [{ frame: startFrame, points: initialPoints }];
+        const writePositions = (): void => {
+            for (const idx of simplifyKeyframes(positions, this.#keyframeTolerance)) {
+                if (positions[idx].frame !== startFrame) {
+                    setKeyframe(positions[idx].frame, positions[idx].points, false);
+                }
+            }
+
+            for (const { frame, points } of positions) {
+                const existing = track.shapes.find((shape) => shape.frame === frame);
+                if (existing && frame !== startFrame) {
+                    existing.points = points;
+                    existing.outside = false;
+                }
+            }
+        };
+
+        for (const { frame, points } of results) {
+            if (points) {
+                positions.push({ frame, points });
+            } else if (positions.length) {
+                writePositions();
+                setKeyframe(frame, positions[positions.length - 1].points, true);
+                positions = [];
+            }
+        }
+
+        if (positions.length) {
+            writePositions();
+        }
     }
 
     public async destroy(): Promise<void> {
@@ -161,14 +282,19 @@ export default class OpenCVTrackerMIL extends BaseCollectionAction {
             const initialShape = initialShapes[i];
             const targetObject = targetObjects[i];
             const targetObjectState = targetObjectStates[i];
-            const tracker = this.#openCVWrapper.tracking.trackerMIL.model();
+            const tracker = this.#openCVWrapper.tracking[this.#trackerKey].model();
+            // tracked points by frame, null where the tracker lost the object
+            const results: { frame: number; points: number[] | null }[] = [];
 
             try {
                 let frameData = await this.#instance.frames.get(number);
                 let image = await frameData.data();
                 const imageData = imageBitmapToImageData(image.imageData as ImageBitmap);
 
-                tracker.init(imageData, initialShape);
+                const [initialScaleX, initialScaleY] = imageScale(frameData, imageData);
+                tracker.init(imageData, initialShape.map(
+                    (value, idx) => value * (idx % 2 === 0 ? initialScaleX : initialScaleY),
+                ));
                 for (let j = 0; j < targetFrameNumbers.length; j++) {
                     currentProgress = i * targetFrameNumbers.length + j;
 
@@ -188,47 +314,40 @@ export default class OpenCVTrackerMIL extends BaseCollectionAction {
                     }
 
                     image = await frameData.data();
-                    const { updated, points } = tracker.update(imageBitmapToImageData(image.imageData as ImageBitmap));
-                    if (updated) {
-                        if (targetObjectState.objectType === ObjectType.TRACK) {
-                            const castedObject = targetObject as Track;
-                            const existingShape = castedObject.shapes.find((_shape) => _shape.frame === frame) ?? null;
-
-                            if (existingShape) {
-                                existingShape.points = points;
-                            } else {
-                                castedObject.shapes.push({
-                                    frame,
-                                    attributes: [],
-                                    occluded: targetObjectState.occluded,
-                                    outside: false,
-                                    points,
-                                    rotation: 0,
-                                    z_order: targetObjectState.zOrder,
-                                    type: targetObjectState.shapeType,
-                                });
-                            }
-                        } else {
-                            const castedObject = targetObject as Shape;
-                            trackedShapes.push({
-                                elements: [],
-                                group: castedObject.group,
-                                frame,
-                                source: Source.AUTO,
-                                attributes: cloneDeep(castedObject.attributes),
-                                occluded: castedObject.occluded,
-                                outside: false,
-                                points,
-                                rotation: 0,
-                                z_order: castedObject.z_order,
-                                label_id: castedObject.label_id,
-                                type: castedObject.type,
-                            });
-                        }
-                    }
+                    const frameImageData = imageBitmapToImageData(image.imageData as ImageBitmap);
+                    const [scaleX, scaleY] = imageScale(frameData, frameImageData);
+                    const { updated, points: scaledPoints } = tracker.update(frameImageData);
+                    const points = (scaledPoints as number[]).map(
+                        (value, idx) => value / (idx % 2 === 0 ? scaleX : scaleY),
+                    );
+                    results.push({ frame, points: updated ? points : null });
                 }
             } finally {
                 tracker.delete();
+            }
+
+            if (targetObjectState.objectType === ObjectType.TRACK) {
+                this.#writeTrack(targetObject as Track, targetObjectState, number, initialShape, results);
+            } else {
+                const castedObject = targetObject as Shape;
+                for (const { frame, points } of results) {
+                    if (points) {
+                        trackedShapes.push({
+                            elements: [],
+                            group: castedObject.group,
+                            frame,
+                            source: Source.AUTO,
+                            attributes: cloneDeep(castedObject.attributes),
+                            occluded: castedObject.occluded,
+                            outside: false,
+                            points,
+                            rotation: 0,
+                            z_order: castedObject.z_order,
+                            label_id: castedObject.label_id,
+                            type: castedObject.type,
+                        });
+                    }
+                }
             }
         }
 
@@ -284,6 +403,11 @@ export default class OpenCVTrackerMIL extends BaseCollectionAction {
 
     public get parameters(): BaseCollectionAction['parameters'] {
         return {
+            'Keyframe tolerance (px)': {
+                type: ActionParameterType.NUMBER,
+                values: ['0', '10', '0.5'],
+                defaultValue: String(this.#keyframeTolerance),
+            },
             'Convert rectangle shapes to tracks': {
                 type: ActionParameterType.CHECKBOX,
                 values: ['true', 'false'],

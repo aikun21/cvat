@@ -12,6 +12,7 @@ import Collapse from 'antd/lib/collapse';
 import notification from 'antd/lib/notification';
 import Text from 'antd/lib/typography/Text';
 import Alert from 'antd/lib/alert';
+import { ScissorOutlined } from '@ant-design/icons';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { ValidateErrorEntity } from 'rc-field-form/lib/interface';
 import { getCore, Storage, StorageLocation } from 'cvat-core-wrapper';
@@ -28,6 +29,7 @@ import ProjectSubsetField from './project-subset-field';
 import MultiTasksProgress from './multi-task-progress';
 import AdvancedConfigurationForm, { AdvancedConfiguration, SortingMethod } from './advanced-configuration-form';
 import QualityConfigurationForm, { QualityConfiguration, ValidationMode } from './quality-configuration-form';
+import VideoSplitModal, { VideoSplit } from './video-split-modal';
 import { t } from 'cvat-i18n';
 import { isDesktop } from 'utils/environment';
 
@@ -62,6 +64,9 @@ type State = CreateTaskData & {
     multiTasks: (CreateTaskData & {
         status: 'pending' | 'progress' | 'failed' | 'completed' | 'cancelled';
     })[];
+    // local videos split into segments, a task is created for each checked segment
+    videoSplits: { file: File; split: VideoSplit }[];
+    splittingFile: File | null;
     uploadFileErrorMessage: string;
     loading: boolean;
     statusInProgressTask: string;
@@ -74,7 +79,7 @@ const defaultState: State = {
     },
     subset: '',
     advanced: {
-        useZipChunks: true,
+        useZipChunks: !isDesktop,
         useCache: true,
         sortingMethod: SortingMethod.LEXICOGRAPHICAL,
         sourceStorage: {
@@ -105,6 +110,8 @@ const defaultState: State = {
     activeFileManagerTab: 'local',
     cloudStorageId: null,
     multiTasks: [],
+    videoSplits: [],
+    splittingFile: null,
     uploadFileErrorMessage: '',
     loading: false,
     statusInProgressTask: '',
@@ -351,12 +358,13 @@ class CreateTaskContent extends React.PureComponent<Props & RouteComponentProps,
         });
 
         if (!uploadFileErrorMessage) {
-            this.setState({
+            this.setState((state) => ({
                 files: {
                     ...files,
                     local: uploadedFiles,
                 },
-            });
+                videoSplits: state.videoSplits.filter((item) => uploadedFiles.includes(item.file)),
+            }));
         }
     };
 
@@ -631,28 +639,72 @@ class CreateTaskContent extends React.PureComponent<Props & RouteComponentProps,
         } = this.state;
 
         const files: (File | string)[] = allFiles[activeFileManagerTab];
+        const makeTask = (
+            file: File | string,
+            name: string,
+            taskAdvanced: AdvancedConfiguration,
+        ): State['multiTasks'][0] => ({
+            projectId,
+            basic: { name },
+            subset,
+            advanced: taskAdvanced,
+            quality,
+            labels,
+            files: {
+                ...defaultState.files,
+                [activeFileManagerTab]: [file],
+            },
+            activeFileManagerTab,
+            cloudStorageId,
+            status: 'pending',
+        });
 
         this.setState({
-            multiTasks: files.map((file, index) => ({
-                projectId,
-                basic: {
-                    name: this.getTaskName(index, activeFileManagerTab),
-                },
-                subset,
-                advanced,
-                quality,
-                labels,
-                files: {
-                    ...defaultState.files,
-                    [activeFileManagerTab]: [file],
-                },
-                activeFileManagerTab,
-                cloudStorageId,
-                status: 'pending',
-            }
-            )),
+            multiTasks: files.flatMap((file, index) => {
+                const split = this.getVideoSplit(file);
+                if (!split) {
+                    return [makeTask(file, this.getTaskName(index, activeFileManagerTab), advanced)];
+                }
+
+                // segment numbers stay the same as in the split dialog, unchecked segments are skipped
+                return split.segments
+                    .map((segment, segmentIndex) => ({ segment, number: segmentIndex + 1 }))
+                    .filter(({ segment }) => segment.checked)
+                    .map(({ segment, number }) => makeTask(file, this.getSegmentTaskName(index, number), {
+                        ...advanced,
+                        startFrame: segment.start,
+                        stopFrame: segment.stop,
+                    }));
+            }),
         }, resolve);
     });
+
+    private getVideoSplit = (file: File | string): VideoSplit | null => {
+        const { activeFileManagerTab, videoSplits } = this.state;
+        if (activeFileManagerTab !== 'local') return null;
+        return videoSplits.find((item) => item.file === file)?.split ?? null;
+    };
+
+    private getTasksCount = (): number => {
+        const { files, activeFileManagerTab } = this.state;
+        return (files[activeFileManagerTab] as (File | string)[]).reduce((acc: number, file: File | string) => {
+            const split = this.getVideoSplit(file);
+            return acc + (split ? split.segments.filter((segment) => segment.checked).length : 1);
+        }, 0);
+    };
+
+    private handleVideoSplitOk = (file: File, split: VideoSplit): void => {
+        this.setState((state) => ({
+            videoSplits: [...state.videoSplits.filter((item) => item.file !== file), { file, split }],
+            splittingFile: null,
+        }));
+    };
+
+    private handleVideoSplitReset = (file: File): void => {
+        this.setState((state) => ({
+            videoSplits: state.videoSplits.filter((item) => item.file !== file),
+        }));
+    };
 
     private handleSubmitMultiTasks = (): void => {
         this.validateBlocks()
@@ -777,6 +829,18 @@ class CreateTaskContent extends React.PureComponent<Props & RouteComponentProps,
             basic.name;
     };
 
+    // a task made of a video segment is named "<name from the template>-<segment number>",
+    // {{file_name}} is used without the extension, e.g. "video-2" or "video-0-2" for "{{file_name}}-{{index}}"
+    private getSegmentTaskName = (indexFile: number, segmentNumber: number): string => {
+        const { basic, files } = this.state;
+        const file = files.local[indexFile] as File;
+        const fileName = file.name.replace(/\.[^.]+$/, '');
+        const name = basic.name
+            .replaceAll('{{file_name}}', fileName)
+            .replaceAll('{{index}}', indexFile.toString());
+        return `${name}-${segmentNumber}`;
+    };
+
     private renderBasicBlock(): JSX.Element {
         const { many } = this.props;
         const exampleMultiTaskName = many ? this.getTaskName(0, 'local', 'fileName.mp4') : '';
@@ -894,7 +958,79 @@ class CreateTaskContent extends React.PureComponent<Props & RouteComponentProps,
                         />
                     </Col>
                 ) : null }
+                {many ? this.renderVideoSplitBlock() : null}
             </>
+        );
+    }
+
+    private renderVideoSplitBlock(): JSX.Element | null {
+        const {
+            files, activeFileManagerTab, splittingFile, uploadFileErrorMessage,
+        } = this.state;
+        const localFiles = files.local as File[];
+        if (activeFileManagerTab !== 'local' || !localFiles.length || uploadFileErrorMessage) return null;
+
+        return (
+            <Col span={24} className='cvat-video-split-files'>
+                <Text className='cvat-text-color'>{t('Video segments')}</Text>
+                <Text type='secondary' className='cvat-video-split-files-hint'>
+                    {t('A video can be split into segments, a separate task is created for each selected segment')}
+                </Text>
+                {localFiles.map((file, index) => {
+                    const split = this.getVideoSplit(file);
+                    const checked = split ? split.segments.filter((segment) => segment.checked) : [];
+                    return (
+                        <Row
+                            key={`${file.name}-${index}`}
+                            className='cvat-video-split-file'
+                            align='middle'
+                            gutter={8}
+                            wrap={false}
+                        >
+                            <Col flex='auto' className='cvat-video-split-file-name'>
+                                <Text ellipsis>{file.name}</Text>
+                            </Col>
+                            <Col>
+                                <Text type='secondary'>
+                                    {split ?
+                                        t('{{checked}} of {{count}} segments selected', {
+                                            checked: checked.length, count: split.segments.length,
+                                        }) :
+                                        t('Not split')}
+                                </Text>
+                            </Col>
+                            <Col>
+                                <Button
+                                    size='small'
+                                    className='cvat-video-split-button'
+                                    icon={<ScissorOutlined />}
+                                    onClick={() => this.setState({ splittingFile: file })}
+                                >
+                                    {split ? t('Edit segments') : t('Split')}
+                                </Button>
+                            </Col>
+                            {split ? (
+                                <Col>
+                                    <Button size='small' onClick={() => this.handleVideoSplitReset(file)}>
+                                        {t('Do not split')}
+                                    </Button>
+                                </Col>
+                            ) : null}
+                        </Row>
+                    );
+                })}
+                {splittingFile ? (
+                    <VideoSplitModal
+                        file={splittingFile}
+                        split={this.getVideoSplit(splittingFile)}
+                        getSegmentName={(segmentNumber: number) => (
+                            this.getSegmentTaskName(localFiles.indexOf(splittingFile), segmentNumber)
+                        )}
+                        onOk={(split) => this.handleVideoSplitOk(splittingFile, split)}
+                        onCancel={() => this.setState({ splittingFile: null })}
+                    />
+                ) : null}
+            </Col>
         );
     }
 
@@ -1015,6 +1151,7 @@ class CreateTaskContent extends React.PureComponent<Props & RouteComponentProps,
             loading,
         } = this.state;
         const currentFiles = files[activeFileManagerTab];
+        const tasksCount = this.getTasksCount();
         const countPending = items.filter((item) => item.status === 'pending').length;
         const countAll = items.length;
 
@@ -1038,9 +1175,9 @@ class CreateTaskContent extends React.PureComponent<Props & RouteComponentProps,
                         htmlType='submit'
                         type='primary'
                         onClick={this.handleSubmitMultiTasks}
-                        disabled={!!uploadFileErrorMessage}
+                        disabled={!!uploadFileErrorMessage || (!!currentFiles.length && !tasksCount)}
                     >
-                        {t('Submit {{count}} tasks', { count: currentFiles.length })}
+                        {t('Submit {{count}} tasks', { count: tasksCount })}
                     </Button>
                 </Col>
             </Row>

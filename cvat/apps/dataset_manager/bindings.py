@@ -18,11 +18,13 @@ from types import SimpleNamespace
 from typing import TYPE_CHECKING, Any, Literal, NamedTuple
 
 import attr
+import cv2
 import datumaro as dm
 import datumaro.components
 import datumaro.components.media
 import datumaro.util
 import defusedxml.ElementTree as ET
+import numpy as np
 import rq
 from attr import attrib, attrs
 from attrs.converters import to_bool
@@ -35,6 +37,7 @@ from cvat.apps.engine import models
 from cvat.apps.engine.cache import MediaCache
 from cvat.apps.engine.label_colors import get_label_color
 from cvat.apps.engine.lazy_list import LazyList
+from cvat.apps.engine.media_extractors import IMediaReader, VideoReader
 from cvat.apps.engine.media_io.frame_provider import FrameOutputType, TaskFrameProvider
 from cvat.apps.engine.models import (
     AttributeSpec,
@@ -1671,11 +1674,57 @@ class MediaProvider:
         pass
 
 
+class SourceVideoFrames:
+    """
+    Frames of a video task decoded straight from the uploaded video file. The original-quality
+    chunks are re-encoded, so exported images taken from them differ slightly from the source.
+    Export reads frames in ascending order, so the video is decoded once; going back restarts it.
+    """
+
+    def __init__(self, db_task: Task) -> None:
+        self._db_data = db_task.require_data()
+        self._frames: Generator[IMediaReader.VideoFrame, None, None] | None = None
+        self._next_frame = 0  # absolute number of the next frame of the iterator
+
+    def get(self, rel_frame: int) -> np.ndarray:
+        "Returns the frame (task-relative number) as a BGR image"
+        db_data = self._db_data
+        abs_frame = db_data.start_frame + rel_frame * db_data.get_frame_step()
+        if self._frames is None or abs_frame < self._next_frame:
+            self.close()
+            reader = VideoReader([db_data.get_openable(db_data.video.path)], allow_threading=True)
+            self._frames = reader.iterate_frames(frame_filter=False)
+            self._next_frame = 0
+
+        for frame, _ in self._frames:
+            frame_number = self._next_frame
+            self._next_frame += 1
+            if frame_number == abs_frame:
+                return frame.to_ndarray(format="bgr24")
+
+        self.close()
+        raise CvatExportError(
+            f"Could not read frame {abs_frame} of the video '{db_data.video.path}'"
+        )
+
+    def get_png(self, rel_frame: int) -> bytes:
+        success, result = cv2.imencode(".PNG", self.get(rel_frame))
+        if not success:
+            raise CvatExportError(f"Failed to encode frame {rel_frame} as PNG")
+        return result.tobytes()
+
+    def close(self) -> None:
+        if self._frames is not None:
+            self._frames.close()
+            self._frames = None
+
+
 class MediaProvider2D(MediaProvider):
     def __init__(self, sources: dict[int, MediaSource]) -> None:
         super().__init__(sources)
         self._current_source_id = None
         self._frame_provider = None
+        self._source_video: SourceVideoFrames | None = None
 
     def unload(self) -> None:
         self._unload_source()
@@ -1688,11 +1737,10 @@ class MediaProvider2D(MediaProvider):
             def video_frame_loader():
                 self._load_source(source_id, source)
 
-                # optimization for videos: use numpy arrays instead of bytes
-                # some formats or transforms can require image data
-                return self._frame_provider.get_frame(
-                    frame_index, quality=FrameQuality.ORIGINAL, out_type=FrameOutputType.NUMPY_ARRAY
-                ).data
+                # exported frames are exactly the frames of the uploaded video
+                if self._source_video is None:
+                    self._source_video = SourceVideoFrames(source.db_task)
+                return self._source_video.get(frame_index)
 
             return dm.Image.from_numpy(data=video_frame_loader, **image_kwargs)
         else:
@@ -1719,6 +1767,10 @@ class MediaProvider2D(MediaProvider):
         if self._frame_provider:
             self._frame_provider.unload()
             self._frame_provider = None
+
+        if self._source_video:
+            self._source_video.close()
+            self._source_video = None
 
         self._current_source_id = None
 

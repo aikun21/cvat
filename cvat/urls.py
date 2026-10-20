@@ -70,6 +70,7 @@ if getattr(settings, "DESKTOP_MODE", False) and settings.DESKTOP_UI_ROOT:
     from cvat.desktop.ui import serve_ui
 
     urlpatterns.insert(0, path("", serve_ui))
+    urlpatterns.append(path("api/desktop/", include("cvat.desktop.video_preview")))
     urlpatterns.append(
         re_path(r"^static/(?P<path>.*)$", serve_static, {"document_root": settings.STATIC_ROOT})
     )

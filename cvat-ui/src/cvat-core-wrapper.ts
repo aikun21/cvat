@@ -6,6 +6,7 @@
 import CVATCore from 'cvat-core/src';
 import _cvat from 'cvat-core/src/api';
 import config from 'config';
+import { isDesktop } from 'utils/environment';
 
 import ObjectState from 'cvat-core/src/object-state';
 import { AudioIntervalState } from 'cvat-core/src/annotations-objects/audio-interval-state';
@@ -68,6 +69,8 @@ cvat.config.origin = window.location.origin;
 // Set the TUS chunk size to 2 MB. A small value works better in case of a slow internet connection.
 // A larger value may cause a server-side timeout errors in the current implementation.
 cvat.config.uploadChunkSize = 2;
+// desktop: jobs show the video in its original resolution and quality, not the downscaled compressed chunks
+if (isDesktop) cvat.config.jobChunkQuality = 'original';
 cvat.config.opencvPath = config.OPENCV_PATH;
 cvat.config.previewPlaceholders = {
     [MediaType.POINT_CLOUD]: '/assets/point_cloud_preview.png',

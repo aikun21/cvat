@@ -27,6 +27,7 @@ import {
     switchPlay,
     switchShowSearchFramesModal as switchShowSearchFramesModalAction,
     undoActionAsync,
+    updateCachedChunksAsync,
 } from 'actions/annotation-actions';
 import AnnotationTopBarComponent from 'components/annotation-page/top-bar/top-bar';
 import {
@@ -45,6 +46,7 @@ import { finishDraw } from 'utils/drawing';
 import { toClipboard } from 'utils/to-clipboard';
 import { Chapter } from 'cvat-core/src/frames';
 import { t } from 'cvat-i18n';
+import { getPlaybackPlan } from 'utils/playback';
 
 interface StateToProps {
     chapters: Chapter[];
@@ -55,6 +57,7 @@ interface StateToProps {
     frameFilename: string;
     frameStep: number;
     frameSpeed: FrameSpeed;
+    playbackStep: number;
     frameDelay: number;
     frameFetching: boolean;
     playing: boolean;
@@ -84,7 +87,8 @@ interface StateToProps {
 }
 
 interface DispatchToProps {
-    onChangeFrame(frame: number, fillBuffer?: boolean, frameStep?: number): void;
+    onChangeFrame(frame: number, fillBuffer?: boolean, frameStep?: number): Promise<void>;
+    updateCachedChunks(): void;
     onSwitchPlay(playing: boolean): void;
     switchShowSearchPallet(visible: boolean): void;
     onSaveAnnotation(): void;
@@ -151,7 +155,9 @@ function mapStateToProps(state: CombinedState): StateToProps {
             workspace,
         },
         settings: {
-            player: { frameSpeed, frameStep, showDeletedFrames },
+            player: {
+                frameSpeed, frameStep, showDeletedFrames, playbackRate,
+            },
             workspace: {
                 autoSave,
                 autoSaveInterval,
@@ -176,6 +182,7 @@ function mapStateToProps(state: CombinedState): StateToProps {
         frameIsDeleted,
         frameStep,
         frameSpeed,
+        playbackStep: getPlaybackPlan(playbackRate, meta?.fps ?? null).step,
         frameDelay,
         frameFetching,
         playing,
@@ -211,8 +218,11 @@ function mapStateToProps(state: CombinedState): StateToProps {
 
 function mapDispatchToProps(dispatch: any): DispatchToProps {
     return {
-        onChangeFrame(frame: number, fillBuffer?: boolean, frameStep?: number): void {
-            dispatch(changeFrameAsync(frame, fillBuffer, frameStep));
+        onChangeFrame(frame: number, fillBuffer?: boolean, frameStep?: number): Promise<void> {
+            return dispatch(changeFrameAsync(frame, fillBuffer, frameStep));
+        },
+        updateCachedChunks(): void {
+            dispatch(updateCachedChunksAsync());
         },
         onSwitchPlay(playing: boolean): void {
             dispatch(switchPlay(playing));
@@ -285,6 +295,7 @@ type Props = StateToProps & DispatchToProps & RouteComponentProps;
 class AnnotationTopBarContainer extends React.PureComponent<Props> {
     private inputFrameRef: React.RefObject<HTMLInputElement>;
     private autoSaveInterval: number | undefined;
+    private cachedChunksInterval: number | undefined;
     private isWaitingForPlayDelay: boolean;
     private unblock: any;
 
@@ -296,9 +307,11 @@ class AnnotationTopBarContainer extends React.PureComponent<Props> {
 
     public componentDidMount(): void {
         const {
-            autoSaveInterval, history, jobInstance, setForceExitAnnotationFlag,
+            autoSaveInterval, history, jobInstance, setForceExitAnnotationFlag, updateCachedChunks,
         } = this.props;
         this.autoSaveInterval = window.setInterval(this.autoSave.bind(this), autoSaveInterval);
+        // the video is downloaded in the background, show the progress on the slider
+        this.cachedChunksInterval = window.setInterval(updateCachedChunks, 1000);
 
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
@@ -337,6 +350,7 @@ class AnnotationTopBarContainer extends React.PureComponent<Props> {
 
     public componentWillUnmount(): void {
         window.clearInterval(this.autoSaveInterval);
+        window.clearInterval(this.cachedChunksInterval);
         window.removeEventListener('beforeunload', this.beforeUnloadCallback);
         this.unblock();
     }
@@ -362,19 +376,20 @@ class AnnotationTopBarContainer extends React.PureComponent<Props> {
                     setTimeout(resolve, frameDelay);
                 });
 
-                const { playing: currentPlaying, showDeletedFrames } = this.props;
+                const { playing: currentPlaying, showDeletedFrames, playbackStep } = this.props;
 
                 if (currentPlaying) {
-                    const nextCandidate = frameNumber + 1;
-                    if (nextCandidate > stopFrame) {
+                    if (frameNumber >= stopFrame) {
                         onSwitchPlay(false);
                         return;
                     }
 
+                    // fast playback skips frames, but the last frame is always shown
+                    const nextCandidate = Math.min(frameNumber + playbackStep, stopFrame);
                     const next = await jobInstance.frames
                         .search({ notDeleted: !showDeletedFrames }, nextCandidate, stopFrame);
                     if (next !== null && isAbleToChangeFrame(next)) {
-                        onChangeFrame(next, currentPlaying);
+                        onChangeFrame(next, currentPlaying, playbackStep);
                     } else {
                         onSwitchPlay(false);
                     }
@@ -423,14 +438,30 @@ class AnnotationTopBarContainer extends React.PureComponent<Props> {
         showFilters();
     };
 
-    private onSwitchPlay = (): void => {
+    private onSwitchPlay = async (): Promise<void> => {
         const {
-            frameNumber, jobInstance, onSwitchPlay, playing,
+            frameNumber, jobInstance, onSwitchPlay, onChangeFrame, playing, showDeletedFrames,
         } = this.props;
+        const { startFrame, stopFrame } = jobInstance;
 
         if (playing) {
             onSwitchPlay(false);
-        } else if (frameNumber < jobInstance.stopFrame) {
+            return;
+        }
+
+        const filters = { notDeleted: !showDeletedFrames };
+        const next = frameNumber < stopFrame ?
+            await jobInstance.frames.search(filters, frameNumber + 1, stopFrame) : null;
+        if (next !== null) {
+            onSwitchPlay(true);
+            return;
+        }
+
+        // the video has been played to the end, play it again from the beginning
+        const first = await jobInstance.frames.search(filters, startFrame, stopFrame);
+        if (first !== null && first !== frameNumber && isAbleToChangeFrame(first)) {
+            // playback must start after the frame is changed, otherwise it stops at once on the last frame
+            await onChangeFrame(first);
             onSwitchPlay(true);
         }
     };

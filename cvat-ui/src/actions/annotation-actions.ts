@@ -23,7 +23,6 @@ import {
     ActiveControl,
     CombinedState,
     ContextMenuType,
-    FrameSpeed,
     NavigationType,
     OpenCVTool,
     Rotation,
@@ -33,6 +32,7 @@ import { switchToolsBlockerState } from './settings-actions';
 import { updateJobAsync } from './jobs-actions';
 import { loadAudioDataAsync } from './audio-actions';
 import { t } from 'cvat-i18n';
+import { getPlaybackPlan } from 'utils/playback';
 
 interface AnnotationsParameters {
     filters: object[];
@@ -741,7 +741,10 @@ export function updateCachedChunksAsync(): ThunkAction {
                 return acc;
             }, []).map(([start, end]) => `${start}:${end}`).join(';');
 
-            dispatch(updateCachedChunks(ranges));
+            // it is called periodically while a video is being downloaded
+            if (ranges !== getState().annotation.player.ranges) {
+                dispatch(updateCachedChunks(ranges));
+            }
         } catch (_error) {
             // even if error happens here, do not need to notify the users
         }
@@ -811,23 +814,12 @@ export function changeFrameAsync(
             }, true);
 
             const currentTime = new Date().getTime();
-            let frameSpeed;
-            switch (state.settings.player.frameSpeed) {
-                case FrameSpeed.Fast: {
-                    frameSpeed = (FrameSpeed.Fast as number) / 2;
-                    break;
-                }
-                case FrameSpeed.Fastest: {
-                    frameSpeed = (FrameSpeed.Fastest as number) / 3;
-                    break;
-                }
-                default: {
-                    frameSpeed = state.settings.player.frameSpeed as number;
-                }
-            }
+            const { delay: frameDelay } = getPlaybackPlan(
+                state.settings.player.playbackRate, state.annotation.job.meta?.fps ?? null,
+            );
             const delay = Math.max(
                 0,
-                Math.round(1000 / frameSpeed) - currentTime + (state.annotation.player.frame.changeTime as number),
+                Math.round(frameDelay) - currentTime + (state.annotation.player.frame.changeTime as number),
             );
 
             const { states, history } = await fetchAnnotations(toFrame);

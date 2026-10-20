@@ -55,7 +55,7 @@ from cvat.apps.engine.cache import (
 )
 from cvat.apps.engine.cloud_provider import Status as CloudStorageStatus
 from cvat.apps.engine.exceptions import CloudStorageMissingError
-from cvat.apps.engine.media_extractors import get_mime, get_video_chapters
+from cvat.apps.engine.media_extractors import get_mime, get_video_chapters, get_video_fps
 from cvat.apps.engine.media_io.audio_provider import (
     IAudioProvider,
     JobAudioProvider,
@@ -165,6 +165,24 @@ from .log import ServerLogManager
 slogger = ServerLogManager(__name__)
 
 _UPLOAD_PARSER_CLASSES = api_settings.DEFAULT_PARSER_CLASSES + [MultiPartParser]
+
+
+def _get_frame_rate(db_task: models.Task, db_data: models.Data) -> float | None:
+    "Frames per second of the task frames, for video tasks with local data"
+    if (
+        db_task.mode != models.TaskMode.INTERPOLATION
+        or not hasattr(db_data, "video")
+        or db_data.storage == StorageChoice.CLOUD_STORAGE
+    ):
+        return None
+
+    try:
+        fps = get_video_fps(db_data.get_openable(db_data.video.path))
+    except Exception:  # the rate is only used for playback, it is not worth an error
+        slogger.task[db_task.id].warning("Failed to get the video frame rate", exc_info=True)
+        return None
+
+    return float(fps / db_data.get_frame_step())
 
 _DATA_CHECKSUM_HEADER_NAME = "X-Checksum"
 _DATA_CHUNK_SIZE_HEADER_NAME = "X-Chunk-Size"
@@ -2021,6 +2039,7 @@ class TaskViewSet(
         db_data.frames = frame_meta
         db_data.chunks_updated_date = db_task.get_chunks_updated_date()
         db_data.chapters = chapters
+        db_data.fps = _get_frame_rate(db_task, db_data)
 
         serializer = DataMetaReadSerializer(db_data, context={"task": db_task})
         return Response(serializer.data)
@@ -2815,6 +2834,7 @@ class JobViewSet(
 
         db_data.frames = frame_meta
         db_data.chapters = chapters
+        db_data.fps = _get_frame_rate(db_task, db_data)
 
         serializer = DataMetaReadSerializer(db_data, context={"task": db_task})
         return Response(serializer.data)

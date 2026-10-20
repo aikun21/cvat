@@ -1,7 +1,7 @@
 {
   "name": "cvat-desktop",
   "productName": "CVATDesktop",
-  "version": "0.2.0",
+  "version": "0.3.6",
   "description": "CVAT video annotation as a local desktop app (Chinese UI)",
   "main": "main.js",
   "license": "MIT",
@@ -12,7 +12,7 @@
     "dist:dir": "electron-builder --win --dir"
   },
   "devDependencies": {
-    "electron": "^44.4.5",
+    "electron": "^44.7.2",
     "electron-builder": "^26.15.3"
   },
   "build": {
@@ -21,6 +21,7 @@
     "directories": {
       "output": "release"
     },
+    "electronDist": "node_modules/electron/dist",
     "files": [
       "main.js",
       "loading.html",
@@ -63,13 +64,15 @@
       }
     ],
     "asar": true,
+    "beforeBuild": "./build/no-node-modules.js",
     "win": {
       "target": [
         "nsis",
         "zip"
       ],
       "icon": "build/icon.ico",
-      "artifactName": "CVATDesktop-${version}-portable-win-${arch}.${ext}"
+      "artifactName": "CVATDesktop-${version}-portable-win-${arch}.${ext}",
+      "signExecutable": false
     },
     "nsis": {
       "oneClick": false,
@@ -77,7 +80,6 @@
       "artifactName": "CVATDesktop-Setup-${version}.exe",
       "shortcutName": "CVAT 视频标注"
     },
-    "npmRebuild": false,
     "extraFiles": [
       {
         "from": "build/使用说明.txt",

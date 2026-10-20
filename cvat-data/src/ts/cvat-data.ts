@@ -91,7 +91,10 @@ export class FrameDecoder {
     private decodedChunks: Record<number, Record<number, ImageBitmap | Blob>>;
     private chunkIsBeingDecoded: BlockToDecode | null;
     private requestedChunkToDecode: BlockToDecode | null;
+    // decoded chunks, the most recently used first
     private orderedStack: number[];
+    // frames of the latest removed chunk are closed with a delay, they may still be on the screen
+    private framesToClose: (ImageBitmap | Blob)[];
     private mutex: Mutex;
     private dimension: DimensionType;
     private cachedChunksLimit: number;
@@ -110,6 +113,7 @@ export class FrameDecoder {
     ) {
         this.mutex = new Mutex();
         this.orderedStack = [];
+        this.framesToClose = [];
         this.zipWorker = null;
         this.videoWorker = null;
 
@@ -144,15 +148,32 @@ export class FrameDecoder {
                 return;
             }
 
-            for (const frame of Object.keys(this.decodedChunks[lastChunk])) {
-                const data = this.decodedChunks[lastChunk][frame];
-                if (data instanceof ImageBitmap) {
-                    data.close();
-                }
+            if (lastChunk in this.decodedChunks) {
+                this.closeLater(Object.values(this.decodedChunks[lastChunk]));
+                delete this.decodedChunks[lastChunk];
+                length--;
             }
+        }
+    }
 
-            delete this.decodedChunks[lastChunk];
-            length--;
+    private closeLater(frames: (ImageBitmap | Blob)[]): void {
+        // with a small cache the chunk of the frame on the screen can be removed
+        // while the next one is being decoded, so its frames are closed one removal later
+        this.closeFrames(this.framesToClose);
+        this.framesToClose = frames;
+    }
+
+    private closeFrames(frames: (ImageBitmap | Blob)[]): void {
+        for (const data of frames) {
+            if (data instanceof ImageBitmap) {
+                data.close();
+            }
+        }
+    }
+
+    private markUsed(chunkIndex: number): void {
+        if (this.orderedStack[0] !== chunkIndex) {
+            this.orderedStack = [chunkIndex, ...this.orderedStack.filter((chunk) => chunk !== chunkIndex)];
         }
     }
 
@@ -228,6 +249,9 @@ export class FrameDecoder {
     frame(frameNumber: number): ImageBitmap | Blob | null {
         const chunkIndex = this.getChunkIndex(frameNumber);
         if (chunkIndex in this.decodedChunks) {
+            // chunks are removed from the cache in the order of their usage, not decoding,
+            // otherwise a chunk decoded long ago is removed while its frames are being shown
+            this.markUsed(chunkIndex);
             return this.decodedChunks[chunkIndex][frameNumber];
         }
 
@@ -264,6 +288,92 @@ export class FrameDecoder {
         return new ImageData(rgbaInt8Clamped, width, height);
     }
 
+    // Hardware accelerated decoding is much faster than Broadway.js (wasm, single thread),
+    // which allows to show compressed chunks immediately and to play videos faster than real time
+    private static webCodecsUsable = typeof VideoDecoder !== 'undefined' && typeof EncodedVideoChunk !== 'undefined';
+
+    private async decodeWithWebCodecs(
+        block: ArrayBuffer,
+        chunkIndex: number,
+        chunkFrameNumbers: number[],
+        decodedFrames: Record<number, ImageBitmap | Blob>,
+        release: () => void,
+    ): Promise<void> {
+        const reader = new MP4Reader(new Bytestream(block));
+        reader.read();
+        const video = reader.tracks[1];
+        const avc = video.trak.mdia.minf.stbl.stsd.avc1.avcC;
+        const sps: Uint8Array = avc.sps[0];
+        const pps: Uint8Array = avc.pps[0];
+        const hex = (value: number): string => value.toString(16).padStart(2, '0');
+
+        // samples are converted to the Annex B format (start codes instead of NAL unit lengths),
+        // so the decoder takes parameter sets from the stream and needs no "description"
+        const toAnnexB = (nalUnits: Uint8Array[]): Uint8Array => {
+            const result = new Uint8Array(nalUnits.reduce((acc, nal) => acc + nal.length + 4, 0));
+            let offset = 0;
+            for (const nal of nalUnits) {
+                result.set([0, 0, 0, 1], offset);
+                result.set(nal, offset + 4);
+                offset += nal.length + 4;
+            }
+            return result;
+        };
+
+        const sampleCount = video.getSampleCount();
+        if (sampleCount !== chunkFrameNumbers.length) {
+            throw new Error(`The chunk has ${sampleCount} frames, expected ${chunkFrameNumbers.length}`);
+        }
+
+        let outputIndex = 0;
+        let decodeError: Error | null = null;
+        const conversions: Promise<void>[] = [];
+        const decoder = new VideoDecoder({
+            output: (frame: VideoFrame) => {
+                // frames are returned in the presentation order
+                const frameNumber = chunkFrameNumbers[outputIndex++];
+                conversions.push(createImageBitmap(frame).then((bitmap) => {
+                    decodedFrames[frameNumber] = bitmap;
+                    this.chunkIsBeingDecoded?.onDecode(frameNumber, bitmap);
+                }).finally(() => frame.close()));
+            },
+            error: (error: Error) => {
+                decodeError = error;
+            },
+        });
+
+        try {
+            decoder.configure({
+                codec: `avc1.${hex(sps[1])}${hex(sps[2])}${hex(sps[3])}`,
+                optimizeForLatency: true,
+            });
+
+            for (let sample = 0; sample < sampleCount; sample++) {
+                const nalUnits = video.getSampleNALUnits(sample);
+                const isKey = nalUnits.some((nal: Uint8Array) => (nal[0] & 0x1f) === 5); // IDR slice
+                decoder.decode(new EncodedVideoChunk({
+                    type: isKey ? 'key' : 'delta',
+                    timestamp: sample * 1000,
+                    data: toAnnexB(sample === 0 ? [sps, pps, ...nalUnits] : nalUnits),
+                }));
+            }
+
+            await decoder.flush();
+            await Promise.all(conversions);
+        } finally {
+            if (decoder.state !== 'closed') decoder.close();
+        }
+
+        if (decodeError || outputIndex !== chunkFrameNumbers.length) {
+            throw decodeError ?? new Error(`Decoded ${outputIndex} of ${chunkFrameNumbers.length} frames`);
+        }
+
+        this.decodedChunks[chunkIndex] = decodedFrames;
+        this.chunkIsBeingDecoded.onDecodeAll();
+        this.chunkIsBeingDecoded = null;
+        release();
+    }
+
     async startDecode(): Promise<void> {
         const blockToDecode = { ...this.requestedChunkToDecode };
         const releaseMutex = await this.mutex.acquire();
@@ -289,13 +399,29 @@ export class FrameDecoder {
                 chunkFrameNumbers[chunkFrameIndex]
             );
 
-            this.orderedStack = [chunkIndex, ...this.orderedStack];
+            this.markUsed(chunkIndex);
             this.cleanup();
             const decodedFrames: Record<number, ImageBitmap | Blob> = {};
             this.chunkIsBeingDecoded = this.requestedChunkToDecode;
             this.requestedChunkToDecode = null;
 
             if (this.blockType === BlockType.MP4VIDEO) {
+                if (FrameDecoder.webCodecsUsable) {
+                    try {
+                        await this.decodeWithWebCodecs(block, chunkIndex, chunkFrameNumbers, decodedFrames, release);
+                        return;
+                    } catch (error) {
+                        // e.g. the codec is not supported: the rest of the session uses the wasm decoder
+                        console.warn('WebCodecs video decoding failed, falling back to Broadway.js', error);
+                        FrameDecoder.webCodecsUsable = false;
+                        for (const frameNumber of Object.keys(decodedFrames)) {
+                            const bitmap = decodedFrames[+frameNumber];
+                            if (bitmap instanceof ImageBitmap) bitmap.close();
+                            delete decodedFrames[+frameNumber];
+                        }
+                    }
+                }
+
                 this.videoWorker = new Worker(
                     new URL('./3rdparty/Decoder.worker', import.meta.url),
                 );
@@ -426,6 +552,8 @@ export class FrameDecoder {
         }
 
         this.cleanup(Number.MAX_SAFE_INTEGER);
+        this.closeFrames(this.framesToClose);
+        this.framesToClose = [];
     }
 
     public cachedChunks(includeInProgress = false): number[] {

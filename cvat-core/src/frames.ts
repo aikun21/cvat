@@ -37,6 +37,8 @@ const frameDataCache: Record<string, {
         size: number;
     }>;
     getChunk: (chunkIndex: number, quality: ChunkQuality) => Promise<ArrayBuffer>;
+    // compressed chunks of a 2D job, all of them are downloaded in the background
+    chunks: ChunkStore | null;
     getMeta: () => Promise<FramesMetaData>;
 }> = {};
 
@@ -125,6 +127,7 @@ export class FramesMetaData {
     public chunksUpdatedDate: string;
     public storage: string;
     public cloudStorageId: number | null;
+    public fps: number | null;
 
     #updateTrigger: FieldUpdateTrigger;
 
@@ -143,6 +146,7 @@ export class FramesMetaData {
             chunks_updated_date: undefined,
             storage: undefined,
             cloud_storage_id: undefined,
+            fps: null,
         };
 
         this.#updateTrigger = new FieldUpdateTrigger();
@@ -267,6 +271,9 @@ export class FramesMetaData {
                 },
                 frames: {
                     get: () => framesInfo,
+                },
+                fps: {
+                    get: () => data.fps ?? null,
                 },
             }),
         );
@@ -401,6 +408,141 @@ export class FrameData {
     }
 }
 
+// Keeps compressed chunks of a job in memory and downloads all of them in the background,
+// starting from the chunk that is shown now. Then any frame can be shown without waiting for the
+// server, only the (fast) decoding of its chunk is needed.
+class ChunkStore {
+    static readonly CONCURRENCY = 3;
+    static readonly MEMORY_LIMIT = 1536 * 1024 * 1024;
+    static readonly ATTEMPTS = 3;
+
+    #chunks = new Map<number, ArrayBuffer>();
+    #requests = new Map<number, Promise<ArrayBuffer>>();
+    #failures = new Map<number, number>();
+    #bytes = 0;
+    #full = false;
+    #focus = 0;
+    #waitingUser = 0;
+    #preloading = false;
+    #closed = false;
+    #chunkCount: number;
+    #download: (chunkIndex: number) => Promise<ArrayBuffer>;
+
+    constructor(chunkCount: number, download: (chunkIndex: number) => Promise<ArrayBuffer>) {
+        this.#chunkCount = chunkCount;
+        this.#download = download;
+    }
+
+    loadedChunks(): number[] {
+        return [...this.#chunks.keys()];
+    }
+
+    // a chunk the user waits for, it gets priority over the background downloads
+    get(chunkIndex: number): Promise<ArrayBuffer> {
+        this.#focus = chunkIndex;
+        const stored = this.#chunks.get(chunkIndex);
+        if (stored) {
+            return Promise.resolve(stored);
+        }
+
+        this.#waitingUser++;
+        return this.request(chunkIndex).finally(() => {
+            this.#waitingUser--;
+        });
+    }
+
+    preload(): void {
+        if (this.#preloading) {
+            return;
+        }
+
+        this.#preloading = true;
+        const worker = async (): Promise<void> => {
+            while (!this.#closed && !this.#full) {
+                if (this.#waitingUser > 0) {
+                    await new Promise((resolve) => setTimeout(resolve, 50));
+                    continue;
+                }
+
+                const chunkIndex = this.nextToLoad();
+                if (chunkIndex === null) {
+                    return;
+                }
+
+                try {
+                    await this.request(chunkIndex);
+                } catch (_error) {
+                    this.#failures.set(chunkIndex, (this.#failures.get(chunkIndex) ?? 0) + 1);
+                    await new Promise((resolve) => setTimeout(resolve, 1000));
+                }
+            }
+        };
+
+        Promise.all(Array.from({ length: ChunkStore.CONCURRENCY }, worker)).finally(() => {
+            this.#preloading = false;
+        });
+    }
+
+    // chunks were updated on the server
+    reset(): void {
+        this.#chunks.clear();
+        this.#failures.clear();
+        this.#bytes = 0;
+        this.#full = false;
+    }
+
+    close(): void {
+        this.#closed = true;
+        this.reset();
+    }
+
+    private nextToLoad(): number | null {
+        for (let offset = 0; offset < this.#chunkCount; offset++) {
+            const chunkIndex = (this.#focus + offset) % this.#chunkCount;
+            if (
+                !this.#chunks.has(chunkIndex) && !this.#requests.has(chunkIndex) &&
+                (this.#failures.get(chunkIndex) ?? 0) < ChunkStore.ATTEMPTS
+            ) {
+                return chunkIndex;
+            }
+        }
+
+        return null;
+    }
+
+    private request(chunkIndex: number): Promise<ArrayBuffer> {
+        let request = this.#requests.get(chunkIndex);
+        if (!request) {
+            request = this.#download(chunkIndex).then((chunk: ArrayBuffer) => {
+                if (!this.#closed && !this.#chunks.has(chunkIndex)) {
+                    if (this.#bytes + chunk.byteLength <= ChunkStore.MEMORY_LIMIT) {
+                        this.#chunks.set(chunkIndex, chunk);
+                        this.#bytes += chunk.byteLength;
+                    } else {
+                        // very long videos: the rest is downloaded when needed
+                        this.#full = true;
+                    }
+                }
+                return chunk;
+            }).finally(() => {
+                this.#requests.delete(chunkIndex);
+            });
+            this.#requests.set(chunkIndex, request);
+        }
+
+        return request;
+    }
+}
+
+function jobChunkQuality(): ChunkQuality {
+    return config.jobChunkQuality === 'original' ? ChunkQuality.ORIGINAL : ChunkQuality.COMPRESSED;
+}
+
+function getCompressedChunk(jobID: number, chunkIndex: number): Promise<ArrayBuffer> {
+    const { chunks, getChunk } = frameDataCache[jobID];
+    return chunks ? chunks.get(chunkIndex) : getChunk(chunkIndex, jobChunkQuality());
+}
+
 class PrefetchAnalyzer {
     #requestedFrames: number[];
     #meta: FramesMetaData;
@@ -514,9 +656,7 @@ Object.defineProperty(FrameData.prototype.data, 'implementation', {
                                 frameDataCache[this.jobID].activeChunkRequest = null;
                             };
 
-                            frameDataCache[this.jobID].getChunk(
-                                nextChunkIndex, ChunkQuality.COMPRESSED,
-                            ).then((chunk: ArrayBuffer) => {
+                            getCompressedChunk(this.jobID, nextChunkIndex).then((chunk: ArrayBuffer) => {
                                 if (!(this.jobID in frameDataCache)) {
                                     // check if frameDataCache still exist
                                     // as it may be released during chunk request
@@ -577,9 +717,7 @@ Object.defineProperty(FrameData.prototype.data, 'implementation', {
                     resolveLoadAndDecode,
                 ) => {
                     let wasResolved = false;
-                    frameDataCache[this.jobID].getChunk(
-                        chunkIndex, ChunkQuality.COMPRESSED,
-                    ).then((chunk: ArrayBuffer) => {
+                    getCompressedChunk(this.jobID, chunkIndex).then((chunk: ArrayBuffer) => {
                         try {
                             if (!(this.jobID in frameDataCache)) {
                                 // check if frameDataCache still exist
@@ -771,6 +909,10 @@ async function refreshJobCacheIfOutdated(jobID: number): Promise<void> {
             // currently we only re-write meta, remove all cached frames from provider and clear cached context images
             // other parameters (e.g. chunkSize) are not supposed to be changed
             cached.provider.cleanup(Number.MAX_SAFE_INTEGER);
+            if (cached.chunks) {
+                cached.chunks.reset();
+                cached.chunks.preload();
+            }
             for (const frame of Object.keys(cached.contextCache)) {
                 for (const image of Object.values(cached.contextCache[+frame].data)) {
                     // close images to immediate memory release
@@ -953,6 +1095,10 @@ export async function getFrame(
             latestContextImagesRequest: null,
             contextCache: {},
             getChunk,
+            // both video (mp4) and image (zip) chunks of 2D jobs, e.g. video tasks created with "use zip chunks"
+            chunks: dimension === DimensionType.DIMENSION_2D ?
+                new ChunkStore(meta.chunkCount, (chunkIndex) => getChunk(chunkIndex, jobChunkQuality())) :
+                null,
             getMeta: () => {
                 const cached = frameMetaCache[jobID];
                 if (!(cached instanceof Promise)) {
@@ -984,6 +1130,11 @@ export async function getFrame(
     const frameIndex = framesMetaData.getFrameIndex(dataFrameNumber);
     const frameMeta = framesMetaData.frames[frameIndex];
     frameDataCache[jobID].provider.setRenderSize(frameMeta.width, frameMeta.height);
+    if (frameDataCache[jobID].chunks) {
+        // (re)starts background downloading from the chunk of the requested frame
+        frameDataCache[jobID].chunks.get(framesMetaData.getFrameChunkIndex(dataFrameNumber)).catch(() => {});
+        frameDataCache[jobID].chunks.preload();
+    }
     frameDataCache[jobID].decodeForward = isPlaying;
     frameDataCache[jobID].forwardStep = step;
 
@@ -1072,7 +1223,10 @@ export function getCachedChunks(jobID: number): number[] {
         return [];
     }
 
-    return frameDataCache[jobID].provider.cachedChunks(true);
+    // chunks in memory are shown almost immediately, so they are reported as cached too
+    const { provider, chunks } = frameDataCache[jobID];
+    const decoded = provider.cachedChunks(true);
+    return chunks ? [...new Set([...decoded, ...chunks.loadedChunks()])].sort((a, b) => a - b) : decoded;
 }
 
 export async function getJobFrameNumbers(jobID: number): Promise<number[]> {
@@ -1087,6 +1241,7 @@ export async function getJobFrameNumbers(jobID: number): Promise<number[]> {
 export function clear(jobID: number): void {
     if (jobID in frameDataCache) {
         frameDataCache[jobID].provider.close();
+        frameDataCache[jobID].chunks?.close();
         for (const contextImagesByFrame of Object.values(frameDataCache[jobID].contextCache)) {
             for (const image of Object.values(contextImagesByFrame.data)) {
                 image.close();

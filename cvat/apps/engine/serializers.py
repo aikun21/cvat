@@ -3698,12 +3698,18 @@ class DataMetaReadSerializer(serializers.ModelSerializer):
         """),
     )
     chunks_updated_date = serializers.DateTimeField()
+    fps = serializers.FloatField(
+        allow_null=True,
+        required=False,
+        help_text="Playback rate of the task frames (frames per second), for video tasks",
+    )
 
     class Meta:
         model = models.Data
         fields = (
             "chapters",
             "chunks_updated_date",
+            "fps",
             "chunk_size",
             "size",
             "image_quality",

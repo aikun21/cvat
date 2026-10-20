@@ -301,6 +301,12 @@ function build(): CVATCore {
             set origin(value) {
                 config.origin = value;
             },
+            get jobChunkQuality() {
+                return config.jobChunkQuality;
+            },
+            set jobChunkQuality(value) {
+                config.jobChunkQuality = value;
+            },
             get uploadChunkSize() {
                 return config.uploadChunkSize;
             },

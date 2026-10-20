@@ -146,6 +146,18 @@ def get_video_chapters(
     return chapters
 
 
+def get_video_fps(source: Openable, *, default: Fraction = Fraction(25)) -> Fraction:
+    with source.open("rb") as source_file, av.open(source_file, "r") as container:
+        stream = container.streams.video[0]
+        rate = stream.average_rate or stream.guessed_rate
+
+    if not rate or rate <= 0:
+        return default
+
+    # some containers report rates like 359251/12000
+    return Fraction(rate).limit_denominator(1001)
+
+
 _T = TypeVar("_T")
 
 

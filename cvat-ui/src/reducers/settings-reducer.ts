@@ -8,6 +8,7 @@ import { AnyAction } from 'redux';
 import { AuthActionTypes } from 'actions/auth-actions';
 import { SettingsActionTypes } from 'actions/settings-actions';
 import { AnnotationActionTypes } from 'actions/annotation-actions';
+import { DEFAULT_PLAYBACK_RATE } from 'utils/playback';
 import {
     SettingsState, GridColor, FrameSpeed, ColorBy,
 } from 'reducers';
@@ -53,6 +54,7 @@ const defaultState: SettingsState = {
         canvasBackgroundColor: '#ffffff',
         frameStep: 10,
         frameSpeed: FrameSpeed.Usual,
+        playbackRate: DEFAULT_PLAYBACK_RATE,
         resetZoom: false,
         rotateAll: false,
         smoothImage: true,
@@ -207,6 +209,15 @@ export default (state = defaultState, action: AnyAction): SettingsState => {
                 player: {
                     ...state.player,
                     frameSpeed: action.payload.frameSpeed,
+                },
+            };
+        }
+        case SettingsActionTypes.CHANGE_PLAYBACK_RATE: {
+            return {
+                ...state,
+                player: {
+                    ...state.player,
+                    playbackRate: action.payload.playbackRate,
                 },
             };
         }

@@ -30,11 +30,17 @@ DATABASES = {
     }
 }
 
+# Video chunks are expensive to prepare (the video is decoded and encoded again), so they are kept
+# until their task is deleted (see cvat/desktop/cache_cleanup.py) instead of one day, and the file
+# cache must not drop entries when there are many of them (the default limit is 300 files).
 CACHES["media"] = {
     "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
     "LOCATION": CACHE_ROOT / "media",
-    "TIMEOUT": CVAT_CHUNK_CACHE_TTL,
+    "TIMEOUT": None,
+    "OPTIONS": {"MAX_ENTRIES": 10**7},
 }
+
+INSTALLED_APPS += ["cvat.desktop"]
 
 SENDFILE_BACKEND = "django_sendfile.backends.simple"
 

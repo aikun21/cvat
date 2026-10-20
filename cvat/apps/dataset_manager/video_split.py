@@ -31,7 +31,7 @@ import rq
 from django.db import transaction
 
 from cvat.apps.engine import models
-from cvat.apps.engine.media_extractors import VideoReader
+from cvat.apps.engine.media_extractors import VideoReader, get_video_fps
 from cvat.apps.engine.rq import ExportRQMeta
 
 from .annotation import AnnotationIR
@@ -43,7 +43,6 @@ MIN_SPLIT_SECONDS = 1
 MAX_SPLIT_SECONDS = 3600
 
 _CLIP_EXT = ".mp4"
-_DEFAULT_FPS = Fraction(25)
 _STORED_EXTENSIONS = {".mp4", ".jpg", ".jpeg", ".png", ".zip"}
 _INDEX_FILENAME = "segments.json"
 
@@ -147,19 +146,6 @@ def _make_file_name(name: str, default: str) -> str:
     return name or default
 
 
-def _get_video_fps(db_data: models.Data) -> Fraction:
-    source = db_data.get_openable(db_data.video.path)
-    with source.open("rb") as source_file, av.open(source_file, "r") as container:
-        stream = container.streams.video[0]
-        rate = stream.average_rate or stream.guessed_rate
-
-    if not rate or rate <= 0:
-        return _DEFAULT_FPS
-
-    # some containers report rates like 359251/12000
-    return Fraction(rate).limit_denominator(1001)
-
-
 def _make_clips(base_name: str, start: int, stop: int, frames_per_clip: int) -> list[_Clip]:
     starts = range(start, stop + 1, frames_per_clip)
     digits = max(3, len(str(len(starts))))
@@ -178,10 +164,10 @@ def _add_video_stream(
 ) -> av.VideoStream:
     try:
         stream = container.add_stream("libx264", rate=fps)
-        stream.options = {"crf": "20", "preset": "veryfast"}
+        stream.options = {"crf": "12", "preset": "veryfast"}
     except av.codec.codec.UnknownCodecError:
         stream = container.add_stream("libopenh264", rate=fps)
-        stream.codec_context.qmin = stream.codec_context.qmax = 20
+        stream.codec_context.qmin = stream.codec_context.qmax = 12
 
     stream.pix_fmt = "yuv420p"
     # yuv420p requires even frame sizes
@@ -332,7 +318,7 @@ def _export_task(
     db_data = db_task.data
     start, stop = frame_range
 
-    fps = _get_video_fps(db_data) / db_data.get_frame_step()
+    fps = get_video_fps(db_data.get_openable(db_data.video.path)) / db_data.get_frame_step()
     frames_per_clip = max(1, round(split_seconds * fps))
     source = PurePath(db_data.video.path).name
     clips = _make_clips(

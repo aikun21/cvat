@@ -55,3 +55,114 @@
         align-items: center;
     }
 }
+
+.cvat-video-split-files {
+    display: flex;
+    flex-direction: column;
+
+    .cvat-video-split-files-hint {
+        margin-bottom: $grid-unit-size;
+    }
+
+    .cvat-video-split-file {
+        padding: $grid-unit-size * 0.5 0;
+        border-bottom: 1px solid $border-color-1;
+    }
+
+    .cvat-video-split-file-name {
+        min-width: 0;
+    }
+}
+
+.cvat-video-split-modal {
+    .cvat-video-split-player {
+        display: block;
+        width: 100%;
+        max-height: 40vh;
+        background: #000;
+    }
+
+    .cvat-video-split-loading {
+        display: block;
+        margin: $grid-unit-size * 2 auto;
+    }
+
+    .cvat-video-split-info,
+    .cvat-video-split-toolbar,
+    .cvat-video-split-segment-header,
+    .cvat-video-split-segment-bounds {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: $grid-unit-size;
+    }
+
+    .cvat-video-split-info {
+        margin-top: $grid-unit-size;
+    }
+
+    .cvat-video-split-timeline {
+        position: relative;
+        height: $grid-unit-size * 3;
+        margin: $grid-unit-size 0;
+        background: $background-color-2;
+        border-radius: 4px;
+        cursor: pointer;
+        overflow: hidden;
+    }
+
+    .cvat-video-split-timeline-segment {
+        position: absolute;
+        top: 2px;
+        bottom: 2px;
+        background: #bfbfbf;
+        border: 1px solid #fff;
+        border-radius: 4px;
+        color: #fff;
+        font-size: 12px;
+        line-height: 18px;
+        text-align: center;
+        overflow: hidden;
+    }
+
+    .cvat-video-split-timeline-segment-checked {
+        background: #1677ff;
+        opacity: 0.8;
+    }
+
+    .cvat-video-split-timeline-cursor {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        margin-left: -1px;
+        background: #f5222d;
+        pointer-events: none;
+    }
+
+    .cvat-video-split-segments {
+        max-height: 30vh;
+        overflow-y: auto;
+        margin: $grid-unit-size 0;
+    }
+
+    .cvat-video-split-segment {
+        padding: $grid-unit-size;
+        border: 1px solid $border-color-1;
+        border-radius: $border-radius-base;
+
+        & + .cvat-video-split-segment {
+            margin-top: $grid-unit-size;
+        }
+    }
+
+    .cvat-video-split-segment-name {
+        flex: 1;
+        min-width: 0;
+    }
+}
+
+.cvat-video-split-loading-placeholder {
+    height: $grid-unit-size * 12;
+}

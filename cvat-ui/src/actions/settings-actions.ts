@@ -33,6 +33,7 @@ export enum SettingsActionTypes {
     CHANGE_SHOW_GROUND_TRUTH = 'CHANGE_SHOW_GROUND_TRUTH',
     CHANGE_FRAME_STEP = 'CHANGE_FRAME_STEP',
     CHANGE_FRAME_SPEED = 'CHANGE_FRAME_SPEED',
+    CHANGE_PLAYBACK_RATE = 'CHANGE_PLAYBACK_RATE',
     SWITCH_RESET_ZOOM = 'SWITCH_RESET_ZOOM',
     SWITCH_SMOOTH_IMAGE = 'SWITCH_SMOOTH_IMAGE',
     SWITCH_TEXT_FONT_SIZE = 'SWITCH_TEXT_FONT_SIZE',
@@ -196,6 +197,15 @@ export function changeFrameSpeed(frameSpeed: number): AnyAction {
         type: SettingsActionTypes.CHANGE_FRAME_SPEED,
         payload: {
             frameSpeed,
+        },
+    };
+}
+
+export function changePlaybackRate(playbackRate: number): AnyAction {
+    return {
+        type: SettingsActionTypes.CHANGE_PLAYBACK_RATE,
+        payload: {
+            playbackRate,
         },
     };
 }

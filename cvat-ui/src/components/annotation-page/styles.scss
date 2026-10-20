@@ -129,6 +129,11 @@
     height: 100%;
     margin-right: 10px;
 
+    > .cvat-player-playback-rate {
+        width: 64px;
+        margin-left: $grid-unit-size;
+    }
+
     > span {
         font-size: 20px;
         margin: 0 4px;

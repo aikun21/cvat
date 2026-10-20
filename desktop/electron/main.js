@@ -8,11 +8,15 @@ const crypto = require('crypto');
 const fs = require('fs');
 const http = require('http');
 const net = require('net');
+const os = require('os');
 const path = require('path');
 
 const HOST = '127.0.0.1';
 const INIT_TIMEOUT_MS = 15 * 60 * 1000; // first start runs all database migrations
 const START_TIMEOUT_MS = 120 * 1000;
+// The UI downloads all chunks of a video when a job is opened; chunks that are not cached yet are
+// prepared in parallel by several workers (each decodes and encodes video on one CPU core)
+const CHUNK_WORKERS = Math.max(1, Math.min(3, Math.floor(os.cpus().length / 2)));
 
 let mainWindow = null;
 let quitting = false;
@@ -312,8 +316,10 @@ async function startServices(paths) {
         'init', paths.python, ['-m', 'cvat.desktop.init', 'redis'], pyOptions, logDir, runDir, INIT_TIMEOUT_MS,
     ).then(() => {
         const workerArgs = (queues) => ['manage.py', 'rqworker', ...queues, '--worker-class', 'cvat.rqworker.SimpleWorker'];
-        // video chunks are needed interactively, so they get their own worker
-        startProcess('worker-chunks', paths.python, workerArgs(['chunks']), pyOptions, logDir, runDir);
+        // video chunks are needed interactively, so they get their own workers
+        for (let i = 1; i <= CHUNK_WORKERS; i++) {
+            startProcess(`worker-chunks-${i}`, paths.python, workerArgs(['chunks']), pyOptions, logDir, runDir);
+        }
         startProcess('worker-default', paths.python, workerArgs([
             'import', 'export', 'annotation', 'cleaning', 'notifications', 'webhooks', 'quality_reports', 'consensus',
         ]), pyOptions, logDir, runDir);

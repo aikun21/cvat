@@ -1,0 +1,16 @@
+{
+    " annotations.": "标注。",
+    "Click an object in the annotation view first": "请先在画面上点击选中要处理的对象",
+    "Convert rectangle shapes to tracks": "把矩形图形转换为轨迹",
+    "Distance": "距离",
+    "End tracks on the current frame": "从当前帧结束轨迹（出画）",
+    "Filtered annotations": "筛选后的标注",
+    "Kalman filter tracker with camera motion compensation, suitable for small objects and moving cameras": "卡尔曼滤波跟踪（参考 ByteTrack），带相机运动补偿，适合小目标和移动镜头（如无人机热成像）",
+    "Keyframe tolerance (px)": "关键帧容差（像素）",
+    "Propagate shapes": "传播图形",
+    "Remove filtered shapes": "删除筛选出的图形",
+    "Selected annotation": "当前选中的标注",
+    "Simplify polygons and polylines": "简化多边形和折线",
+    "Target frame": "目标帧",
+    "filtered": "筛选后的"
+}

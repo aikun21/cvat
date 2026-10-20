@@ -63,7 +63,7 @@ interface DispatchToProps {
 }
 
 type IntelligentScissors = ReturnType<typeof openCVWrapper.segmentation.intelligentScissorsFactory>;
-type OpenCVTracker = (typeof openCVWrapper.tracking)['trackerMIL'];
+type OpenCVTracker = (typeof openCVWrapper.tracking)[keyof typeof openCVWrapper.tracking];
 
 interface State {
     libraryInitialized: boolean;

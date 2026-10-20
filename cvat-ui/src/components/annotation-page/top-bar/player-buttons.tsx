@@ -31,6 +31,7 @@ import { registerComponentShortcuts } from 'actions/shortcuts-actions';
 import { subKeyMap } from 'utils/component-subkeymap';
 import { Chapter } from 'cvat-core/src/frames';
 import ChapterMenu from './chapter-menu';
+import PlaybackRateSelect from './playback-rate-select';
 import { t } from 'cvat-i18n';
 
 interface Props {
@@ -382,6 +383,7 @@ function PlayerButtons(props: Props): JSX.Element {
                     onClick={onLastFrame}
                 />
             </CVATTooltip>
+            <PlaybackRateSelect />
         </Col>
     );
 }

@@ -5,7 +5,7 @@
 
 import { ObjectState, ShapeType, getCore } from 'cvat-core-wrapper';
 import config from 'config';
-import TrackerMILAction from './annotations-actions/tracker-mil';
+import OpenCVTrackerAction from './annotations-actions/tracker-mil';
 import { t } from 'cvat-i18n';
 
 const core = getCore();
@@ -13,15 +13,15 @@ const core = getCore();
 type OpenCVInterface = ReturnType<typeof core.opencv.createOpenCVInterface>;
 export type IntelligentScissors = ReturnType<OpenCVInterface['segmentation']['intelligentScissorsFactory']>;
 
-type OpenCVTrackingWrapper = OpenCVInterface['tracking'] & {
-    trackerMIL: {
-        model: () => ReturnType<OpenCVInterface['tracking']['trackerMIL']['model']>;
-        name: string;
-        description: string;
-        kind: string;
-    };
-};
-export type OpenCVTracker = OpenCVTrackingWrapper['trackerMIL'];
+export interface OpenCVTracker {
+    model: () => ReturnType<OpenCVInterface['tracking']['trackerMIL']['model']>;
+    name: string;
+    description: string;
+    kind: string;
+}
+
+// the first tracker is selected by default
+type OpenCVTrackingWrapper = Record<'trackerKalman' | 'trackerMIL', OpenCVTracker>;
 
 export class OpenCVWrapper {
     private initialized: boolean;
@@ -249,6 +249,12 @@ export class OpenCVWrapper {
 
     public get tracking(): OpenCVTrackingWrapper {
         return {
+            trackerKalman: {
+                model: () => this.getCVInterface().tracking.trackerKalman.model(),
+                name: 'TrackerKalman',
+                description: t('Kalman filter tracker with camera motion compensation, suitable for small objects and moving cameras'),
+                kind: 'opencv_tracker_kalman',
+            },
             trackerMIL: {
                 model: () => this.getCVInterface().tracking.trackerMIL.model(),
                 name: 'TrackerMIL',
@@ -260,5 +266,6 @@ export class OpenCVWrapper {
 }
 
 const openCVWrapper = new OpenCVWrapper();
-await core.actions.register(new TrackerMILAction(openCVWrapper));
+await core.actions.register(new OpenCVTrackerAction(openCVWrapper, 'trackerKalman'));
+await core.actions.register(new OpenCVTrackerAction(openCVWrapper, 'trackerMIL'));
 export default openCVWrapper;

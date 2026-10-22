@@ -721,11 +721,13 @@ interface StateToProps {
     instance: Project | Task | Job | null;
 }
 
+const NO_IMPORTERS: Loader[] = [];
+
 function mapStateToProps(state: CombinedState): StateToProps {
     const { instanceType } = state.import;
 
     return {
-        importers: state.formats.annotationFormats?.loaders ?? [],
+        importers: state.formats.annotationFormats?.loaders ?? NO_IMPORTERS,
         instanceT: instanceType,
         instance: !instanceType ? null : (
             state.import[`${instanceType}s` as 'projects' | 'tasks' | 'jobs']
@@ -733,4 +735,9 @@ function mapStateToProps(state: CombinedState): StateToProps {
     };
 }
 
-export default connect(mapStateToProps)(ImportDatasetModal);
+// the closed modal is not rendered at all, otherwise its form is re-rendered on every store update
+function ImportDatasetModalWrapper(props: StateToProps): JSX.Element | null {
+    return props.instance ? <ImportDatasetModal {...props} /> : null;
+}
+
+export default connect(mapStateToProps)(ImportDatasetModalWrapper);

@@ -47,6 +47,9 @@ const TRANSLATED_PLACEHOLDERS = new Set([
     'shapeType',
 ]);
 
+// translations without options are requested many times per rendered frame, while the language is fixed
+const plainTranslations = new Map<string, string>();
+
 export function t(key: string, options?: Record<string, unknown>): string {
     if (options) {
         const translated: Record<string, unknown> = { ...options };
@@ -57,7 +60,13 @@ export function t(key: string, options?: Record<string, unknown>): string {
         }
         return i18next.t(key, translated) as string;
     }
-    return i18next.t(key) as string;
+
+    let translation = plainTranslations.get(key);
+    if (translation === undefined) {
+        translation = i18next.t(key) as string;
+        plainTranslations.set(key, translation);
+    }
+    return translation;
 }
 
 export function setLanguage(lng: string): void {

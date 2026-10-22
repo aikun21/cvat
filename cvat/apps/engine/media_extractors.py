@@ -1227,6 +1227,16 @@ class Mpeg4ChunkWriter(IChunkWriter):
     FORMAT = "mp4"
     MAX_MBS_PER_FRAME = 36864
 
+    # x264 with the "ultrafast" preset encodes original chunks about 5 times faster than OpenH264
+    # (1080p: 15 instead of 76 ms per frame), with the same or better quality. Its streams are still
+    # Constrained Baseline, which both UI decoders support. Chunks are prepared while a job is being
+    # played, so a slow encoder makes the playback of a new video stop and wait.
+    PREFERRED_CODECS = ("libx264", "libopenh264")
+
+    # CRF 0 means lossless encoding with the High 4:4:4 profile, which browsers cannot decode.
+    # CRF 14: 47 dB PSNR on 1080p, OpenH264 with the highest quality gives 45 dB.
+    MIN_X264_CRF = 14
+
     def __init__(self, *, quality: int, dimension: DimensionType) -> None:
         assert dimension == DimensionType.DIM_2D
 
@@ -1235,20 +1245,25 @@ class Mpeg4ChunkWriter(IChunkWriter):
         super().__init__(quality=quality, dimension=dimension)
 
         self._output_fps = 25
-        try:
-            codec = av.codec.Codec("libopenh264", "w")
-            self._codec_name = codec.name
+        for codec_name in self.PREFERRED_CODECS:
+            try:
+                codec = av.codec.Codec(codec_name, "w")
+                break
+            except av.codec.codec.UnknownCodecError:
+                if codec_name == self.PREFERRED_CODECS[-1]:
+                    raise
+
+        self._codec_name = codec.name
+        if self._codec_name == "libopenh264":
             self._codec_opts = {
                 "profile": "constrained_baseline",
                 "qmin": str(self._quality),
                 "qmax": str(self._quality),
                 "rc_mode": "buffer",
             }
-        except av.codec.codec.UnknownCodecError:
-            codec = av.codec.Codec("libx264", "w")
-            self._codec_name = codec.name
+        else:
             self._codec_opts = {
-                "crf": str(self._quality),
+                "crf": str(max(self._quality, self.MIN_X264_CRF)),
                 "preset": "ultrafast",
             }
 
@@ -1335,6 +1350,8 @@ class Mpeg4ChunkWriter(IChunkWriter):
 
 
 class Mpeg4CompressedChunkWriter(Mpeg4ChunkWriter):
+    PREFERRED_CODECS = ("libopenh264", "libx264")
+
     def __init__(self, *, quality, dimension):
         super().__init__(quality=quality, dimension=dimension)
 

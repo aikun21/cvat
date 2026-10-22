@@ -484,6 +484,8 @@ interface StateToProps {
     instance: Project | Task | Job | null;
 }
 
+const NO_DUMPERS: Dumper[] = [];
+
 function mapStateToProps(state: CombinedState): StateToProps {
     const { instanceType } = state.export;
     const instance = !instanceType ? null : (
@@ -492,8 +494,14 @@ function mapStateToProps(state: CombinedState): StateToProps {
 
     return {
         instance,
-        dumpers: state.formats.annotationFormats?.dumpers ?? [],
+        dumpers: state.formats.annotationFormats?.dumpers ?? NO_DUMPERS,
     };
 }
 
-export default connect(mapStateToProps)(ExportDatasetModal);
+// the closed modal is not rendered at all, otherwise its form is re-rendered on every store update
+// (e.g. several times per frame while a video is playing)
+function ExportDatasetModalWrapper(props: Readonly<StateToProps>): JSX.Element | null {
+    return props.instance ? <ExportDatasetModal {...props} /> : null;
+}
+
+export default connect(mapStateToProps)(ExportDatasetModalWrapper);

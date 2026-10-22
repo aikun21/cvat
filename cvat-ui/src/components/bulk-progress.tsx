@@ -9,6 +9,7 @@ import notification from 'antd/lib/notification';
 import Button from 'antd/lib/button';
 import Progress from 'antd/lib/progress';
 import { CombinedState } from 'reducers';
+import { shallowEqual } from 'utils/redux';
 import { resetErrors } from 'actions/notification-actions';
 import { makeBulkOperationAsync, bulkActions } from 'actions/bulk-actions';
 import CVATMarkdown from './common/cvat-markdown';
@@ -21,7 +22,7 @@ export default function BulkProgress(): JSX.Element | null {
         fetching: state.bulkActions.fetching,
         status: state.bulkActions.status,
         bulkError: state.notifications.errors.bulkOperation.processing,
-    }));
+    }), shallowEqual);
 
     const percent = status?.percent ?? 0;
     const message = status?.message ?? t('Processing...');

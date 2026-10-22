@@ -98,17 +98,26 @@ export default function IssueAggregatorComponent(): JSX.Element | null {
 
     useEffect(() => {
         if (canvasReady) {
-            const { geometry: updatedGeometry } = canvasInstance;
-            setGeometry(updatedGeometry);
+            // the canvas becomes ready on every frame change, the state is updated only when it really changed,
+            // otherwise each frame of a playing video causes an additional render of the whole workspace
+            const updateGeometry = (): void => {
+                const updatedGeometry = canvasInstance.geometry;
+                setGeometry((prev) => (
+                    prev && JSON.stringify(prev) === JSON.stringify(updatedGeometry) ? prev : updatedGeometry
+                ));
+            };
+            updateGeometry();
 
             const canvasElement = window.document.getElementById('cvat_canvas_wrapper');
             if (canvasElement) {
-                setCanvasRect(canvasElement.getBoundingClientRect());
+                const rect = canvasElement.getBoundingClientRect();
+                setCanvasRect((prev) => (
+                    prev && prev.x === rect.x && prev.y === rect.y &&
+                    prev.width === rect.width && prev.height === rect.height ? prev : rect
+                ));
             }
 
-            const geometryListener = (): void => {
-                setGeometry(canvasInstance.geometry);
-            };
+            const geometryListener = updateGeometry;
 
             canvasInstance.html().addEventListener('canvas.zoom', geometryListener);
             canvasInstance.html().addEventListener('canvas.fit', geometryListener);
@@ -187,7 +196,7 @@ export default function IssueAggregatorComponent(): JSX.Element | null {
 
             setConflictMapping(updatedConflictMapping);
         } else {
-            setConflictMapping([]);
+            setConflictMapping((prev) => (prev.length ? [] : prev));
         }
     }, [geometry, objectStates, showConflicts, canvasReady, qualityConflicts, hiddenZLayers]);
 

@@ -808,10 +808,13 @@ class MediaCache:
             source_path = db_data.get_openable(db_data.video.path)
 
             manifest_path = db_data.get_manifest_path()
+            # Multithreaded decoding: chunks are prepared while a job is played and a single
+            # thread decodes 1080p H.264 at ~20 frames per second, slower than the playback
+            # (the desktop build has a single user, no other requests compete for the CPU)
             reader = VideoReaderWithManifest(
                 manifest_path=manifest_path,
                 source_path=source_path,
-                allow_threading=False,
+                allow_threading=True,
             )
             if not os.path.isfile(manifest_path):
                 try:
@@ -827,7 +830,7 @@ class MediaCache:
                 for frame in reader.iterate_frames(frame_filter=frame_ids):
                     yield (frame, None)
             else:
-                reader = VideoReader([source_path], allow_threading=False)
+                reader = VideoReader([source_path], allow_threading=True)
 
                 yield from reader.iterate_frames(frame_filter=frame_ids)
         else:

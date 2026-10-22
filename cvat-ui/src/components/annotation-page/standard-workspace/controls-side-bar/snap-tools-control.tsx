@@ -12,6 +12,7 @@ import Text from 'antd/lib/typography/Text';
 
 import { SnapToolsIcon, SnapToContourIcon, SnapToPointIcon } from 'icons';
 import { CombinedState } from 'reducers';
+import { shallowEqual } from 'utils/redux';
 import { switchAutomaticBordering, switchSnapToPoint } from 'actions/settings-actions';
 import CVATTooltip from 'components/common/cvat-tooltip';
 import withVisibilityHandling from './handle-popover-visibility';
@@ -25,7 +26,7 @@ function SnapToolsControlComponent(): JSX.Element {
         automaticBordering: state.settings.workspace.automaticBordering,
         snapToPoint: state.settings.workspace.snapToPoint,
         normalizedKeyMap: state.shortcuts.normalizedKeyMap,
-    }));
+    }), shallowEqual);
 
     const isAnySnapEnabled = automaticBordering || snapToPoint;
 

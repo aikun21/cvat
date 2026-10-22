@@ -12,7 +12,7 @@ import Collapse from 'antd/lib/collapse';
 import notification from 'antd/lib/notification';
 import Text from 'antd/lib/typography/Text';
 import Alert from 'antd/lib/alert';
-import { ScissorOutlined } from '@ant-design/icons';
+import { DeleteOutlined, ScissorOutlined } from '@ant-design/icons';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { ValidateErrorEntity } from 'rc-field-form/lib/interface';
 import { getCore, Storage, StorageLocation } from 'cvat-core-wrapper';
@@ -700,6 +700,19 @@ class CreateTaskContent extends React.PureComponent<Props & RouteComponentProps,
         }));
     };
 
+    // a video uploaded by mistake can be removed from the list
+    private handleRemoveLocalFile = (file: File): void => {
+        this.fileManagerComponent?.removeLocalFile(file);
+        this.setState((state) => ({
+            files: {
+                ...state.files,
+                local: (state.files.local as File[]).filter((item) => item !== file),
+            },
+            videoSplits: state.videoSplits.filter((item) => item.file !== file),
+            splittingFile: state.splittingFile === file ? null : state.splittingFile,
+        }));
+    };
+
     private handleVideoSplitReset = (file: File): void => {
         this.setState((state) => ({
             videoSplits: state.videoSplits.filter((item) => item.file !== file),
@@ -1016,6 +1029,17 @@ class CreateTaskContent extends React.PureComponent<Props & RouteComponentProps,
                                     </Button>
                                 </Col>
                             ) : null}
+                            <Col>
+                                <Button
+                                    size='small'
+                                    danger
+                                    className='cvat-video-split-remove-file-button'
+                                    icon={<DeleteOutlined />}
+                                    onClick={() => this.handleRemoveLocalFile(file)}
+                                >
+                                    {t('Remove')}
+                                </Button>
+                            </Col>
                         </Row>
                     );
                 })}

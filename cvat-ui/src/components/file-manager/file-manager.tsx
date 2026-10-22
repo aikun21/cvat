@@ -89,6 +89,15 @@ export class FileManager extends React.PureComponent<Props, State> {
         onUploadShareFiles(shareFiles);
     };
 
+    public removeLocalFile(file: File): void {
+        this.setState((state) => ({
+            files: {
+                ...state.files,
+                local: state.files.local.filter((item) => item !== file),
+            },
+        }));
+    }
+
     public getCloudStorageId(): number | null {
         const { cloudStorage } = this.state;
         return cloudStorage?.id || null;

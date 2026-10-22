@@ -200,7 +200,7 @@ export function implementJob(Job: typeof JobClass): typeof JobClass {
             return getFrame(
                 this.id,
                 this.dataChunkSize,
-                this.dataChunkType,
+                { compressed: this.dataChunkType, original: this.dataOriginalChunkType },
                 this.mode,
                 frame,
                 this.startFrame,
@@ -990,7 +990,7 @@ export function implementTask(Task: typeof TaskClass): typeof TaskClass {
             const result = await getFrame(
                 job.id,
                 this.dataChunkSize,
-                this.dataChunkType,
+                { compressed: this.dataChunkType, original: this.dataOriginalChunkType },
                 this.mode,
                 frame,
                 job.startFrame,

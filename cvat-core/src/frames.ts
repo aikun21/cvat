@@ -1041,7 +1041,9 @@ export async function resolvePreviewResponse(
 export async function getFrame(
     jobID: number,
     chunkSize: number,
-    chunkType: 'video' | 'imageset',
+    // chunk types of the compressed and the original quality, e.g. video tasks with "use zip chunks"
+    // have zip compressed chunks and mp4 original chunks
+    chunkTypes: { compressed: 'video' | 'imageset', original?: 'video' | 'imageset' },
     mode: 'interpolation' | 'annotation', // todo: obsolete, need to remove
     frame: number,
     jobStartFrame: number,
@@ -1053,6 +1055,8 @@ export async function getFrame(
     const dataCacheExists = jobID in frameDataCache;
 
     if (!dataCacheExists) {
+        const chunkType = jobChunkQuality() === ChunkQuality.ORIGINAL ?
+            chunkTypes.original ?? chunkTypes.compressed : chunkTypes.compressed;
         const blockType = chunkType === 'video' ? BlockType.MP4VIDEO : BlockType.ARCHIVE;
         const meta = await getFramesMeta('job', jobID);
 

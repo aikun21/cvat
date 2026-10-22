@@ -612,6 +612,7 @@ export class Job extends Session {
         dimension?: DimensionType;
         media_type: MediaType;
         data_compressed_chunk_type?: ChunkType;
+        data_original_chunk_type?: ChunkType;
         data_chunk_size?: number;
         bug_tracker: string | null;
         mode?: TaskMode;
@@ -644,6 +645,7 @@ export class Job extends Session {
             dimension: undefined,
             media_type: undefined,
             data_compressed_chunk_type: undefined,
+            data_original_chunk_type: undefined,
             data_chunk_size: undefined,
             bug_tracker: null,
             mode: undefined,
@@ -667,6 +669,8 @@ export class Job extends Session {
         this.#data.media_type = initialData.media_type ?? this.#data.media_type;
         this.#data.data_compressed_chunk_type =
             initialData.data_compressed_chunk_type ?? this.#data.data_compressed_chunk_type;
+        this.#data.data_original_chunk_type =
+            initialData.data_original_chunk_type ?? this.#data.data_original_chunk_type;
         this.#data.data_chunk_size = initialData.data_chunk_size ?? this.#data.data_chunk_size;
         this.#data.mode = initialData.mode ?? this.#data.mode;
         this.#data.created_date = initialData.created_date ?? this.#data.created_date;
@@ -799,6 +803,10 @@ export class Job extends Session {
         return this.#data.data_compressed_chunk_type;
     }
 
+    public get dataOriginalChunkType(): ChunkType {
+        return this.#data.data_original_chunk_type;
+    }
+
     public get dataChunkSize(): number {
         return this.#data.data_chunk_size;
     }
@@ -900,6 +908,7 @@ export class Task extends Session {
     public readonly imageQuality: number;
     public readonly dataChunkSize: number;
     public readonly dataChunkType: ChunkType;
+    public readonly dataOriginalChunkType: ChunkType;
     public readonly dimension: DimensionType | undefined;
     public readonly mediaType: MediaType | undefined;
     public readonly progress: {
@@ -1048,6 +1057,7 @@ export class Task extends Session {
                     dimension: data.dimension,
                     media_type: data.media_type,
                     data_compressed_chunk_type: data.data_compressed_chunk_type,
+                    data_original_chunk_type: data.data_original_chunk_type,
                     data_chunk_size: data.data_chunk_size,
                     target_storage: initialData.target_storage,
                     source_storage: initialData.source_storage,
@@ -1186,6 +1196,9 @@ export class Task extends Session {
                 },
                 dataChunkType: {
                     get: () => data.data_compressed_chunk_type,
+                },
+                dataOriginalChunkType: {
+                    get: () => data.data_original_chunk_type,
                 },
                 dimension: {
                     get: () => data.dimension,

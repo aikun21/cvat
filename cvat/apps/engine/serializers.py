@@ -1169,7 +1169,9 @@ class JobReadSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
 
         if instance.segment.type == models.SegmentType.SPECIFIC_FRAMES:
+            # chunks of such segments are always zip archives, whatever the quality
             data["data_compressed_chunk_type"] = models.DataChoice.IMAGESET
+            data["data_original_chunk_type"] = models.DataChoice.IMAGESET
 
         if "replicas_count" in self.fields:
             data["replicas_count"] = getattr(instance, "child_jobs__count", 0)

@@ -126,6 +126,24 @@ if ($SkipPython) {
     Set-Stamp "python" $pythonKey
 }
 
+# The standalone Python only ships vcruntime140*.dll, but extension modules such as
+# datumaro._capi also need msvcp140.dll and friends. They are found next to python.exe,
+# so bundle the Visual C++ runtime of this machine there instead of relying on an installed
+# redistributable. The whole set is copied so that all files have the same version.
+if (Test-Path $python) {
+    Write-Step "Copying the Visual C++ runtime"
+    $vcRuntime = @("vcruntime140.dll", "vcruntime140_1.dll", "msvcp140.dll", "msvcp140_1.dll",
+        "msvcp140_2.dll", "msvcp140_atomic_wait.dll", "msvcp140_codecvt_ids.dll", "concrt140.dll",
+        "vcomp140.dll")
+    foreach ($dll in $vcRuntime) {
+        $source = Join-Path $env:SystemRoot "System32\$dll"
+        if (-not (Test-Path $source)) {
+            throw "$source is missing, install the latest Microsoft Visual C++ Redistributable (x64)"
+        }
+        Copy-Item -Force $source "$staging\python\"
+    }
+}
+
 # 3. Backend sources
 Write-Step "Copying backend sources"
 if (Test-Path "$staging\backend") { Remove-Item -Recurse -Force "$staging\backend" }

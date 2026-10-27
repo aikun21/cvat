@@ -973,27 +973,38 @@ export function resetCanvas(): AnyAction {
     };
 }
 
+// when the annotation page switches to another job (e.g. from the project tasks drawer),
+// the previous page is unmounted and the next one is mounted at once,
+// the next job is opened only after the previous one is closed and its state is reset
+let closingJob: Promise<void> = Promise.resolve();
+
 export function closeJob(): ThunkAction {
     return async (dispatch: ThunkDispatch, getState): Promise<void> => {
         const state = getState();
         const { instance: canvasInstance } = state.annotation.canvas;
         const { jobInstance, groundTruthInstance } = receiveAnnotationsParameters();
 
-        if (groundTruthInstance) {
-            await groundTruthInstance.close();
-        }
+        closingJob = (async () => {
+            try {
+                if (groundTruthInstance) {
+                    await groundTruthInstance.close();
+                }
 
-        if (jobInstance) {
-            await jobInstance.close();
-        }
+                if (jobInstance) {
+                    await jobInstance.close();
+                }
+            } finally {
+                if (canvasInstance) {
+                    canvasInstance.destroy();
+                }
 
-        if (canvasInstance) {
-            canvasInstance.destroy();
-        }
+                dispatch({
+                    type: AnnotationActionTypes.CLOSE_JOB,
+                });
+            }
+        })();
 
-        dispatch({
-            type: AnnotationActionTypes.CLOSE_JOB,
-        });
+        await closingJob;
     };
 }
 
@@ -1014,6 +1025,8 @@ export function getJobAsync({
 }): ThunkAction {
     return async (dispatch: ThunkDispatch, getState): Promise<void> => {
         try {
+            await closingJob.catch(() => {});
+
             const state = getState();
             const filters = initialFilters;
 

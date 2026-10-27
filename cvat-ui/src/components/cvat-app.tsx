@@ -569,7 +569,14 @@ class CVATApplication extends React.PureComponent<CVATAppProps & RouteComponentP
                                         <Route exact path='/tasks/:tid/consensus' component={ConsensusManagementPage} />
                                         <Route exact path='/tasks/:id/jobs/create' component={CreateJobPage} />
                                         <Route exact path='/tasks/:id/guide' component={AnnotationGuidePage} />
-                                        <Route exact path='/tasks/:tid/jobs/:jid' component={AnnotationPageContainer} />
+                                        <Route
+                                            exact
+                                            path='/tasks/:tid/jobs/:jid'
+                                            // the page is mounted again when another job is opened from it
+                                            render={(routeProps) => (
+                                                <AnnotationPageContainer key={routeProps.match.params.jid} />
+                                            )}
+                                        />
                                         <Route exact path='/tasks/:tid/jobs/:jid/analytics' component={AnalyticsReportPage} />
                                         <Route exact path='/jobs' component={JobsPageComponent} />
                                         <Route exact path='/cloudstorages' component={CloudStoragesPageComponent} />

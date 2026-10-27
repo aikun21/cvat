@@ -1,0 +1,10 @@
+{
+    "Project tasks": "项目任务",
+    "Switch to another task of the project": "切换到项目中的其他任务（会先保存当前更改）",
+    "Search tasks": "搜索任务名称或 ID",
+    "Current": "当前",
+    "{{count}} frames": "{{count}} 帧",
+    "{{completed}} of {{total}} jobs completed": "已完成 {{completed}}/{{total}} 个作业",
+    "No jobs to annotate": "没有可标注的作业",
+    "Could not load the tasks of the project": "无法加载项目任务"
+}

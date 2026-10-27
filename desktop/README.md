@@ -50,6 +50,7 @@ CVAT 视频标注.exe (Electron, desktop/electron/main.js)
 | `cvat/apps/dataset_manager/video_split.py` | 导出时按时长切分视频（导出对话框的“视频分段”，接口参数 `video_split=<秒>`）：每段小视频连同自己的标注放在单独的文件夹里，帧号按段重新从 0 开始 |
 | `create-task-page/video-split-modal.tsx`, `cvat/desktop/video_preview.py` | 批量创建任务时可把视频切成多段，每个勾选的段按 `start_frame`/`stop_frame` 单独建任务，名称为“模板名-段号”；浏览器不能播放的视频（如 MPEG-TS）由本地服务转成 MP4 预览（H.264 只换封装，其他编码转成小尺寸 H.264） |
 | `cvat-core/src/frames.ts`（`config.jobChunkQuality`）, `dataset_manager/bindings.py`（`SourceVideoFrames`）, `formats/cvat.py` | 画质：标注页使用原始质量分块（原分辨率，不再缩到 540p）；导出的帧图片直接从上传的视频解码，与原视频逐像素一致；导出的分段小视频用 CRF 12（视觉无损） |
+| `annotation-page/top-bar/project-tasks-drawer.tsx`, `cvat-app.tsx`, `closeJob()` | 标注界面顶栏“项目任务”：左侧抽屉列出项目全部任务（缩略图、帧数、作业状态，多作业任务可选帧范围），点击后先保存再切换；标注页按作业 ID 重新挂载，新作业等旧作业关闭（释放分块缓存）后才加载 |
 | `cvat-ui/src/utils/environment.ts` | `isDesktop`：构建时 `CVAT_DESKTOP=true`，隐藏云存储、组织、AI 模型、分析、质量控制、共识等入口 |
 
 ## 开发

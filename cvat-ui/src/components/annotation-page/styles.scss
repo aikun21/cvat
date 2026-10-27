@@ -675,3 +675,111 @@
     direction: rtl;
     unicode-bidi: plaintext;
 }
+
+.cvat-project-tasks-drawer {
+    .ant-drawer-body {
+        padding: $grid-unit-size * 2;
+    }
+
+    .cvat-project-tasks-search {
+        margin-bottom: $grid-unit-size * 2;
+    }
+
+    .cvat-project-tasks-spinner {
+        display: block;
+        margin: $grid-unit-size * 4 auto;
+    }
+}
+
+.cvat-project-tasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: $grid-unit-size;
+}
+
+.cvat-project-tasks-item {
+    display: flex;
+    gap: $grid-unit-size * 1.5;
+    padding: $grid-unit-size;
+    border: 1px solid $border-color-1;
+    border-radius: $border-radius-base;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+
+    &:hover {
+        border-color: $border-color-hover;
+    }
+
+    &.cvat-project-tasks-item-current {
+        border-color: $border-color-hover;
+        background-color: #e6f4ff;
+    }
+
+    &.cvat-project-tasks-item-disabled {
+        cursor: default;
+        opacity: 0.6;
+
+        &:hover {
+            border-color: $border-color-1;
+        }
+    }
+
+    .cvat-project-tasks-item-preview-wrapper,
+    .cvat-project-tasks-item-preview-loading,
+    .cvat-project-tasks-item-preview-empty {
+        flex: 0 0 auto;
+        width: $grid-unit-size * 16;
+        height: $grid-unit-size * 9;
+        border-radius: $border-radius-base * 0.5;
+        background-color: $background-color-2;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .cvat-project-tasks-item-preview-empty {
+        font-size: 24px;
+        color: $text-color-secondary;
+    }
+
+    .cvat-project-tasks-item-preview {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .cvat-project-tasks-item-details {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .cvat-project-tasks-item-name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .cvat-project-tasks-item-meta {
+        font-size: 12px;
+    }
+
+    .cvat-project-tasks-item-tags,
+    .cvat-project-tasks-item-jobs {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: $grid-unit-size * 0.5;
+
+        .ant-tag {
+            margin: 0;
+        }
+    }
+
+    .cvat-project-tasks-item-job {
+        cursor: pointer;
+    }
+}

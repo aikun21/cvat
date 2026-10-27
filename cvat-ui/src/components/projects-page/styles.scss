@@ -200,3 +200,17 @@
 .cvat-import-project-button-loading {
     margin-left: 10;
 }
+
+.cvat-import-project-form {
+    display: flex;
+    flex-direction: column;
+    gap: $grid-unit-size;
+
+    .cvat-import-project-format {
+        width: 100%;
+    }
+
+    .ant-upload-drag {
+        margin: $grid-unit-size 0;
+    }
+}

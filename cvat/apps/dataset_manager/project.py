@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: MIT
 
 import io
+import os.path as osp
 from collections.abc import Callable, Mapping
 from contextlib import nullcontext
 from typing import Any
@@ -85,8 +86,9 @@ class ProjectAnnotation:
 
     def add_task(self, task_fields: dict, files: dict, project_data: ProjectData):
         def split_name(file):
-            _, name = file.split(files["data_root"])
-            return name
+            # on Windows the media paths of a dataset can mix "/" and "\"
+            name = osp.relpath(osp.normpath(file), osp.normpath(files["data_root"]))
+            return name.replace(osp.sep, "/")
 
         data_serializer = DataSerializer(
             data={

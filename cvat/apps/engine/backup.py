@@ -7,6 +7,7 @@ import io
 import itertools
 import mimetypes
 import os
+import posixpath
 import re
 import shutil
 from abc import ABCMeta, abstractmethod
@@ -1029,7 +1030,8 @@ class TaskImporter(_ImporterBase, _TaskBackupBase):
             if file_path.endswith("/") or self._subdir and not file_path.startswith(self._subdir):
                 continue
 
-            file_name = os.path.relpath(file_path, self._subdir)
+            # names in zip archives always use "/", also on Windows
+            file_name = posixpath.relpath(file_path, self._subdir)
             if excluded_filenames and file_name in excluded_filenames:
                 continue
 
@@ -1039,14 +1041,14 @@ class TaskImporter(_ImporterBase, _TaskBackupBase):
                 # and the if condition will be false for any path that starts with "..".
                 # But in case the surrounding logic changes, let's treat it as untrusted anyway.
                 target_file = join_untrusted_path(
-                    output_data_path, os.path.relpath(file_name, input_data_dirname)
+                    output_data_path, posixpath.relpath(file_name, input_data_dirname)
                 )
 
                 self._prepare_dirs(target_file)
                 with open(target_file, "wb") as out, input_archive.open(file_path) as source:
                     shutil.copyfileobj(source, out)
 
-                uploaded_files.append(os.path.relpath(file_name, input_data_dirname))
+                uploaded_files.append(posixpath.relpath(file_name, input_data_dirname))
 
         return uploaded_files
 
@@ -1061,7 +1063,7 @@ class TaskImporter(_ImporterBase, _TaskBackupBase):
 
         self._prepare_data_meta(data)
 
-        excluded_input_files = [os.path.join(self.DATA_DIRNAME, self.MEDIA_MANIFEST_INDEX_FILENAME)]
+        excluded_input_files = [posixpath.join(self.DATA_DIRNAME, self.MEDIA_MANIFEST_INDEX_FILENAME)]
 
         job_file_mapping = None
         if data.pop("custom_segments", False):

@@ -10,7 +10,9 @@ import { Row, Col } from 'antd/lib/grid';
 import Button from 'antd/lib/button';
 import Popover from 'antd/lib/popover';
 import Input from 'antd/lib/input';
-import { LoadingOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import {
+    ImportOutlined, LoadingOutlined, PlusOutlined, UploadOutlined,
+} from '@ant-design/icons';
 import { importActions } from 'actions/import-actions';
 import { usePrevious } from 'utils/hooks';
 import { ProjectsQuery } from 'reducers';
@@ -22,7 +24,9 @@ import {
 } from 'components/resource-sorting-filtering';
 
 import dimensions from 'utils/dimensions';
+import { isDesktop } from 'utils/environment';
 import ProjectsCSVExportButton from './projects-csv-export-button';
+import ImportProjectModal from './import-project-modal';
 import {
     localStorageRecentKeyword, localStorageRecentCapacity, predefinedFilterValues, config,
 } from './projects-filter-configuration';
@@ -49,6 +53,8 @@ function TopBarComponent(props: Readonly<Props>): JSX.Element {
         selectedCount, onSelectAll,
     } = props;
     const [visibility, setVisibility] = useState(defaultVisibility);
+    const [importModalOpen, setImportModalOpen] = useState(false);
+    const [createMenuOpen, setCreateMenuOpen] = useState(false);
     const prevImporting = usePrevious(importing);
 
     useEffect(() => {
@@ -106,6 +112,8 @@ function TopBarComponent(props: Readonly<Props>): JSX.Element {
                 <div>
                     <Popover
                         destroyTooltipOnHide
+                        open={createMenuOpen}
+                        onOpenChange={setCreateMenuOpen}
                         trigger={['click']}
                         overlayInnerStyle={{ padding: 0 }}
                         content={(
@@ -128,11 +136,31 @@ function TopBarComponent(props: Readonly<Props>): JSX.Element {
                                 >
                                     {t('Create from backup')}
                                 </Button>
+                                {isDesktop && (
+                                    <Button
+                                        className='cvat-import-annotated-project-button'
+                                        type='primary'
+                                        icon={<ImportOutlined />}
+                                        onClick={() => {
+                                            setCreateMenuOpen(false);
+                                            setImportModalOpen(true);
+                                        }}
+                                    >
+                                        {t('Import annotated data')}
+                                    </Button>
+                                )}
                             </div>
                         )}
                     >
                         <Button type='primary' className='cvat-create-project-dropdown' icon={<PlusOutlined />} />
                     </Popover>
+                    {isDesktop && (
+                        <ImportProjectModal
+                            open={importModalOpen}
+                            onClose={() => setImportModalOpen(false)}
+                            onImported={() => onApplyFilter(query.filter)}
+                        />
+                    )}
                 </div>
             </Col>
         </Row>

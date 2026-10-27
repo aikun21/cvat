@@ -123,6 +123,15 @@ const MESSAGES: Record<string, () => string> = {
     'Downloading input media': () => t('Downloading input media'),
     'Media files are being extracted...': () => t('Media files are being extracted...'),
     'CVAT is preparing data chunks': () => t('CVAT is preparing data chunks'),
+    'Task is being saved in database': () => t('Task is being saved in database'),
+    'Data are being copied from source..': () => t('Data are being copied from source..'),
+    // import of annotated data as a new project (cvat/desktop/project_import.py)
+    'The file is not a zip archive': () => t('The file is not a zip archive'),
+    'Could not upload the archive': () => t('Could not upload the archive'),
+    'The annotation format is not recognized, choose it manually':
+        () => t('The annotation format is not recognized, choose it manually'),
+    'Dataset import has been started...': () => t('Dataset import has been started...'),
+    'Task from dataset is being created...': () => t('Task from dataset is being created...'),
 };
 
 // Translates a known progress message; a known message followed by extra text

@@ -8,6 +8,7 @@ import { NodeIndexOutlined } from '@ant-design/icons';
 import Button from 'antd/lib/button';
 import InputNumber from 'antd/lib/input-number';
 import Popover from 'antd/lib/popover';
+import Switch from 'antd/lib/switch';
 import message from 'antd/lib/message';
 import notification from 'antd/lib/notification';
 import Text from 'antd/lib/typography/Text';
@@ -15,8 +16,8 @@ import Text from 'antd/lib/typography/Text';
 import { getCore } from 'cvat-core-wrapper';
 import { Canvas } from 'cvat-canvas-wrapper';
 import { getCVATStore } from 'cvat-store';
-import { CombinedState } from 'reducers';
-import { fetchAnnotationsAsync } from 'actions/annotation-actions';
+import { CombinedState, NavigationType } from 'reducers';
+import { fetchAnnotationsAsync, setNavigationType } from 'actions/annotation-actions';
 import CVATTooltip from 'components/common/cvat-tooltip';
 import { t } from 'cvat-i18n';
 
@@ -37,6 +38,7 @@ function TrackKeyframesControl(): JSX.Element | null {
     const dispatch = useDispatch();
     const job = useSelector((state: CombinedState) => state.annotation.job.instance);
     const frameNumber = useSelector((state: CombinedState) => state.annotation.player.frame.number);
+    const navigationType = useSelector((state: CombinedState) => state.annotation.player.navigationType);
     const [open, setOpen] = useState(false);
     const [seconds, setSeconds] = useState<number>(1);
     const [running, setRunning] = useState<string | null>(null);
@@ -129,6 +131,17 @@ function TrackKeyframesControl(): JSX.Element | null {
             >
                 {t('Clear keyframes')}
             </Button>
+            <div className='cvat-track-keyframes-control-navigation'>
+                <Switch
+                    size='small'
+                    checked={navigationType === NavigationType.KEYFRAME}
+                    onChange={(checked) => dispatch(setNavigationType(
+                        checked ? NavigationType.KEYFRAME : NavigationType.REGULAR,
+                    ))}
+                    className='cvat-track-keyframes-control-navigation-switch'
+                />
+                <Text>{t('Previous/next frame buttons go to keyframes')}</Text>
+            </div>
             <Text type='secondary' className='cvat-track-keyframes-control-hint'>
                 {t('Keyframes are inserted into all tracks on the same frames, at the interpolated positions. Clearing removes the keyframes that do not change the tracks: all inserted ones; edited keyframes and keyframes where objects appear or go outside are kept.')}
             </Text>

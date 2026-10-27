@@ -1535,7 +1535,8 @@ export function searchAnnotationsAsync(
     frameFrom: number,
     frameTo: number,
     generalFilters?: {
-        isEmptyFrame: boolean;
+        isEmptyFrame?: boolean;
+        isKeyframe?: boolean;
     },
 ): ThunkAction {
     return async (dispatch: ThunkDispatch, getState): Promise<void> => {

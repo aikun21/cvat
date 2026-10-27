@@ -19,12 +19,14 @@ import {
     NextEmptyIcon,
     NextFilteredIcon,
     NextIcon,
+    NextKeyframeIcon,
     PauseIcon,
     PlayIcon,
     PreviousChapterIcon,
     PreviousEmptyIcon,
     PreviousFilteredIcon,
     PreviousIcon,
+    PreviousKeyframeIcon,
 } from 'icons';
 import { ShortcutScope } from 'utils/enums';
 import { registerComponentShortcuts } from 'actions/shortcuts-actions';
@@ -193,6 +195,8 @@ function PlayerButtons(props: Props): JSX.Element {
     const nextFilteredText = t('Go next with a filter');
     const nextEmptyText = t('Go next to an empty frame');
     const nextChapterText = t('Go to the next chapter');
+    const prevKeyframeText = t('Go back to a track keyframe');
+    const nextKeyframeText = t('Go next to a track keyframe');
 
     let prevButton = <Icon className='cvat-player-previous-button' component={PreviousIcon} onClick={onPrevFrame} />;
     let prevButtonTooltipMessage = prevRegularText;
@@ -215,6 +219,15 @@ function PlayerButtons(props: Props): JSX.Element {
             <Icon className='cvat-player-previous-button-chapter' component={PreviousChapterIcon} onClick={onPrevFrame} />
         );
         prevButtonTooltipMessage = prevChapterText;
+    } else if (navigationType === NavigationType.KEYFRAME) {
+        prevButton = (
+            <Icon
+                className='cvat-player-previous-button-keyframe'
+                component={PreviousKeyframeIcon}
+                onClick={onPrevFrame}
+            />
+        );
+        prevButtonTooltipMessage = prevKeyframeText;
     }
 
     let nextButton = <Icon className='cvat-player-next-button' component={NextIcon} onClick={onNextFrame} />;
@@ -232,6 +245,11 @@ function PlayerButtons(props: Props): JSX.Element {
             <Icon className='cvat-player-next-button-chapter' component={NextChapterIcon} onClick={onNextFrame} />
         );
         nextButtonTooltipMessage = nextChapterText;
+    } else if (navigationType === NavigationType.KEYFRAME) {
+        nextButton = (
+            <Icon className='cvat-player-next-button-keyframe' component={NextKeyframeIcon} onClick={onNextFrame} />
+        );
+        nextButtonTooltipMessage = nextKeyframeText;
     }
 
     const navIconStyle: CSSProperties = workspace === Workspace.SINGLE_SHAPE ? {
@@ -299,6 +317,13 @@ function PlayerButtons(props: Props): JSX.Element {
                                 onClick={() => setNavigationType(NavigationType.CHAPTER)}
                             />
                         </CVATTooltip>
+                        <CVATTooltip title={`${prevKeyframeText}`}>
+                            <Icon
+                                className='cvat-player-previous-keyframe-inlined-button'
+                                component={PreviousKeyframeIcon}
+                                onClick={() => setNavigationType(NavigationType.KEYFRAME)}
+                            />
+                        </CVATTooltip>
                     </>
                 )}
             >
@@ -358,6 +383,13 @@ function PlayerButtons(props: Props): JSX.Element {
                                 className='cvat-player-next-chapter-inlined-button'
                                 component={NextChapterIcon}
                                 onClick={() => setNavigationType(NavigationType.CHAPTER)}
+                            />
+                        </CVATTooltip>
+                        <CVATTooltip title={`${nextKeyframeText}`}>
+                            <Icon
+                                className='cvat-player-next-keyframe-inlined-button'
+                                component={NextKeyframeIcon}
+                                onClick={() => setNavigationType(NavigationType.KEYFRAME)}
                             />
                         </CVATTooltip>
                     </>

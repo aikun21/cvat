@@ -383,8 +383,11 @@ export function implementJob(Job: typeof JobClass): typeof JobClass {
                 throw new ArgumentError('Annotations filters must be an array');
             }
 
-            if ('generalFilters' in searchParameters && typeof searchParameters.generalFilters.isEmptyFrame !== 'boolean') {
-                throw new ArgumentError('General filter isEmptyFrame must be a boolean');
+            if ('generalFilters' in searchParameters &&
+                typeof searchParameters.generalFilters.isEmptyFrame !== 'boolean' &&
+                typeof searchParameters.generalFilters.isKeyframe !== 'boolean'
+            ) {
+                throw new ArgumentError('General filter isEmptyFrame or isKeyframe must be a boolean');
             }
 
             if ('annotationsFilters' in searchParameters && 'generalFilters' in searchParameters) {
@@ -1208,8 +1211,11 @@ export function implementTask(Task: typeof TaskClass): typeof TaskClass {
                 throw new ArgumentError('Annotations filters must be an array');
             }
 
-            if ('generalFilters' in searchParameters && typeof searchParameters.generalFilters.isEmptyFrame !== 'boolean') {
-                throw new ArgumentError('General filter isEmptyFrame must be a boolean');
+            if ('generalFilters' in searchParameters &&
+                typeof searchParameters.generalFilters.isEmptyFrame !== 'boolean' &&
+                typeof searchParameters.generalFilters.isKeyframe !== 'boolean'
+            ) {
+                throw new ArgumentError('General filter isEmptyFrame or isKeyframe must be a boolean');
             }
 
             if ('annotationsFilters' in searchParameters && 'generalFilters' in searchParameters) {

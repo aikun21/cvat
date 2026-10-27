@@ -1719,6 +1719,38 @@ export default class Collection {
         return null;
     }
 
+    // the same frames as exporting only keyframes: keyframes of all tracks and their elements, except outside ones
+    private _searchKeyframe(
+        frameFrom: number,
+        frameTo: number,
+        searchParameters: {
+            allowDeletedFrames: boolean;
+        },
+    ): number | null {
+        const { allowDeletedFrames } = searchParameters;
+        const [min, max] = frameFrom <= frameTo ? [frameFrom, frameTo] : [frameTo, frameFrom];
+        const frames = new Set<number>();
+        const addTrack = (track: Track): void => {
+            for (const [key, shape] of Object.entries(track.shapes)) {
+                const frame = +key;
+                if (!shape.outside && frame >= min && frame <= max) {
+                    frames.add(frame);
+                }
+            }
+
+            for (const element of (track as SkeletonTrack).elements ?? []) {
+                addTrack(element as Track);
+            }
+        };
+
+        this.tracks.filter((track) => !track.removed).forEach(addTrack);
+        const candidates = [...frames]
+            .filter((frame) => allowDeletedFrames || !this.injection.framesInfo.isFrameDeleted(frame))
+            .sort((a, b) => (frameFrom <= frameTo ? a - b : b - a));
+
+        return candidates.length ? candidates[0] : null;
+    }
+
     public search(
         frameFrom: number,
         frameTo: number,
@@ -1727,6 +1759,7 @@ export default class Collection {
             annotationsFilters?: object[];
             generalFilters?: {
                 isEmptyFrame?: boolean;
+                isKeyframe?: boolean;
             };
         },
     ): number | null {
@@ -1737,6 +1770,10 @@ export default class Collection {
             // if we are looking for en empty frame, run a dedicated algorithm
             if (searchParameters.generalFilters.isEmptyFrame) {
                 return this._searchEmpty(frameFrom, frameTo, { allowDeletedFrames });
+            }
+
+            if (searchParameters.generalFilters.isKeyframe) {
+                return this._searchKeyframe(frameFrom, frameTo, { allowDeletedFrames });
             }
 
             // not empty frames corresponds to default behaviour of the function with empty annotation filters

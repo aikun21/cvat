@@ -576,7 +576,9 @@
 .cvat-player-previous-empty-inlined-button,
 .cvat-player-next-empty-inlined-button,
 .cvat-player-previous-chapter-inlined-button,
-.cvat-player-next-chapter-inlined-button {
+.cvat-player-next-chapter-inlined-button,
+.cvat-player-previous-keyframe-inlined-button,
+.cvat-player-next-keyframe-inlined-button {
     color: $player-buttons-color;
 
     &:not(:first-child) {
@@ -798,6 +800,12 @@
 
     .cvat-track-keyframes-control-seconds {
         flex: 1;
+    }
+
+    .cvat-track-keyframes-control-navigation {
+        display: flex;
+        align-items: center;
+        gap: $grid-unit-size;
     }
 
     .cvat-track-keyframes-control-hint {

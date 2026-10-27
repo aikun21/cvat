@@ -446,6 +446,7 @@ export class Session {
                 annotationsFilters?: object[];
                 generalFilters?: {
                     isEmptyFrame?: boolean;
+                    isKeyframe?: boolean;
                 };
             },
         ) => Promise<number | null>;

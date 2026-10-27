@@ -875,6 +875,7 @@ export enum NavigationType {
     FILTERED = 'filtered',
     EMPTY = 'empty',
     CHAPTER = 'chapter',
+    KEYFRAME = 'keyframe',
 }
 
 export interface EditingState {

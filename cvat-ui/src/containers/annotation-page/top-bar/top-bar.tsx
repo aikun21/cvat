@@ -101,7 +101,8 @@ interface DispatchToProps {
         frameFrom: number,
         frameTo: number,
         generalFilters?: {
-            isEmptyFrame: boolean;
+            isEmptyFrame?: boolean;
+            isKeyframe?: boolean;
         },
     ): void;
     searchChapters(
@@ -251,7 +252,8 @@ function mapDispatchToProps(dispatch: any): DispatchToProps {
             frameFrom: number,
             frameTo: number,
             generalFilters?: {
-                isEmptyFrame: boolean;
+                isEmptyFrame?: boolean;
+                isKeyframe?: boolean;
             },
         ): void {
             dispatch(searchAnnotationsAsync(sessionInstance, frameFrom, frameTo, generalFilters));
@@ -527,6 +529,8 @@ class AnnotationTopBarContainer extends React.PureComponent<Props> {
                 searchAnnotations(jobInstance, newFrame, startFrame);
             } else if (navigationType === NavigationType.CHAPTER) {
                 searchChapters(jobInstance, newFrame, startFrame);
+            } else if (navigationType === NavigationType.KEYFRAME) {
+                searchAnnotations(jobInstance, newFrame, startFrame, { isKeyframe: true });
             } else {
                 searchAnnotations(jobInstance, newFrame, startFrame, { isEmptyFrame: true });
             }
@@ -557,6 +561,8 @@ class AnnotationTopBarContainer extends React.PureComponent<Props> {
                 searchAnnotations(jobInstance, newFrame, stopFrame);
             } else if (navigationType === NavigationType.CHAPTER) {
                 searchChapters(jobInstance, newFrame, stopFrame);
+            } else if (navigationType === NavigationType.KEYFRAME) {
+                searchAnnotations(jobInstance, newFrame, stopFrame, { isKeyframe: true });
             } else {
                 searchAnnotations(jobInstance, newFrame, stopFrame, { isEmptyFrame: true });
             }

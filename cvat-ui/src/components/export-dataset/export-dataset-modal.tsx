@@ -39,6 +39,7 @@ type FormValues = {
     saveImages: boolean;
     splitVideo: boolean;
     splitSeconds: number;
+    keyframesOnly: boolean;
     customName: string | undefined;
     targetStorage: StorageData;
     useProjectTargetStorage: boolean;
@@ -49,6 +50,7 @@ const initialValues: FormValues = {
     saveImages: false,
     splitVideo: false,
     splitSeconds: 10,
+    keyframesOnly: false,
     customName: undefined,
     targetStorage: {
         location: StorageLocation.LOCAL,
@@ -217,6 +219,9 @@ function ExportDatasetModal(props: Readonly<StateToProps>): JSX.Element {
             const getVideoSplit = (target: ProjectOrTaskOrJob): number | undefined => (
                 values.splitVideo && canSplitVideo(target) ? values.splitSeconds : undefined
             );
+            const getKeyframesOnly = (target: ProjectOrTaskOrJob): boolean | undefined => (
+                values.keyframesOnly && canSplitVideo(target) ? true : undefined
+            );
             if (isBulkMode) {
                 dispatch(makeBulkOperationAsync<ProjectOrTaskOrJob>(
                     selectedInstances,
@@ -238,6 +243,7 @@ function ExportDatasetModal(props: Readonly<StateToProps>): JSX.Element {
                                 }),
                                 exportName,
                                 getVideoSplit(inst),
+                                getKeyframesOnly(inst),
                             ),
                         );
                     },
@@ -271,6 +277,7 @@ function ExportDatasetModal(props: Readonly<StateToProps>): JSX.Element {
                     }) : new Storage(targetStorage),
                     values.customName ? appendExportExtension(values.customName, exportExtension) : undefined,
                     getVideoSplit(instance as ProjectOrTaskOrJob),
+                    getKeyframesOnly(instance as ProjectOrTaskOrJob),
                 ),
             );
             closeModal();
@@ -342,6 +349,19 @@ function ExportDatasetModal(props: Readonly<StateToProps>): JSX.Element {
                     }
                     if ('splitVideo' in changedValues) {
                         setSplitVideo(!!changedValues.splitVideo);
+                        if (changedValues.splitVideo) {
+                            // clips and keyframes are different exports
+                            form.setFieldsValue({ keyframesOnly: false });
+                        }
+                    }
+                    if (changedValues.keyframesOnly) {
+                        // images and annotations of the keyframes, as an image dataset
+                        form.setFieldsValue({ saveImages: true, splitVideo: false });
+                        setSplitVideo(false);
+                        if (form.getFieldValue('selectedFormat') === 'CVAT for video 1.1') {
+                            form.setFieldsValue({ selectedFormat: 'CVAT for images 1.1' });
+                            setSelectedFormat('CVAT for images 1.1');
+                        }
                     }
                 }}
             >
@@ -382,6 +402,27 @@ function ExportDatasetModal(props: Readonly<StateToProps>): JSX.Element {
                         </Form.Item>
                         <Text strong>{tr('Save images')}</Text>
                     </Space>
+                }
+                {
+                    canSplit && (
+                        <div className='cvat-modal-export-keyframes-only'>
+                            <Space>
+                                <Form.Item
+                                    className='cvat-modal-export-switch-use-default-storage'
+                                    name='keyframesOnly'
+                                    valuePropName='checked'
+                                >
+                                    <Switch className='cvat-modal-export-keyframes-only-switch' />
+                                </Form.Item>
+                                <Text strong>{tr('Export only keyframes')}</Text>
+                                <Tooltip
+                                    title={tr('Only the frames with track keyframes are exported: their images (when images are saved) and all annotations on them.')}
+                                >
+                                    <QuestionCircleOutlined />
+                                </Tooltip>
+                            </Space>
+                        </div>
+                    )
                 }
                 {
                     canSplit && (

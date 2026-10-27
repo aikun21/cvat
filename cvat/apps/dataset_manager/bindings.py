@@ -1210,9 +1210,12 @@ class ProjectData(InstanceLabelData):
         task_annotations: Mapping[int, Any] = None,
         *,
         use_server_track_ids: bool = False,
+        included_frames: Mapping[int, set[int]] | None = None,
     ):
         self._annotation_irs = annotation_irs
         self._db_project = db_project
+        # frames to export of each task, all frames when not set
+        self._included_frames = included_frames
         self._task_annotations = task_annotations
         self._host = host
         self._soft_attribute_import = False
@@ -1590,6 +1593,11 @@ class ProjectData(InstanceLabelData):
             create_callback=(
                 self._task_annotations[task_id].create
                 if self._task_annotations is not None
+                else None
+            ),
+            included_frames=(
+                self._included_frames.get(task_id, set())
+                if self._included_frames is not None
                 else None
             ),
         )

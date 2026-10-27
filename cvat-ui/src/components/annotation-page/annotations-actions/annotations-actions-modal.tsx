@@ -251,6 +251,8 @@ function actionLabel(name: string): string {
         'Propagate shapes': t('Propagate shapes'),
         'Simplify polygons and polylines': t('Simplify polygons and polylines'),
         'End tracks on the current frame': t('End tracks on the current frame'),
+        'Insert track keyframes at intervals': t('Insert track keyframes at intervals'),
+        'Remove redundant track keyframes': t('Remove redundant track keyframes'),
     };
     return labels[name] ?? name;
 }
@@ -262,6 +264,7 @@ function parameterLabel(name: string): string {
         'Convert rectangle shapes to tracks': t('Convert rectangle shapes to tracks'),
         'Keyframe tolerance (px)': t('Keyframe tolerance (px)'),
         Distance: t('Distance'),
+        'Interval, seconds': t('Interval, seconds'),
     };
     return labels[name] ?? name;
 }

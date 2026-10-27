@@ -615,9 +615,10 @@ export function implementJob(Job: typeof JobClass): typeof JobClass {
             targetStorage: Parameters<typeof JobClass.prototype.annotations.exportDataset>[3],
             customName?: Parameters<typeof JobClass.prototype.annotations.exportDataset>[4],
             videoSplit?: Parameters<typeof JobClass.prototype.annotations.exportDataset>[5],
+            keyframesOnly?: Parameters<typeof JobClass.prototype.annotations.exportDataset>[6],
         ): ReturnType<typeof JobClass.prototype.annotations.exportDataset> {
             const rqID = await exportDataset(
-                this, format, saveImages, useDefaultSettings, targetStorage, customName, videoSplit,
+                this, format, saveImages, useDefaultSettings, targetStorage, customName, videoSplit, keyframesOnly,
             );
             return rqID;
         },
@@ -1437,9 +1438,10 @@ export function implementTask(Task: typeof TaskClass): typeof TaskClass {
             targetStorage: Parameters<typeof TaskClass.prototype.annotations.exportDataset>[3],
             customName: Parameters<typeof TaskClass.prototype.annotations.exportDataset>[4],
             videoSplit?: Parameters<typeof TaskClass.prototype.annotations.exportDataset>[5],
+            keyframesOnly?: Parameters<typeof TaskClass.prototype.annotations.exportDataset>[6],
         ): ReturnType<typeof TaskClass.prototype.annotations.exportDataset> {
             const rqID = await exportDataset(
-                this, format, saveImages, useDefaultSettings, targetStorage, customName, videoSplit,
+                this, format, saveImages, useDefaultSettings, targetStorage, customName, videoSplit, keyframesOnly,
             );
             return rqID;
         },

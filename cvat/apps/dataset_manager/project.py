@@ -14,7 +14,7 @@ from datumaro.components.errors import DatasetError, DatasetImportError, Dataset
 from django.conf import settings
 from django.db import transaction
 
-from cvat.apps.dataset_manager.task import TaskAnnotation
+from cvat.apps.dataset_manager.task import TaskAnnotation, get_keyframes
 from cvat.apps.dataset_manager.util import TmpDirManager, format_import_exception
 from cvat.apps.engine import models
 from cvat.apps.engine.log import DatasetLogManager
@@ -25,7 +25,13 @@ from cvat.apps.engine.utils import av_scan_paths
 from cvat.utils import django_database as db_utils
 
 from .annotation import AnnotationIR
-from .bindings import CvatDatasetNotFoundError, CvatImportError, ProjectData, load_dataset_data
+from .bindings import (
+    CvatDatasetNotFoundError,
+    CvatExportError,
+    CvatImportError,
+    ProjectData,
+    load_dataset_data,
+)
 
 dlogger = DatasetLogManager()
 
@@ -39,15 +45,35 @@ def export_project(
     server_url: str | None = None,
     save_images: bool = False,
     temp_dir: str | None = None,
+    keyframes_only: bool = False,
 ):
     from .formats.registry import make_exporter
 
     project = ProjectAnnotation(project_id)
-    project.init_from_db(streaming=True)
+    # keyframes are collected from all tracks before the export
+    project.init_from_db(streaming=not keyframes_only)
+
+    included_frames = None
+    if keyframes_only:
+        included_frames = {}
+        for task_id, annotation_ir in project.annotation_irs.items():
+            try:
+                included_frames[task_id] = get_keyframes(annotation_ir)
+            except CvatExportError:
+                included_frames[task_id] = set()
+        if not any(included_frames.values()):
+            raise CvatExportError("There are no track keyframes to export")
 
     exporter = make_exporter(format_name)
     with open(dst_file, "wb") as f:
-        project.export(f, exporter, host=server_url, save_images=save_images, temp_dir=temp_dir)
+        project.export(
+            f,
+            exporter,
+            host=server_url,
+            save_images=save_images,
+            temp_dir=temp_dir,
+            included_frames=included_frames,
+        )
 
 
 class ProjectAnnotation:
@@ -154,10 +180,14 @@ class ProjectAnnotation:
         *,
         host: str = "",
         temp_dir: str | None = None,
+        included_frames: Mapping[int, set[int]] | None = None,
         **options,
     ):
         project_data = ProjectData(
-            annotation_irs=self.annotation_irs, db_project=self.db_project, host=host
+            annotation_irs=self.annotation_irs,
+            db_project=self.db_project,
+            host=host,
+            included_frames=included_frames,
         )
 
         with (

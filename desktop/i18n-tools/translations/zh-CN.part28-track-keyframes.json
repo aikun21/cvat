@@ -1,0 +1,20 @@
+{
+    "Insert track keyframes at intervals": "每隔一段时间插入轨迹关键帧",
+    "Remove redundant track keyframes": "清除不影响轨迹的关键帧",
+    "Interval, seconds": "间隔（秒）",
+    "Track keyframes": "轨迹关键帧",
+    "Keyframes": "关键帧",
+    "Insert a keyframe every few seconds or clear them": "每隔几秒插入一个关键帧，或清除关键帧",
+    "Every": "每隔",
+    "seconds": "秒",
+    "Insert keyframes": "插入关键帧",
+    "Clear keyframes": "清除关键帧",
+    "Keyframes are inserted into all tracks on the same frames, at the interpolated positions. Clearing removes the keyframes that do not change the tracks: all inserted ones; edited keyframes and keyframes where objects appear or go outside are kept.": "在所有轨迹的相同帧上按插值位置插入关键帧。清除时删除不改变轨迹的关键帧：插入的关键帧会全部删除，手动调整过的关键帧以及对象出现、出画处的关键帧会保留。",
+    "There are no frames to insert keyframes": "没有需要插入关键帧的帧",
+    "There are no keyframes to remove": "没有可以清除的关键帧",
+    "Inserted {{keyframes}} keyframes into {{tracks}} tracks, press Ctrl+Z to undo": "已在 {{tracks}} 条轨迹中插入 {{keyframes}} 个关键帧，按 Ctrl+Z 可撤销",
+    "Removed {{keyframes}} keyframes from {{tracks}} tracks, press Ctrl+Z to undo": "已从 {{tracks}} 条轨迹中清除 {{keyframes}} 个关键帧，按 Ctrl+Z 可撤销",
+    "Could not update the keyframes": "关键帧更新失败",
+    "Export only keyframes": "只导出关键帧",
+    "Only the frames with track keyframes are exported: their images (when images are saved) and all annotations on them.": "只导出有轨迹关键帧的帧：这些帧的图片（保存图片时）以及帧上的全部标注。"
+}

@@ -327,6 +327,7 @@ class ExportCacheManager:
         save_images: bool,
         format_name: str,
         video_split: int | None = None,
+        keyframes_only: bool = False,
     ) -> str:
         from .formats.registry import EXPORT_FORMATS
 
@@ -339,6 +340,8 @@ class ExportCacheManager:
         if video_split:
             # exports with different clip durations are different files
             normalized_format_name += f"_split{video_split}s"
+        if keyframes_only:
+            normalized_format_name += "_keyframes"
         filename = cls.FILE_NAME_TEMPLATE_WITH_INSTANCE.format(
             instance_type=instance_type,
             instance_id=instance_id,

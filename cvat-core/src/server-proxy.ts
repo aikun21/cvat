@@ -1041,6 +1041,7 @@ function exportDataset(instanceType: 'projects' | 'jobs' | 'tasks') {
         targetStorage: Storage,
         name?: string,
         videoSplit?: number,
+        keyframesOnly?: boolean,
     ) {
         const { backendAPI } = config;
         const baseURL = `${backendAPI}/${instanceType}/${id}/dataset/export`;
@@ -1049,6 +1050,7 @@ function exportDataset(instanceType: 'projects' | 'jobs' | 'tasks') {
             ...configureStorage(targetStorage, useDefaultSettings),
             ...(name ? { filename: name } : {}),
             ...(videoSplit ? { video_split: videoSplit } : {}),
+            ...(keyframesOnly ? { keyframes_only: true } : {}),
             format,
             save_images: saveImages,
         };

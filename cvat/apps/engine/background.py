@@ -272,6 +272,7 @@ class DatasetExporter(BaseResourceExporter):
         format: str
         save_images: bool
         video_split: int | None = None  # clip duration in seconds
+        keyframes_only: bool = False  # only the frames with track keyframes
 
     def init_request_args(self) -> None:
         super().init_request_args()
@@ -292,6 +293,8 @@ class DatasetExporter(BaseResourceExporter):
             format=format_name,
             save_images=save_images,
             video_split=video_split,
+            keyframes_only=self.request.query_params.get("keyframes_only", "").lower()
+            in ("1", "true"),
         )
 
     def validate_request(self):
@@ -307,6 +310,18 @@ class DatasetExporter(BaseResourceExporter):
 
         if self.export_args.video_split is not None:
             self._validate_video_split(format_desc)
+
+        if self.export_args.keyframes_only:
+            self._validate_keyframes_only(format_desc)
+
+    def _validate_keyframes_only(self, format_desc) -> None:
+        if self.export_args.video_split is not None:
+            raise serializers.ValidationError(
+                "Keyframes cannot be exported together with video splitting"
+            )
+
+        if format_desc.DIMENSION != DimensionType.DIM_2D:
+            raise serializers.ValidationError("Keyframe export is not supported for this format")
 
     def _validate_video_split(self, format_desc) -> None:
         if not MIN_SPLIT_SECONDS <= self.export_args.video_split <= MAX_SPLIT_SECONDS:
@@ -340,6 +355,7 @@ class DatasetExporter(BaseResourceExporter):
             ),
             format=self.export_args.format,
             video_split=self.export_args.video_split,
+            keyframes=self.export_args.keyframes_only or None,
         ).render()
 
     def validate_request_id(self, request_id, /) -> None:
@@ -370,6 +386,8 @@ class DatasetExporter(BaseResourceExporter):
         }
         if self.export_args.video_split is not None:
             self.callback_kwargs["video_split"] = self.export_args.video_split
+        if self.export_args.keyframes_only:
+            self.callback_kwargs["keyframes_only"] = True
 
     def finalize_request(self):
         handle_dataset_export(
@@ -397,6 +415,9 @@ class DatasetExporter(BaseResourceExporter):
             if self.export_args.video_split is not None:
                 name, ext = osp.splitext(filename)
                 filename = f"{name}_split_{self.export_args.video_split}s{ext}"
+            if self.export_args.keyframes_only:
+                name, ext = osp.splitext(filename)
+                filename = f"{name}_keyframes{ext}"
 
         return filename
 

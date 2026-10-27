@@ -17,6 +17,7 @@ import { RemoveFilteredShapes } from './remove-filtered-shapes';
 import { PropagateShapes } from './propagate-shapes';
 import { PolySimplify } from './poly-simplify';
 import { EndTracks } from './end-tracks';
+import { InsertTrackKeyframes, RemoveRedundantTrackKeyframes } from './track-keyframes';
 
 const registeredActions: BaseAction[] = [];
 
@@ -50,6 +51,8 @@ registerAction(new RemoveFilteredShapes());
 registerAction(new PropagateShapes());
 registerAction(new PolySimplify());
 registerAction(new EndTracks());
+registerAction(new InsertTrackKeyframes());
+registerAction(new RemoveRedundantTrackKeyframes());
 
 export async function runAction(
     instance: Job | Task,

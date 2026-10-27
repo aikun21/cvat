@@ -20,6 +20,7 @@ from rest_framework.exceptions import ValidationError
 from cvat.apps.dataset_manager.annotation import AnnotationIR, AnnotationManager
 from cvat.apps.dataset_manager.bindings import (
     CvatDatasetNotFoundError,
+    CvatExportError,
     CvatImportError,
     JobData,
     TaskData,
@@ -966,12 +967,14 @@ class JobAnnotation:
         *,
         host: str = "",
         temp_dir: str | None = None,
+        included_frames: set[int] | None = None,
         **options,
     ):
         job_data = JobData(
             annotation_ir=self.ir_data,
             db_job=self.db_job,
             host=host,
+            included_frames=included_frames,
         )
 
         with (
@@ -1209,12 +1212,14 @@ class TaskAnnotation:
         *,
         host: str = "",
         temp_dir: str | None = None,
+        included_frames: set[int] | None = None,
         **options,
     ):
         task_data = TaskData(
             annotation_ir=self.ir_data,
             db_task=self.db_task,
             host=host,
+            included_frames=included_frames,
         )
 
         with (
@@ -1320,15 +1325,46 @@ def export_job(
     server_url: str | None = None,
     save_images=False,
     temp_dir: str | None = None,
+    keyframes_only: bool = False,
 ):
     from cvat.apps.dataset_manager.formats.registry import make_exporter
 
     job = JobAnnotation(job_id, prefetch_images=True)
-    job.init_from_db(streaming=True)
+    # keyframes are collected from all tracks before the export
+    job.init_from_db(streaming=not keyframes_only)
 
     exporter = make_exporter(format_name)
     with open(dst_file, "wb") as f:
-        job.export(f, exporter, host=server_url, save_images=save_images, temp_dir=temp_dir)
+        job.export(
+            f,
+            exporter,
+            host=server_url,
+            save_images=save_images,
+            temp_dir=temp_dir,
+            included_frames=get_keyframes(job.ir_data) if keyframes_only else None,
+        )
+
+
+def get_keyframes(annotation_ir: AnnotationIR) -> set[int]:
+    """
+    Frames with track keyframes where the objects are visible.
+    Exporting only these frames gives the images and annotations of the keyframes.
+    """
+
+    frames = set()
+
+    def add_track(track: dict) -> None:
+        frames.update(shape["frame"] for shape in track["shapes"] if not shape["outside"])
+        for element in track.get("elements", []):
+            add_track(element)
+
+    for track in annotation_ir.tracks:
+        add_track(track)
+
+    if not frames:
+        raise CvatExportError("There are no track keyframes to export")
+
+    return frames
 
 
 @silk_profile(name="GET task data")
@@ -1379,15 +1415,24 @@ def export_task(
     server_url: str | None = None,
     save_images: bool = False,
     temp_dir: str | None = None,
+    keyframes_only: bool = False,
 ):
     from cvat.apps.dataset_manager.formats.registry import make_exporter
 
     task = TaskAnnotation(task_id)
-    task.init_from_db(streaming=True)
+    # keyframes are collected from all tracks before the export
+    task.init_from_db(streaming=not keyframes_only)
 
     exporter = make_exporter(format_name)
     with open(dst_file, "wb") as f:
-        task.export(f, exporter, host=server_url, save_images=save_images, temp_dir=temp_dir)
+        task.export(
+            f,
+            exporter,
+            host=server_url,
+            save_images=save_images,
+            temp_dir=temp_dir,
+            included_frames=get_keyframes(task.ir_data) if keyframes_only else None,
+        )
 
 
 @transaction.atomic

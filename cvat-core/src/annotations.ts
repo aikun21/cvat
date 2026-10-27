@@ -198,6 +198,7 @@ export async function exportDataset(
     targetStorage: Storage,
     name?: string,
     videoSplit?: number,
+    keyframesOnly?: boolean,
 ): Promise<string | void> {
     if (!(instance instanceof Task || instance instanceof Project || instance instanceof Job)) {
         throw new ArgumentError('A dataset can only be created from a job, task or project');
@@ -206,13 +207,19 @@ export async function exportDataset(
     let result = null;
     if (instance instanceof Task) {
         result = await serverProxy.tasks
-            .exportDataset(instance.id, format, saveImages, useDefaultSettings, targetStorage, name, videoSplit);
+            .exportDataset(
+                instance.id, format, saveImages, useDefaultSettings, targetStorage, name, videoSplit, keyframesOnly,
+            );
     } else if (instance instanceof Job) {
         result = await serverProxy.jobs
-            .exportDataset(instance.id, format, saveImages, useDefaultSettings, targetStorage, name, videoSplit);
+            .exportDataset(
+                instance.id, format, saveImages, useDefaultSettings, targetStorage, name, videoSplit, keyframesOnly,
+            );
     } else {
         result = await serverProxy.projects
-            .exportDataset(instance.id, format, saveImages, useDefaultSettings, targetStorage, name, videoSplit);
+            .exportDataset(
+                instance.id, format, saveImages, useDefaultSettings, targetStorage, name, videoSplit, keyframesOnly,
+            );
     }
 
     return result;

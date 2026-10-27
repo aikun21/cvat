@@ -131,6 +131,7 @@ def export(
     server_url: str | None = None,
     save_images: bool = False,
     video_split: int | None = None,
+    keyframes_only: bool = False,
 ):
     if task_id is not None:
         logger = slogger.task[task_id]
@@ -167,6 +168,7 @@ def export(
             save_images=save_images,
             format_name=dst_format,
             video_split=video_split,
+            keyframes_only=keyframes_only,
         )
 
         # acquire a lock 2 times instead of using one long lock:
@@ -206,6 +208,7 @@ def export(
                     server_url=server_url,
                     save_images=save_images,
                     temp_dir=temp_subdir,
+                    keyframes_only=keyframes_only,
                 )
 
             with get_export_cache_lock(

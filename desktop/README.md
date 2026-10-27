@@ -53,6 +53,8 @@ CVAT 视频标注.exe (Electron, desktop/electron/main.js)
 | `annotation-page/top-bar/project-tasks-drawer.tsx`, `cvat-app.tsx`, `closeJob()` | 标注界面顶栏“项目任务”：左侧抽屉列出项目全部任务（缩略图、帧数、作业状态，多作业任务可选帧范围），点击后先保存再切换；标注页按作业 ID 重新挂载，新作业等旧作业关闭（释放分块缓存）后才加载 |
 | `cvat/desktop/project_import.py`, `projects-page/import-project-modal.tsx` | 项目页“+”菜单的“导入标注数据”：从 zip 新建项目。项目备份原样恢复；含视频的压缩包每个视频建一个视频任务，导入同目录（或同名）的标注文件（本应用的视频分段导出、视频 + CVAT/MOT 等标注）；只有图片时按 CVAT 的项目数据集导入建图片任务；缺少的标签和属性自动创建。格式可自动识别（分段导出的 `segments.json`、CVAT XML、MOT、COCO、YOLO、VOC、Datumaro），在 `import` 队列中运行，失败时删除已建的项目 |
 | `cvat/apps/engine/backup.py`, `cvat/apps/dataset_manager/project.py` | Windows 路径修复：恢复备份时 zip 内路径按 `/` 处理（原来 `os.path.relpath` 得到 `\`，视频不会被复制，报 “No media data found”）；项目导入图片数据集时媒体路径混用 `/` 和 `\` 也能拆出相对路径 |
+| `cvat-core/src/annotations-actions/track-keyframes.ts`, `top-bar/track-keyframes-control.tsx` | 视频标注页顶栏“关键帧”：每隔 N 秒给所有轨迹插入关键帧（按 `data/meta` 的 `fps` 换算成帧，统一放在帧号为间隔整数倍的帧上，取当前插值位置，出画的帧不插），或清除不改变轨迹的关键帧（与前后关键帧插值结果相同、属性/遮挡/层级不变的关键帧；插入的关键帧会全部删除，编辑过的、起始和出画/再出现处的保留）。两个操作也在“运行操作”里，可撤销 |
+| `export-dataset-modal.tsx`, `dataset_manager/task.py`（`get_keyframes`） | 导出对话框“只导出关键帧”（接口参数 `keyframes_only=true`）：只导出有轨迹关键帧（非出画）的帧，包括这些帧的图片和帧上的全部标注；任务、作业、项目都可用，打开时自动保存图像、改用 CVAT for images 格式，不能与视频分段同时使用 |
 | `cvat-ui/src/utils/environment.ts` | `isDesktop`：构建时 `CVAT_DESKTOP=true`，隐藏云存储、组织、AI 模型、分析、质量控制、共识等入口 |
 
 ## 开发

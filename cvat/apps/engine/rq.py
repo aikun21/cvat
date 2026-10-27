@@ -403,6 +403,10 @@ class RequestIdWithOptionalVideoSplit(RequestId):
     video_split: int | None = attrs.field(
         converter=lambda x: x if x is None else int(x), default=None
     )
+    # only the frames with track keyframes are exported
+    keyframes: bool | None = attrs.field(
+        converter=lambda x: x if x is None else bool(x), default=None
+    )
 
 
 @attrs.frozen(kw_only=True, slots=False)

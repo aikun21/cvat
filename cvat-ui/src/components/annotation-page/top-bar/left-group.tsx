@@ -23,6 +23,7 @@ import { finishDrawAvailable } from 'utils/drawing';
 import SaveAnnotationsButton from './save-annotations-button';
 import BackToProjectButton from './back-to-project-button';
 import ProjectTasksDrawer from './project-tasks-drawer';
+import TrackKeyframesControl from './track-keyframes-control';
 import { t } from 'cvat-i18n';
 
 interface Props {
@@ -147,6 +148,7 @@ function LeftGroup(props: Props): JSX.Element {
                 </CVATTooltip>
                 <BackToProjectButton />
                 <ProjectTasksDrawer />
+                <TrackKeyframesControl />
                 {includesDoneButton ? (
                     <CVATTooltip overlay={t('Press "{{drawShortcut}}" to finish', { drawShortcut })}>
                         <Button type='link' className='cvat-annotation-header-done-button cvat-annotation-header-button' onClick={onFinishDraw}>

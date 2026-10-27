@@ -38,6 +38,7 @@ export default class Project {
             targetStorage: Storage,
             name?: string,
             videoSplit?: number,
+            keyframesOnly?: boolean,
         ) => Promise<string | void>;
         importDataset: (
             format: string,
@@ -255,6 +256,7 @@ Object.defineProperties(
                     targetStorage: Parameters<typeof Project.prototype.annotations.exportDataset>[3],
                     customName: Parameters<typeof Project.prototype.annotations.exportDataset>[4],
                     videoSplit?: Parameters<typeof Project.prototype.annotations.exportDataset>[5],
+                    keyframesOnly?: Parameters<typeof Project.prototype.annotations.exportDataset>[6],
                 ) {
                     const result = await PluginRegistry.apiWrapper.call(
                         this,
@@ -265,6 +267,7 @@ Object.defineProperties(
                         targetStorage,
                         customName,
                         videoSplit,
+                        keyframesOnly,
                     );
                     return result;
                 },

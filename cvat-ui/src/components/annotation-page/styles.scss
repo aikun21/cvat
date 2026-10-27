@@ -783,3 +783,24 @@
         cursor: pointer;
     }
 }
+
+.cvat-track-keyframes-control-content {
+    display: flex;
+    flex-direction: column;
+    gap: $grid-unit-size;
+    width: $grid-unit-size * 32;
+
+    .cvat-track-keyframes-control-interval {
+        display: flex;
+        align-items: center;
+        gap: $grid-unit-size;
+    }
+
+    .cvat-track-keyframes-control-seconds {
+        flex: 1;
+    }
+
+    .cvat-track-keyframes-control-hint {
+        font-size: 12px;
+    }
+}

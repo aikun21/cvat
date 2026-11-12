@@ -1,7 +1,7 @@
 {
   "name": "cvat-desktop",
   "productName": "CVATDesktop",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "CVAT video annotation as a local desktop app (Chinese UI)",
   "main": "main.js",
   "license": "MIT",

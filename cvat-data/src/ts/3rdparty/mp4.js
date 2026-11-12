@@ -456,6 +456,10 @@ var MP4Reader = (function reader() {
           var count = stream.readU32();
           if (box.sampleSize == 0) {
             box.table = stream.readU32Array(count);
+          } else {
+            // all samples have the same size, so the box has no table (e.g. a chunk with a single
+            // frame); the table is still needed to count samples and to compute their offsets
+            box.table = new Uint32Array(count).fill(box.sampleSize);
           }
           break;
         case 'stco':

@@ -13,11 +13,14 @@ import {
     SettingsState, GridColor, FrameSpeed, ColorBy,
 } from 'reducers';
 
+// the fill of a selected shape hides the video under it, so every opened job starts without it
+const MIN_SELECTED_OPACITY = 0;
+
 const defaultState: SettingsState = {
     shapes: {
         colorBy: ColorBy.LABEL,
         opacity: 3,
-        selectedOpacity: 30,
+        selectedOpacity: MIN_SELECTED_OPACITY,
         outlined: false,
         outlineColor: '#000000',
         showBitmap: false,
@@ -498,6 +501,7 @@ export default (state = defaultState, action: AnyAction): SettingsState => {
                 shapes: {
                     ...state.shapes,
                     showGroundTruth: false,
+                    selectedOpacity: MIN_SELECTED_OPACITY,
                 },
             };
         }
